@@ -162,7 +162,8 @@ namespace XMMTwrapper1
 
                 this.Activate();
 
-                // 2. The Logic:
+                // 2. The Logic: F8 clears the callsign box only if the app was already active
+                //                  otherwise first click just focuses the box without clearing
                 // ONLY clear if the app was already in front AND the box was already active
                 if (appWasAlreadyActive && this.ActiveControl == tbCallsign)
                 {
@@ -179,21 +180,6 @@ namespace XMMTwrapper1
             base.WndProc(ref m);
         }
 
-        /*
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == WM_HOTKEY && m.WParam.ToInt32() == MY_HOTKEY_ID)
-            {
-                //force window to show and gain focus for KB input
-                this.WindowState = FormWindowState.Normal; // Un-minimize if needed
-                this.Activate();                           // Give it focus       
-                this.Focus();                           // Target the keyboard focus
-                tbCallsign.Focus();
-            }
-            base.WndProc(ref m);
-        }
-        */
-
         private void Form1_Load(object sender, EventArgs e)
         {
             BuildMmttyButtons();
@@ -204,7 +190,47 @@ namespace XMMTwrapper1
             this.Height = TextToInt(_ini.GetValue("General", "Height", "572"));
             this.Width = TextToInt(_ini.GetValue("General", "Width", "820"));
 
+            string mode = _ini.GetValue("General", "Mode", "CW");
+            if (mode == "CW")
+                btnCW.Checked = true;
+            else
+                btnRTTY.Checked = true;
+
             InitQsoLogger();
+        }
+
+        private void Form1_Shown(object? sender, EventArgs e)
+        {
+            Log.Mark("Form1_Shown entered");
+            Log.LogThreadDetails("Form1_Shown");
+
+            //XmmrRawEventHook event message callbacks
+            if (_hook != null)      //should not be set already here
+            {
+                Log.Mark("Form1_Shown _hook not null");
+                return;
+            }
+            else
+            {
+                _hook = new XmmrRawEventHook(axXMMR1);
+                _hook.OnNotifyFftRaw += OnNotifyFftRaw;
+                _hook.OnNotifyGetXY += OnNotifyGetXY;
+                _hook.OnNotifyNMMR += OnNotifyNMMR;
+                _hook.AcceptFft = false;                    // ignore early noise
+                _hook.Advise();
+            }
+
+            //setup button group defaults
+            _MmttyButtons.ApplyMmttyBtnSetup();
+
+            //start MMTTY app in background
+            StartMmttyEngine();
+
+            SelectMode();           //init mode UI
+            UpdateButtonMacros();   //init Send button macros & labels
+
+            //diagnostic to explore ocx interface
+            //DumpSpecDrawSignature();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -217,6 +243,7 @@ namespace XMMTwrapper1
                 _ini.SetValue("General", "Height", $"{this.Height}");
             }
             _ini.SetValue("FixedSubs", "myPower", tbPwr.Text);
+            _ini.SetValue("General", "Mode", btnCW.Checked ? "CW" : "RTTY");
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
@@ -270,39 +297,6 @@ namespace XMMTwrapper1
             lock (_nmmrLock) return _currentNmmr;
         }
 
-        private void Form1_Shown(object? sender, EventArgs e)
-        {
-            Log.Mark("Form1_Shown entered");
-            Log.LogThreadDetails("Form1_Shown");
-
-            //XmmrRawEventHook event message callbacks
-            if (_hook != null)      //should not be set already here
-            {
-                Log.Mark("Form1_Shown _hook not null");
-                return;
-            }
-            else
-            {
-                _hook = new XmmrRawEventHook(axXMMR1);
-                _hook.OnNotifyFftRaw += OnNotifyFftRaw;
-                _hook.OnNotifyGetXY += OnNotifyGetXY;
-                _hook.OnNotifyNMMR += OnNotifyNMMR;
-                _hook.AcceptFft = false;                    // ignore early noise
-                _hook.Advise();
-            }
-
-            //setup button group defaults
-            _MmttyButtons.ApplyMmttyBtnSetup();
-
-            //start MMTTY app in background
-            StartMmttyEngine();
-
-            SelectMode();           //init mode UI
-            UpdateButtonMacros();   //init Send button macros & labels
-
-            //diagnostic to explore ocx interface
-            //DumpSpecDrawSignature();
-        }
 
         void StartMmttyEngine()
         {
@@ -356,7 +350,11 @@ namespace XMMTwrapper1
                 // Map the incoming array memory to a managed structure snapshot
                 Nmmr nmmr = Marshal.PtrToStructure<Nmmr>(pNMMR);
                 //modify it
-                if (btnCW.Checked) nmmr.SigLevel = (uint)SignalStrength;       //replace MMRRTY level with CW engine
+                if (btnCW.Checked)
+                {
+                    nmmr.SigLevel = (uint)SignalStrength;          //replace MMRRTY level with CW engine
+                    SendSquelchFromXMMLevel((int) nmmr.SqLevel);   //send squelch level to CW engine
+                }
                 // Copy the modified managed structure BACK into the unmanaged buffer
                 Marshal.StructureToPtr(nmmr, pNMMR, false);
 
@@ -889,5 +887,6 @@ namespace XMMTwrapper1
         {
             _QSOlogger.OpenLogDirectory();
         }
+
     }
 }

@@ -532,7 +532,7 @@ namespace XMMTwrapper1
             // setupEngineToolStripMenuItem
             // 
             setupEngineToolStripMenuItem.Name = "setupEngineToolStripMenuItem";
-            setupEngineToolStripMenuItem.Size = new Size(180, 22);
+            setupEngineToolStripMenuItem.Size = new Size(171, 22);
             setupEngineToolStripMenuItem.Text = "RTTY Setup Engine";
             setupEngineToolStripMenuItem.Click += setupEngineToolStripMenuItem_Click;
             // 
@@ -552,14 +552,14 @@ namespace XMMTwrapper1
             // exportCabrilloToolStripMenuItem
             // 
             exportCabrilloToolStripMenuItem.Name = "exportCabrilloToolStripMenuItem";
-            exportCabrilloToolStripMenuItem.Size = new Size(180, 22);
+            exportCabrilloToolStripMenuItem.Size = new Size(173, 22);
             exportCabrilloToolStripMenuItem.Text = "Export Cabrillo";
             exportCabrilloToolStripMenuItem.Click += exportCabrilloToolStripMenuItem_Click;
             // 
             // openLogDirectoryToolStripMenuItem
             // 
             openLogDirectoryToolStripMenuItem.Name = "openLogDirectoryToolStripMenuItem";
-            openLogDirectoryToolStripMenuItem.Size = new Size(180, 22);
+            openLogDirectoryToolStripMenuItem.Size = new Size(173, 22);
             openLogDirectoryToolStripMenuItem.Text = "Open log directory";
             openLogDirectoryToolStripMenuItem.Click += openLogDirectoryToolStripMenuItem_Click;
             // 
@@ -1034,11 +1034,13 @@ namespace XMMTwrapper1
             Controls.Add(gbCWcontrols);
             Controls.Add(lblDUPE);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            KeyPreview = true;
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "RTTY/CW Controller";
             FormClosing += Form1_FormClosing;
             Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).EndInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).EndInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).EndInit();

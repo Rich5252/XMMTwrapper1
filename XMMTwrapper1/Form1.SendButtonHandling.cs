@@ -141,7 +141,40 @@ namespace XMMTwrapper1
                 return $"{"RTTY"}_{strCurrentSendButtonMode}";
             }
         }
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.F1:
+                    btnSend1.PerformClick();    // Simulates a physical mouse click
+                    e.Handled = true;           // Prevents Windows from doing anything else with F1
+                    break;
 
+                case Keys.F2:
+                    btnSend2.PerformClick();
+                    e.Handled = true;
+                    break;
 
+                case Keys.F3:
+                    btnSend3.PerformClick();
+                    e.Handled = true;
+                    break;
+
+                case Keys.F4:
+                    btnSend4.PerformClick();
+                    e.Handled = true;
+                    break;
+
+                case Keys.F5:
+                    btnSend5.PerformClick();
+                    e.Handled = true;
+                    break;
+
+                case Keys.F6:
+                    btnSend6.PerformClick();
+                    e.Handled = true;
+                    break;
+            }
+        }
     }
 }
