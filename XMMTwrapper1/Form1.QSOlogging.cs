@@ -68,7 +68,7 @@ namespace XMMTwrapper1
                     SaveFileDialog sfd = new SaveFileDialog { Filter = "Cabrillo Log|*.cbr" };
                     if (sfd.ShowDialog() == DialogResult.OK)
                     {
-                        _QSOlogger.ExportToCabrillo(sfd.FileName, headerForm.HeaderData);
+                        headerForm.ExportToCabrillo(sfd.FileName, headerForm.HeaderData, _QSOlogger._loggedEntries);
                         MessageBox.Show("Cabrillo log created successfully!");
                     }
                 }

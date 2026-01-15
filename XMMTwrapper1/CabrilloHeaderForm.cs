@@ -25,6 +25,8 @@ SOAPBOX:                Any comments about the contest (multiple lines allowed).
 */
 
 
+using System.Text;
+
 namespace XMMTwrapper1
 {
     public partial class CabrilloHeaderForm : Form
@@ -79,6 +81,89 @@ namespace XMMTwrapper1
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        public void ExportToCabrillo(string fileName, CabrilloHeader header, List<QsoEntry> _loggedEntries)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // 1. Header (Standard Cabrillo v3.0)
+            sb.AppendLine("START-OF-LOG: 3.0");
+            sb.AppendLine($"CONTEST: {header.Contest}");
+            sb.AppendLine($"CALLSIGN: {header.Callsign}");
+            sb.AppendLine($"OPERATORS: {header.Operators}");
+            sb.AppendLine($"CATEGORY-OPERATOR: {header.CategoryOp}");
+            sb.AppendLine($"CATEGORY-TRANSMITTER: {header.CategoryTx}");
+            sb.AppendLine($"CATEGORY-STATION: {header.CategoryStation}");
+            sb.AppendLine($"CATEGORY-MODE: {header.CategoryMode}");
+            sb.AppendLine($"CATEGORY-POWER: {header.CategoryPower}");
+            sb.AppendLine($"LOCATION: {header.Location}");
+            sb.AppendLine($"CLUB: {header.Club}");
+            sb.AppendLine($"LOCATOR: {header.Locator}");
+            sb.AppendLine($"NAME: {header.FullName}");
+
+            // Split by pipe and add a line for each segment
+            foreach (var line in header.Address.Split('|'))
+            {
+                sb.AppendLine($"ADDRESS: {line.Trim()}");
+            }
+
+            sb.AppendLine($"CLAMED-SCORE: {header.ClaimedScore}");
+
+            if (!string.IsNullOrWhiteSpace(header.Soapbox))
+            {
+                // Split by the standard Windows NewLine (\r\n) from multiline textbox
+                string[] lines = header.Soapbox.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string line in lines)
+                {
+                    // Cabrillo spec prefers lines under 75 chars
+                    sb.AppendLine($"SOAPBOX: {line.Trim()}");
+                }
+            }
+
+            sb.AppendLine("CREATED-BY: MyG4AHNLogger v1.0");
+            sb.AppendLine("<EOH>");
+            sb.AppendLine("");
+            sb.AppendLine("");
+            // 2. QSO Data - Column alignment is critical here
+            // Format: FREQ MOD DATE       TIME  SENT-CALL SENT-RST SENT-NUM  RCVD-CALL RCVD-RST RCVD-NUM
+            foreach (var qso in _loggedEntries)
+            {
+                // Split "599 001" into parts
+                string[] rstSentParts = qso.RstSent.Split(' ');
+                string myRst = rstSentParts.Length > 0 ? rstSentParts[0] : "599";
+                string mySerial = rstSentParts.Length > 1 ? rstSentParts[1] : "001";
+
+                string[] rstRecParts = qso.RstRcvd.Split(' ');
+                string dxRst = rstRecParts.Length > 0 ? rstRecParts[0] : "599";
+                string dxSerial = rstRecParts.Length > 1 ? rstRecParts[1] : "001";
+
+                string mode = qso.Mode;
+                if (mode == "RTTY") mode = "RY";
+
+                // Build the line with separate columns
+                // The widths below are standard for most HF contests
+                string line = string.Format("QSO: {0} {1} {2} {3} {4} {5} {6} {7} {8} {9}",
+                    qso.FrequencyMHz.Replace(".", "").PadLeft(5), // Freq
+                    mode,                                         // Mode (e.g., RTTY)
+                    qso.Date,                                     // Date
+                    qso.Time,                                     // Time
+                    header.Callsign.PadRight(13),                // Sent Call
+                    myRst.PadRight(3),                           // Sent RST
+                    mySerial.PadLeft(4),                         // Sent Serial (often 4-6 chars)
+                    qso.Callsign.PadRight(13),                   // Received Call
+                    dxRst.PadRight(3),                           // Received RST
+                    dxSerial.PadLeft(4)                          // Received Serial
+                );
+
+                sb.AppendLine(line);
+            }
+
+            sb.AppendLine("END-OF-LOG:");
+
+            // 3. Write to file
+            File.WriteAllText(fileName, sb.ToString());
         }
     }
 
