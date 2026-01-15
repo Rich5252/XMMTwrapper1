@@ -37,8 +37,17 @@ namespace XMMTwrapper1
             InitializeComponent();
             // Pre-fill from INI using your IniManager
             tbCallsign.Text = ini.GetValue("Station", "Callsign", "G4AHN");
-            tbOpNames.Text = ini.GetValue("Station", "Operators", "Richard Lax");
+
+            tbOpCalls.Text = ini.GetValue("Station", "Operators", "G4AHN");
             tbClub.Text = ini.GetValue("Station", "Club", "");
+            tbCatOp.Text = ini.GetValue("Station", "CategoryOp", "SINGLE-OP");
+            tbCatTx.Text = ini.GetValue("Station", "CategoryTx", "ONE");
+            tbCatPwr.Text = ini.GetValue("Station", "CategoryPower", "HIGH");
+            tbLocator.Text = ini.GetValue("Station", "GridLocator", "IO91OE");
+            tbFullName.Text = ini.GetValue("Station", "FullName", "Richard Lax");
+            tbAddress.Text = ini.GetValue("Station", "Address", "1 Gardeners Hill Rd|Farnham|GU10 4RL|England");
+            tbCatStation.Text = ini.GetValue("Station", "CategoryStation", "FIXED");
+            tbLocation.Text = ini.GetValue("Station", "Location", "DX");
         }
 
         private void btnExport_Click(object sender, EventArgs e)
@@ -48,10 +57,16 @@ namespace XMMTwrapper1
             {
                 Contest = tbContest.Text,
                 Callsign = tbCallsign.Text,
+                FullName = tbFullName.Text,
+                Address = tbAddress.Text,
+                Location = tbLocation.Text,
+                Locator = tbLocator.Text,
+                CategoryStation = tbCatStation.Text,
                 CategoryOp = tbCatOp.Text,
                 CategoryTx = tbCatTx.Text,
                 CategoryPower = tbCatPwr.Text,
-                Operators = tbOpNames.Text,
+                Operators = tbOpCalls.Text,
+                Club = tbClub.Text,
                 Soapbox = tbSoap.Text,
                 ClaimedScore = tbScore.Text
             };
@@ -71,9 +86,16 @@ namespace XMMTwrapper1
     {
         public string Contest { get; set; }
         public string Callsign { get; set; }
+        public string Club { get; set; }
         public string CategoryOp { get; set; }
         public string CategoryTx { get; set; }
         public string CategoryPower { get; set; }
+        public string CategoryStation { get; set; }
+        public string CategoryMode { get; set; }
+        public string FullName { get; set; }
+        public string Location { get; set; }
+        public string Locator { get; set; }
+        public string Address { get; set; }
         public string Operators { get; set; }
         public string ClaimedScore { get; set; }
         public string Soapbox { get; set; }

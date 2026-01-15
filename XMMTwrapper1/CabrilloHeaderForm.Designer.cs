@@ -45,17 +45,31 @@
             btnCancel = new Button();
             tbCallsign = new TextBox();
             label7 = new Label();
-            tbOpNames = new TextBox();
+            tbOpCalls = new TextBox();
             label8 = new Label();
             tbClub = new TextBox();
             label9 = new Label();
+            label10 = new Label();
+            label11 = new Label();
+            label12 = new Label();
+            tbFullName = new TextBox();
+            tbAddress = new TextBox();
+            tbLocator = new TextBox();
+            tbCatBand = new TextBox();
+            tbCatMode = new TextBox();
+            tbCatStation = new TextBox();
+            label13 = new Label();
+            label14 = new Label();
+            label15 = new Label();
+            label16 = new Label();
+            tbLocation = new TextBox();
             SuspendLayout();
             // 
             // label1
             // 
             label1.Location = new Point(267, 7);
             label1.Name = "label1";
-            label1.Size = new Size(86, 23);
+            label1.Size = new Size(100, 23);
             label1.TabIndex = 0;
             label1.Text = "Contest";
             label1.TextAlign = ContentAlignment.MiddleRight;
@@ -64,16 +78,16 @@
             // 
             label2.Location = new Point(267, 35);
             label2.Name = "label2";
-            label2.Size = new Size(86, 23);
+            label2.Size = new Size(100, 23);
             label2.TabIndex = 1;
-            label2.Text = "Category Op";
+            label2.Text = "Category Ops";
             label2.TextAlign = ContentAlignment.MiddleRight;
             // 
             // label3
             // 
             label3.Location = new Point(267, 64);
             label3.Name = "label3";
-            label3.Size = new Size(86, 23);
+            label3.Size = new Size(100, 23);
             label3.TabIndex = 2;
             label3.Text = "Category Tx";
             label3.TextAlign = ContentAlignment.MiddleRight;
@@ -82,25 +96,25 @@
             // 
             label4.Location = new Point(267, 93);
             label4.Name = "label4";
-            label4.Size = new Size(86, 23);
+            label4.Size = new Size(100, 23);
             label4.TabIndex = 3;
             label4.Text = "Category Pwr";
             label4.TextAlign = ContentAlignment.MiddleRight;
             // 
             // label5
             // 
-            label5.Location = new Point(267, 122);
+            label5.Location = new Point(267, 210);
             label5.Name = "label5";
-            label5.Size = new Size(86, 23);
+            label5.Size = new Size(100, 23);
             label5.TabIndex = 4;
             label5.Text = "Claimed Score";
             label5.TextAlign = ContentAlignment.MiddleRight;
             // 
             // label6
             // 
-            label6.Location = new Point(267, 151);
+            label6.Location = new Point(267, 239);
             label6.Name = "label6";
-            label6.Size = new Size(86, 23);
+            label6.Size = new Size(100, 23);
             label6.TabIndex = 5;
             label6.Text = "Soapbox";
             label6.TextAlign = ContentAlignment.MiddleRight;
@@ -135,14 +149,14 @@
             // 
             // tbScore
             // 
-            tbScore.Location = new Point(373, 123);
+            tbScore.Location = new Point(373, 211);
             tbScore.Name = "tbScore";
             tbScore.Size = new Size(185, 23);
             tbScore.TabIndex = 10;
             // 
             // tbSoap
             // 
-            tbSoap.Location = new Point(373, 152);
+            tbSoap.Location = new Point(373, 240);
             tbSoap.Multiline = true;
             tbSoap.Name = "tbSoap";
             tbSoap.Size = new Size(185, 86);
@@ -150,7 +164,7 @@
             // 
             // btnExport
             // 
-            btnExport.Location = new Point(402, 255);
+            btnExport.Location = new Point(402, 343);
             btnExport.Name = "btnExport";
             btnExport.Size = new Size(75, 23);
             btnExport.TabIndex = 12;
@@ -160,7 +174,7 @@
             // 
             // btnCancel
             // 
-            btnCancel.Location = new Point(483, 255);
+            btnCancel.Location = new Point(483, 343);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 23);
             btnCancel.TabIndex = 13;
@@ -184,12 +198,12 @@
             label7.Text = "Callsign";
             label7.TextAlign = ContentAlignment.MiddleRight;
             // 
-            // tbOpNames
+            // tbOpCalls
             // 
-            tbOpNames.Location = new Point(77, 36);
-            tbOpNames.Name = "tbOpNames";
-            tbOpNames.Size = new Size(158, 23);
-            tbOpNames.TabIndex = 17;
+            tbOpCalls.Location = new Point(77, 36);
+            tbOpCalls.Name = "tbOpCalls";
+            tbOpCalls.Size = new Size(158, 23);
+            tbOpCalls.TabIndex = 17;
             // 
             // label8
             // 
@@ -197,7 +211,7 @@
             label8.Name = "label8";
             label8.Size = new Size(70, 23);
             label8.TabIndex = 16;
-            label8.Text = "Op name";
+            label8.Text = "Op Calls";
             label8.TextAlign = ContentAlignment.MiddleRight;
             // 
             // tbClub
@@ -216,14 +230,141 @@
             label9.Text = "Club ";
             label9.TextAlign = ContentAlignment.MiddleRight;
             // 
+            // label10
+            // 
+            label10.Location = new Point(1, 93);
+            label10.Name = "label10";
+            label10.Size = new Size(70, 23);
+            label10.TabIndex = 20;
+            label10.Text = "Full name";
+            label10.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label11
+            // 
+            label11.Location = new Point(1, 122);
+            label11.Name = "label11";
+            label11.Size = new Size(70, 23);
+            label11.TabIndex = 21;
+            label11.Text = "Address";
+            label11.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label12
+            // 
+            label12.Location = new Point(1, 151);
+            label12.Name = "label12";
+            label12.Size = new Size(70, 23);
+            label12.TabIndex = 22;
+            label12.Text = "Locator";
+            label12.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tbFullName
+            // 
+            tbFullName.Location = new Point(77, 94);
+            tbFullName.Name = "tbFullName";
+            tbFullName.Size = new Size(158, 23);
+            tbFullName.TabIndex = 23;
+            // 
+            // tbAddress
+            // 
+            tbAddress.Location = new Point(77, 123);
+            tbAddress.Multiline = true;
+            tbAddress.Name = "tbAddress";
+            tbAddress.Size = new Size(158, 23);
+            tbAddress.TabIndex = 24;
+            // 
+            // tbLocator
+            // 
+            tbLocator.Location = new Point(77, 152);
+            tbLocator.Name = "tbLocator";
+            tbLocator.Size = new Size(158, 23);
+            tbLocator.TabIndex = 25;
+            // 
+            // tbCatBand
+            // 
+            tbCatBand.Location = new Point(373, 123);
+            tbCatBand.Name = "tbCatBand";
+            tbCatBand.Size = new Size(185, 23);
+            tbCatBand.TabIndex = 26;
+            // 
+            // tbCatMode
+            // 
+            tbCatMode.Location = new Point(373, 152);
+            tbCatMode.Name = "tbCatMode";
+            tbCatMode.Size = new Size(185, 23);
+            tbCatMode.TabIndex = 27;
+            // 
+            // tbCatStation
+            // 
+            tbCatStation.Location = new Point(373, 181);
+            tbCatStation.Name = "tbCatStation";
+            tbCatStation.Size = new Size(185, 23);
+            tbCatStation.TabIndex = 28;
+            // 
+            // label13
+            // 
+            label13.Location = new Point(267, 122);
+            label13.Name = "label13";
+            label13.Size = new Size(100, 23);
+            label13.TabIndex = 29;
+            label13.Text = "Category Band";
+            label13.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label14
+            // 
+            label14.Location = new Point(267, 151);
+            label14.Name = "label14";
+            label14.Size = new Size(100, 23);
+            label14.TabIndex = 30;
+            label14.Text = "Category Mode";
+            label14.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label15
+            // 
+            label15.Location = new Point(267, 180);
+            label15.Name = "label15";
+            label15.Size = new Size(100, 23);
+            label15.TabIndex = 31;
+            label15.Text = "Category Station";
+            label15.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label16
+            // 
+            label16.Location = new Point(1, 181);
+            label16.Name = "label16";
+            label16.Size = new Size(70, 23);
+            label16.TabIndex = 32;
+            label16.Text = "Location";
+            label16.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tbLocation
+            // 
+            tbLocation.Location = new Point(77, 181);
+            tbLocation.Name = "tbLocation";
+            tbLocation.Size = new Size(158, 23);
+            tbLocation.TabIndex = 33;
+            // 
             // CabrilloHeaderForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(570, 290);
+            ClientSize = new Size(570, 376);
+            Controls.Add(tbLocation);
+            Controls.Add(label16);
+            Controls.Add(label15);
+            Controls.Add(label14);
+            Controls.Add(label13);
+            Controls.Add(tbCatStation);
+            Controls.Add(tbCatMode);
+            Controls.Add(tbCatBand);
+            Controls.Add(tbLocator);
+            Controls.Add(tbAddress);
+            Controls.Add(tbFullName);
+            Controls.Add(label12);
+            Controls.Add(label11);
+            Controls.Add(label10);
             Controls.Add(tbClub);
             Controls.Add(label9);
-            Controls.Add(tbOpNames);
+            Controls.Add(tbOpCalls);
             Controls.Add(label8);
             Controls.Add(tbCallsign);
             Controls.Add(label7);
@@ -267,9 +408,23 @@
         private Button btnCancel;
         private TextBox tbCallsign;
         private Label label7;
-        private TextBox tbOpNames;
+        private TextBox tbOpCalls;
         private TextBox tbClub;
         private Label label8;
         private Label label9;
+        private Label label10;
+        private Label label11;
+        private Label label12;
+        private TextBox tbFullName;
+        private TextBox tbAddress;
+        private TextBox tbLocator;
+        private TextBox tbCatBand;
+        private TextBox tbCatMode;
+        private TextBox tbCatStation;
+        private Label label13;
+        private Label label14;
+        private Label label15;
+        private Label label16;
+        private TextBox tbLocation;
     }
 }

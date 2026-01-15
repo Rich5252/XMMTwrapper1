@@ -40,7 +40,13 @@ public class IniManager
         // 1. Check if section exists, then if key exists
         if (_data.Sections.ContainsSection(section) && _data[section].ContainsKey(key))
         {
-            string val = _data[section][key];
+            string val = defaultValue;
+            try
+            {
+                val = _data[section][key];
+            } catch {
+                // In case of any error, fall through to set default
+            }
             if (!string.IsNullOrEmpty(val)) return val;
         }
 

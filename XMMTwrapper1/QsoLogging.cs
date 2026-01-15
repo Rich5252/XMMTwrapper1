@@ -169,11 +169,38 @@ public class AdifLogger
         sb.AppendLine($"OPERATORS: {header.Operators}");
         sb.AppendLine($"CATEGORY-OPERATOR: {header.CategoryOp}");
         sb.AppendLine($"CATEGORY-TRANSMITTER: {header.CategoryTx}");
-        sb.AppendLine($"CATEGORY-OPERATOR: {header.CategoryPower}");
-        sb.AppendLine($"CLAMED-SCORE: {header.ClaimedScore}");
-        sb.AppendLine($"SOAPBOX: {header.Soapbox}");
-        sb.AppendLine("CREATED-BY: MyG4AHNLogger v1.0");
+        sb.AppendLine($"CATEGORY-STATION: {header.CategoryStation}");
+        sb.AppendLine($"CATEGORY-MODE: {header.CategoryMode}");
+        sb.AppendLine($"CATEGORY-POWER: {header.CategoryPower}");
+        sb.AppendLine($"LOCATION: {header.Location}");
+        sb.AppendLine($"CLUB: {header.Club}");
+        sb.AppendLine($"LOCATOR: {header.Locator}");
+        sb.AppendLine($"NAME: {header.FullName}");
 
+        // Split by pipe and add a line for each segment
+        foreach (var line in header.Address.Split('|'))
+        {
+            sb.AppendLine($"ADDRESS: {line.Trim()}");
+        }
+
+        sb.AppendLine($"CLAMED-SCORE: {header.ClaimedScore}");
+
+        if (!string.IsNullOrWhiteSpace(header.Soapbox))
+        {
+            // Split by the standard Windows NewLine (\r\n) from multiline textbox
+            string[] lines = header.Soapbox.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                // Cabrillo spec prefers lines under 75 chars
+                sb.AppendLine($"SOAPBOX: {line.Trim()}");
+            }
+        }
+
+        sb.AppendLine("CREATED-BY: MyG4AHNLogger v1.0");
+        sb.AppendLine("<EOH>");
+        sb.AppendLine("");
+        sb.AppendLine("");
         // 2. QSO Data - Column alignment is critical here
         // Format: FREQ MOD DATE       TIME  SENT-CALL SENT-RST SENT-NUM  RCVD-CALL RCVD-RST RCVD-NUM
         foreach (var qso in _loggedEntries)
@@ -224,7 +251,7 @@ public class AdifLogger
             return;
         }
 
-        // The /select argument is the secret sauce
+        // The /select argument is the secret sauce to select file automatically
         string argument = $"/select, \"{_filePath}\"";
         Process.Start("explorer.exe", argument);
     }
