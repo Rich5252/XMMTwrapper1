@@ -86,7 +86,8 @@
       <Guid>9fae7eb9-098b-4952-a234-cf460419d752</Guid>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
     </COMReference>
     <COMReference Include="AxXMMTLib">
       <WrapperTool>aximp</WrapperTool>
@@ -95,6 +96,8 @@
       <Guid>9fae7eb9-098b-4952-a234-cf460419d752</Guid>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
     </COMReference>
     <COMReference Include="stdole">
       <WrapperTool>tlbimp</WrapperTool>

@@ -48,7 +48,7 @@ namespace XMMTwrapper1
             if (cbSerialNumAutoInc.Checked) { tbSerialNumOut.Increment(); }
         }
 
-        //this is also called when tbFreq
+        //this is also called when tbFreq changes
         private void tbCallsign_TextChanged(object sender, EventArgs e)
         {
             string freq = tbRxFrequency.Text;
