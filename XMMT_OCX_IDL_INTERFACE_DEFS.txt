@@ -1,0 +1,859 @@
+// Generated .IDL file (by the OLE/COM Object Viewer)
+// 
+// typelib filename: XMMT.ocx
+
+[
+  uuid(9FAE7EB9-098B-4952-A234-CF460419D752),
+  version(1.0),
+  helpstring("XMMT ActiveX control module"),
+  helpfile("XMMT.hlp"),
+  helpcontext(00000000)
+]
+library XMMTLib
+{
+    // TLib :     // TLib : OLE Automation : {00020430-0000-0000-C000-000000000046}
+    importlib("stdole2.tlb");
+
+    // Forward declare all types defined in this typelib
+    dispinterface _DXMMT;
+    dispinterface _DXMMTEvents;
+    dispinterface _DXMMXY;
+    dispinterface _DXMMXYEvents;
+    dispinterface _DXMMBtn;
+    dispinterface _DXMMBtnEvents;
+    dispinterface _DXMMLvl;
+    dispinterface _DXMMLvlEvents;
+    dispinterface _DXMMSpec;
+    dispinterface _DXMMSpecEvents;
+    dispinterface _DXMMWater;
+    dispinterface _DXMMWaterEvents;
+    dispinterface _DXMMR;
+    dispinterface _DXMMREvents;
+
+    typedef enum {
+        TNC_PTTON = 240,
+        TNC_PTTOFF = 241,
+        TNC_PTTFLUSH = 242,
+        TNC_CLEARBUF = 243,
+        TNC_AFCON = 244,
+        TNC_AFCOFF = 245,
+        TNC_NETON = 246,
+        TNC_NETOFF = 247,
+        TNC_REVON = 248,
+        TNC_REVOFF = 249,
+        TNC_HAM = 250,
+        TNC_ECHOON = 251,
+        TNC_ECHOOFF = 252,
+        TNC_CANCELPTTFLUSH = 253
+    } MMT_COM;
+
+    typedef enum {
+        MMTMSG_NULL = 0,
+        MMTMSG_CHAR = 1,
+        MMTMSG_PTT = 2,
+        MMTMSG_COMMON = 3,
+        MMTMSG_CLEARFIFO = 4,
+        MMTMSG_SETSWITCH = 5,
+        MMTMSG_SETVIEW = 6,
+        MMTMSG_CHARTXW = 7,
+        MMTMSG_WRITETXW = 8,
+        MMTMSG_SETFREQ = 9,
+        MMTMSG_SETBAUD = 10,
+        MMTMSG_SETSQ = 11,
+        MMTMSG_SETNOTCH = 12,
+        MMTMSG_SETDEFFREQ = 13,
+        MMTMSG_SETPTTTIMER = 14,
+        MMTMSG_SETTNCTYPE = 15,
+        MMTMSG_SETPRIORITY = 16,
+        MMTMSG_SETLENGTH = 17,
+        MMTMSG_SETRESO = 18,
+        MMTMSG_SETLPF = 19,
+        MMTMSG_GETPROFILENAME = 20,
+        MMTMSG_LOADPROFILE = 21,
+        MMTMSG_SAVEPROFILE = 22
+    } MMT_MSG;
+
+    typedef enum {
+        xt_markfreq = 0,
+        xt_spacefreq = 1,
+        xt_siglevel = 2,
+        xt_sqlevel = 3,
+        xt_txbuflen = 4,
+        xt_codeswitch = 5,
+        xt_codeview = 6,
+        xt_notch1 = 7,
+        xt_notch2 = 8,
+        xt_baud = 9,
+        xt_bitlength = 10,
+        xt_txwlen = 11,
+        xt_sampfreq = 12,
+        xt_demfreq = 13,
+        xt_radiofreq = 14,
+        xt_modetnc = 15,
+        xt_fig = 16,
+        xt_defmark = 17,
+        xt_defshift = 18,
+        xt_Reserved = 19
+    } MMT_NMMT;
+
+    typedef enum {
+        ntNOTIFY = 1,
+        ntNOTIFYFFT = 2,
+        ntNOTIFYXY = 4
+    } MMT_SETNOTIFY;
+
+    [
+      uuid(D38B08E1-B3A1-4FFD-9EC3-8130FBAD3593),
+      helpstring("XMMT Control dispatch interface"),
+      hidden
+    ]
+    dispinterface _DXMMT {
+        properties:
+            [id(0x00000002)            
+]
+            short wPortTcp;
+            [id(0x00000003)            
+]
+            VARIANT_BOOL bActive;
+            [id(0x00000004)            
+]
+            short wMaxCount;
+            [id(0x00000005)            
+]
+            short wCount;
+            [id(0x00000006)            
+]
+            BSTR HostName;
+            [id(0x00000001)            
+]
+            VARIANT_BOOL bFftConversion;
+        methods:
+            [id(0x00000007)]
+            VARIANT_BOOL Listen();
+            [id(0x00000008)]
+            VARIANT_BOOL SendChar(
+                            short nIndex, 
+                            short bChar);
+            [id(0x00000009)]
+            VARIANT_BOOL SendCode(
+                            short nIndex, 
+                            short bCode);
+            [id(0x0000000a)]
+            void SetBusy(
+                            short nIndex, 
+                            short bBusy);
+            [id(0x0000000b)]
+            VARIANT_BOOL SendMmttyMessage(
+                            short nIndex, 
+                            long wParam, 
+                            long lParam);
+            [id(0x0000000c)]
+            VARIANT_BOOL PostMmttyMessage(
+                            short nIndex, 
+                            long wParam, 
+                            long lParam);
+            [id(0x0000000d)]
+            VARIANT_BOOL WriteMmttyTxw(
+                            short nIndex, 
+                            BSTR pStr);
+            [id(0x0000000e)]
+            VARIANT_BOOL SetNotify(
+                            short nIndex, 
+                            short bNotify);
+            [id(0x0000000f)]
+            VARIANT_BOOL IsConnected(short nIndex);
+            [id(0x00000010)]
+            void Disconnect(short nIndex);
+            [id(0x00000011)]
+            VARIANT_BOOL IsBusy(short nIndex);
+            [id(0x00000012)]
+            VARIANT_BOOL SendString(
+                            short nIndex, 
+                            BSTR pStr, 
+                            short nLen);
+            [id(0x00000013)]
+            BSTR GetAddress(short nIndex);
+            [id(0x00000014)]
+            VARIANT_BOOL PostMmttyMessageAsString(
+                            short nIndex, 
+                            long wParam, 
+                            BSTR pStr);
+    };
+
+    [
+      uuid(39642706-D45B-46A9-9685-C7436DF56138),
+      helpstring("Event interface for XMMT Control")
+    ]
+    dispinterface _DXMMTEvents {
+        properties:
+        methods:
+            [id(0x00000001)]
+            void OnPttEvent(
+                            short nIndex, 
+                            short btx);
+            [id(0x00000002)]
+            void OnBusyEvent(
+                            short nIndex, 
+                            short bBusy);
+            [id(0x00000003)]
+            void OnDisconnected(short nIndex);
+            [id(0x00000004)]
+            void OnCharRcvd(
+                            short nIndex, 
+                            short bChar);
+            [id(0x00000005)]
+            void OnConnected(short nIndex);
+            [id(0x00000006)]
+            void OnMessageResult(
+                            short nIndex, 
+                            long wParam, 
+                            long lParam, 
+                            long lResult);
+            [id(0x00000007)]
+            void OnNotifyNMMT(
+                            short nIndex, 
+                            long* pNMMT);
+            [id(0x00000008)]
+            void OnNotifyXY(
+                            short nIndex, 
+                            long* pXY);
+            [id(0x00000009)]
+            void OnNotifyFFT(
+                            short nIndex, 
+                            short* pFFT, 
+                            short size, 
+                            short sampfreq);
+            [id(0x0000000a)]
+            void OnGetProfileName(
+                            short nIndex, 
+                            short nProfile, 
+                            BSTR pStr);
+    };
+
+    [
+      uuid(9AE88AC4-3C6D-41BA-B116-84792514E438),
+      helpstring("XMMT Control"),
+      control
+    ]
+    coclass XMMT {
+        [default] dispinterface _DXMMT;
+        [default, source] dispinterface _DXMMTEvents;
+    };
+
+    [
+      uuid(BFF74B5E-A2D0-4865-823E-0F91CA52EA7A),
+      helpstring("XMMXY Control dispatch interface"),
+      hidden
+    ]
+    dispinterface _DXMMXY {
+        properties:
+            [id(0x00000003)            
+]
+            OLE_COLOR BackColor;
+            [id(0x00000004)            
+]
+            OLE_COLOR Color;
+            [id(0x00000005)            
+]
+            VARIANT_BOOL HighQuality;
+            [id(0x00000006)            
+]
+            short DemSampleFreq;
+            [id(0x00000001)            
+]
+            VARIANT_BOOL Invert;
+            [id(0xfffffe08), bindable, requestedit            
+]
+            short BorderStyle;
+            [id(0x00000002)            
+]
+            VARIANT_BOOL Visible;
+            [id(0xfffffdfd), bindable, requestedit            
+]
+            OLE_HANDLE hwnd;
+        methods:
+            [id(0x00000007)]
+            void Draw(long* pXY);
+            [id(0x00000008)]
+            void Clear();
+    };
+
+    [
+      uuid(15FE58B4-5152-4E06-B6E7-B5C2D40AF884),
+      helpstring("Event interface for XMMXY Control")
+    ]
+    dispinterface _DXMMXYEvents {
+        properties:
+        methods:
+            [id(0x00000001)]
+            void OnLButtonClick(
+                            short X, 
+                            short Y);
+            [id(0x00000002)]
+            void OnRButtonClick(
+                            short X, 
+                            short Y);
+    };
+
+    [
+      uuid(964DCB7F-A8E7-407F-A689-26696BC18478),
+      helpstring("XMMXY Control"),
+      control
+    ]
+    coclass XMMXY {
+        [default] dispinterface _DXMMXY;
+        [default, source] dispinterface _DXMMXYEvents;
+    };
+
+    [
+      uuid(F5BF613F-D4BC-4582-80E5-2F5E5B31F82E),
+      helpstring("XMMBtn Control dispatch interface"),
+      hidden
+    ]
+    dispinterface _DXMMBtn {
+        properties:
+            [id(0x00000002)            
+]
+            BSTR Caption;
+            [id(0x00000003)            
+]
+            OLE_COLOR TextColor;
+            [id(0x00000004)            
+]
+            VARIANT_BOOL Enabled;
+            [id(0x00000005)            
+]
+            VARIANT_BOOL State;
+            [id(0x00000006)            
+]
+            VARIANT_BOOL Toggled;
+            [id(0x00000007)            
+]
+            OLE_COLOR FaceColor;
+            [id(0xfffffe00), bindable            
+]
+            Font* Font;
+            [id(0x00000001)            
+]
+            VARIANT_BOOL Visible;
+            [id(0xfffffdfd), bindable, requestedit            
+]
+            OLE_HANDLE hwnd;
+        methods:
+    };
+
+    [
+      uuid(C3DECF69-C3BC-427C-9CF3-4BE61AAE9EFF),
+      helpstring("Event interface for XMMBtn Control")
+    ]
+    dispinterface _DXMMBtnEvents {
+        properties:
+        methods:
+            [id(0x00000001)]
+            void OnLButtonClick();
+            [id(0x00000002)]
+            void OnRButtonClick();
+            [id(0xfffffda7)]
+            void DblClick();
+    };
+
+    [
+      uuid(34104A6C-B355-43E0-BBD1-9A7718AB0D4C),
+      helpstring("XMMBtn Control"),
+      control
+    ]
+    coclass XMMBtn {
+        [default] dispinterface _DXMMBtn;
+        [default, source] dispinterface _DXMMBtnEvents;
+    };
+
+    [
+      uuid(E05FF165-5785-446E-B2E6-6E9E7E324DC1),
+      helpstring("XMMLvl Control —pÃÞ¨½Êß¯Á ²ÝÀ°Ìª²½"),
+      hidden
+    ]
+    dispinterface _DXMMLvl {
+        properties:
+            [id(0x00000002)            
+]
+            OLE_COLOR OnColor;
+            [id(0x00000003)            
+]
+            OLE_COLOR OffColor;
+            [id(0x00000004)            
+]
+            OLE_COLOR BackColor;
+            [id(0x00000005)            
+]
+            OLE_COLOR LineColor;
+            [id(0xfffffe08), bindable, requestedit            
+]
+            short BorderStyle;
+            [id(0x00000001)            
+]
+            VARIANT_BOOL Visible;
+            [id(0xfffffdfd), bindable, requestedit            
+]
+            OLE_HANDLE hwnd;
+        methods:
+            [id(0x00000006)]
+            void Draw(
+                            short sig, 
+                            short sq);
+            [id(0x00000007)]
+            void DrawByNMMT(long* pNMMT);
+            [id(0x00000008)]
+            void Clear();
+            [id(0x00000009)]
+            void DrawByNMMR(long* pNMMR);
+    };
+
+    [
+      uuid(8973D8D1-D0B0-4E4A-88BC-827E38324558),
+      helpstring("Event interface for XMMLvl Control")
+    ]
+    dispinterface _DXMMLvlEvents {
+        properties:
+        methods:
+            [id(0x00000001)]
+            void OnLMouseDown(short level);
+            [id(0x00000002)]
+            void OnLMouseUp(short level);
+            [id(0x00000003)]
+            void OnLMouseMove(short level);
+            [id(0x00000004)]
+            void OnRMouseDown(short level);
+            [id(0x00000005)]
+            void OnRMouseUp(short level);
+            [id(0x00000006)]
+            void OnRMouseMove(short level);
+    };
+
+    [
+      uuid(306B30AD-3ABE-4F84-A8B6-323095070635),
+      helpstring("XMMLvl Control"),
+      control
+    ]
+    coclass XMMLvl {
+        [default] dispinterface _DXMMLvl;
+        [default, source] dispinterface _DXMMLvlEvents;
+    };
+
+    [
+      uuid(825B17E6-DC7B-40C4-B03B-39793CA9DF06),
+      helpstring("XMMSpec Control —pÃÞ¨½Êß¯Á ²ÝÀ°Ìª²½"),
+      hidden
+    ]
+    dispinterface _DXMMSpec {
+        properties:
+            [id(0xfffffe00), bindable            
+]
+            Font* Font;
+            [id(0x00000004)            
+]
+            short Notch1;
+            [id(0x00000005)            
+]
+            short Notch2;
+            [id(0x00000001)            
+]
+            VARIANT_BOOL bShowValue;
+            [id(0x00000006)            
+]
+            short BaseFreq;
+            [id(0x00000007)            
+]
+            short WidthFreq;
+            [id(0x00000008)            
+]
+            short MarkFreq;
+            [id(0x00000009)            
+]
+            short SpaceFreq;
+            [id(0x00000002)            
+]
+            VARIANT_BOOL bShowLimiter;
+            [id(0x0000000a)            
+]
+            OLE_COLOR BackColor;
+            [id(0x0000000b)            
+]
+            OLE_COLOR MarkerColor;
+            [id(0x0000000c)            
+]
+            OLE_COLOR SpectramColor;
+            [id(0x0000000d)            
+]
+            OLE_COLOR LimiterColor;
+            [id(0xfffffe08), bindable, requestedit            
+]
+            short BorderStyle;
+            [id(0x00000003)            
+]
+            VARIANT_BOOL Visible;
+            [id(0xfffffdfd), bindable, requestedit            
+]
+            OLE_HANDLE hwnd;
+        methods:
+            [id(0x0000000e)]
+            void Draw(
+                            short* pFFT, 
+                            short size, 
+                            short sampfreq);
+            [id(0x0000000f)]
+            void Clear();
+            [id(0x00000010)]
+            void UpdateByNMMT(long* pNMMT);
+            [id(0x00000011)]
+            void UpdateByNMMR(long* pNMMR);
+    };
+
+    [
+      uuid(7AE508F5-0E62-491E-B023-214C1B0065E0),
+      helpstring("Event interface for XMMSpec Control")
+    ]
+    dispinterface _DXMMSpecEvents {
+        properties:
+        methods:
+            [id(0x00000001)]
+            void OnLMouseDown(short freq);
+            [id(0x00000002)]
+            void OnLMouseMove(short freq);
+            [id(0x00000003)]
+            void OnLMouseUp(short freq);
+            [id(0x00000004)]
+            void OnRMouseDown(short freq);
+            [id(0x00000005)]
+            void OnRMouseUp(short freq);
+            [id(0x00000006)]
+            void OnRMouseMove(short freq);
+    };
+
+    [
+      uuid(9614C387-73AA-4A07-8FC6-7C407DAB017C),
+      helpstring("XMMSpec Control"),
+      control
+    ]
+    coclass XMMSpec {
+        [default] dispinterface _DXMMSpec;
+        [default, source] dispinterface _DXMMSpecEvents;
+    };
+
+    [
+      uuid(EEBEEE03-7B8C-4817-A28B-6085445F80B0),
+      helpstring("XMMWater Control —pÃÞ¨½Êß¯Á ²ÝÀ°Ìª²½"),
+      hidden
+    ]
+    dispinterface _DXMMWater {
+        properties:
+            [id(0x00000002)            
+]
+            OLE_COLOR BackColor;
+            [id(0x00000003)            
+]
+            OLE_COLOR SpectramColor;
+            [id(0x00000004)            
+]
+            short BaseFreq;
+            [id(0x00000005)            
+]
+            short WidthFreq;
+            [id(0xfffffe08), bindable, requestedit            
+]
+            short BorderStyle;
+            [id(0x00000001)            
+]
+            VARIANT_BOOL Visible;
+            [id(0xfffffdfd), bindable, requestedit            
+]
+            OLE_HANDLE hwnd;
+        methods:
+            [id(0x00000006)]
+            void Draw(
+                            short* pFFT, 
+                            short size, 
+                            short sampfreq);
+            [id(0x00000007)]
+            void Clear();
+    };
+
+    [
+      uuid(7FE82F53-2389-4078-A4DF-DA9E853393BE),
+      helpstring("Event interface for XMMWater Control")
+    ]
+    dispinterface _DXMMWaterEvents {
+        properties:
+        methods:
+            [id(0x00000001)]
+            void OnLMouseDown(short freq);
+            [id(0x00000002)]
+            void OnLMouseUp(short freq);
+            [id(0x00000003)]
+            void OnLMouseMove(short freq);
+            [id(0x00000004)]
+            void OnRMouseDown(short freq);
+            [id(0x00000005)]
+            void OnRMouseMove(short freq);
+            [id(0x00000006)]
+            void OnRMouseUp(short freq);
+    };
+
+    [
+      uuid(68ED648D-FF56-43FB-BEE9-EE9083058B8A),
+      helpstring("XMMWater Control"),
+      control
+    ]
+    coclass XMMWater {
+        [default] dispinterface _DXMMWater;
+        [default, source] dispinterface _DXMMWaterEvents;
+    };
+
+    typedef enum {
+        RXM_HANDLE = 0,
+        RXM_REQHANDLE = 1,
+        RXM_EXIT = 2,
+        RXM_PTT = 3,
+        RXM_CHAR = 4,
+        RXM_WINPOS = 5,
+        RXM_WIDTH = 6,
+        RXM_REQPARA = 7,
+        RXM_SETBAUD = 8,
+        RXM_SETMARK = 9,
+        RXM_SETSPACE = 10,
+        RXM_SETSWITCH = 11,
+        RXM_SETHAM = 12,
+        RXM_SHOWSETUP = 13,
+        RXM_SETVIEW = 14,
+        RXM_SETSQLVL = 15,
+        RXM_SHOW = 16,
+        RXM_SETFIG = 17,
+        RXM_SETRESO = 18,
+        RXM_SETLPF = 19,
+        RXM_SETTXDELAY = 20,
+        RXM_UPDATECOM = 21,
+        RXM_SUSPEND = 22,
+        RXM_NOTCH = 23,
+        RXM_PROFILE = 24,
+        RXM_TIMER = 25,
+        RXM_ENBFOCUS = 26,
+        RXM_SETDEFFREQ = 27,
+        RXM_SETLENGTH = 28,
+        RXM_ENBSHARED = 29,
+        RXM_PTTFSK = 30,
+        TXM_HANDLE = 32768,
+        TXM_REQHANDLE = 32769,
+        TXM_START = 32770,
+        TXM_CHAR = 32771,
+        TXM_PTTEVENT = 32772,
+        TXM_HEIGHT = 32773,
+        TXM_BAUD = 32774,
+        TXM_MARK = 32775,
+        TXM_SPACE = 32776,
+        TXM_SWITCH = 32777,
+        TXM_VIEW = 32778,
+        TXM_LEVEL = 32779,
+        TXM_FIGEVENT = 32780,
+        TXM_RESO = 32781,
+        TXM_LPF = 32782,
+        TXM_THREAD = 32783,
+        TXM_PROFILE = 32784,
+        TXM_NOTCH = 32785,
+        TXM_DEFSHIFT = 32786,
+        TXM_RADIOFREQ = 32787,
+        TXM_SHOWSETUP = 32788,
+        TXM_SHOWPROFILE = 32789
+    } MMR_MSG;
+
+    typedef enum {
+        xr_markfreq = 0,
+        xr_spacefreq = 1,
+        xr_siglevel = 2,
+        xr_sqlevel = 3,
+        xr_codeswitch = 4,
+        xr_codeview = 5,
+        xr_notch1 = 6,
+        xr_notch2 = 7,
+        xr_baud = 8,
+        xr_fig = 9,
+        xr_radiofreq = 10,
+        xr_Reserved = 11
+    } MMR_NMMR;
+
+    [
+      uuid(D721E49E-6EB1-4A51-AD84-61155FCE29B4),
+      helpstring("XMMR Control —pÃÞ¨½Êß¯Á ²ÝÀ°Ìª²½"),
+      hidden
+    ]
+    dispinterface _DXMMR {
+        properties:
+            [id(0x0000000a)            
+]
+            VARIANT_BOOL bActive;
+            [id(0x0000000b)            
+]
+            BSTR InvokeCommand;
+            [id(0x0000000c)            
+]
+            long TxBufLen;
+            [id(0x0000000d)            
+]
+            BSTR ComName;
+            [id(0x0000000e)            
+]
+            BSTR Title;
+            [id(0x0000000f)            
+]
+            BSTR RadioName;
+            [id(0x00000010)            
+]
+            long smpFreq;
+            [id(0x00000011)            
+]
+            long smpFFT;
+            [id(0x00000012)            
+]
+            BSTR verMMTTY;
+            [id(0x00000013)            
+]
+            long LostSound;
+            [id(0x00000014)            
+]
+            long OverFlow;
+            [id(0x00000015)            
+]
+            long ErrorClock;
+            [id(0x00000016)            
+]
+            long smpDemFreq;
+            [id(0x00000017)            
+]
+            VARIANT_BOOL PTT;
+            [id(0x00000009)            
+]
+            VARIANT_BOOL Visible;
+            [id(0x00000018)            
+]
+            OLE_HANDLE hWndMmtty;
+            [id(0xfffffdfd), bindable, requestedit            
+]
+            OLE_HANDLE hwnd;
+            [id(0x00000019)            
+]
+            VARIANT_BOOL bInvoking;
+            [id(0x0000001a)            
+]
+            long SharedPointer;
+            [id(0x0000001b)            
+]
+            VARIANT_BOOL VisibleMmtty;
+            [id(0x00000001)            
+]
+            VARIANT_BOOL bRemoveUselessMessage;
+            [id(0x00000002)            
+]
+            VARIANT_BOOL bTranslateAllMessages;
+            [id(0x00000003)            
+]
+            VARIANT_BOOL bInitialClose;
+            [id(0x00000004)            
+]
+            long DelayInvoke;
+            [id(0x00000005)            
+]
+            VARIANT_BOOL bNotifyComChange;
+            [id(0x00000006)            
+]
+            VARIANT_BOOL bConfirmClose;
+            [id(0x00000007)            
+]
+            VARIANT_BOOL bNotifyXY;
+            [id(0x00000008)            
+]
+            VARIANT_BOOL bNotifyFFT;
+        methods:
+            [id(0x0000001c)]
+            VARIANT_BOOL PostMmttyMessage(
+                            long wParam, 
+                            long lParam);
+            [id(0x0000001d)]
+            VARIANT_BOOL SetMmttySwitch(long codeswitch);
+            [id(0x0000001e)]
+            VARIANT_BOOL SetMmttyView(long codeview);
+            [id(0x0000001f)]
+            VARIANT_BOOL SetMmttyPTT(short PTT);
+            [id(0x00000020)]
+            VARIANT_BOOL SendChar(short bChar);
+            [id(0x00000021)]
+            VARIANT_BOOL SendString(BSTR pStr);
+            [id(0x00000023), propget]
+            BSTR Profiles(short nIndex);
+            [id(0x00000023), propput]
+            void Profiles(
+                            short nIndex, 
+                            BSTR rhs);
+            [id(0x00000022)]
+            void ReadNMMR(long* pNMMR);
+    };
+
+    [
+      uuid(527A76C5-3C2D-4D68-99EC-B4D2F53CAE74),
+      helpstring("Event interface for XMMR Control")
+    ]
+    dispinterface _DXMMREvents {
+        properties:
+        methods:
+            [id(0x00000001)]
+            void OnConnected();
+            [id(0x00000002)]
+            void OnCharRcvd(short bChar);
+            [id(0x00000003)]
+            void OnPttEvent(short btx);
+            [id(0x00000004)]
+            void OnDisconnected(short status);
+            [id(0x00000005)]
+            void OnNotifyNMMR(long* pNMMR);
+            [id(0x00000006)]
+            void OnNotchChanged(
+                            short Notch1, 
+                            short Notch2);
+            [id(0x00000007)]
+            void OnViewChanged(long codeview);
+            [id(0x00000008)]
+            void OnSwitchChanged(long codeswitch);
+            [id(0x00000009)]
+            void OnFreqChanged(
+                            short MarkFreq, 
+                            short SpaceFreq);
+            [id(0x0000000a)]
+            void OnBaudChanged(short baud);
+            [id(0x0000000b)]
+            void OnNotifyFFT(
+                            short* pFFT, 
+                            short size, 
+                            short sampfreq);
+            [id(0x0000000c)]
+            void OnNotifyXY(long* pXY);
+            [id(0x0000000d)]
+            void OnRadioFreqChanged(long freq);
+            [id(0x0000000e)]
+            void OnRadioNameChanged(BSTR pStrRadio);
+            [id(0x0000000f)]
+            void OnComNameChanged(BSTR pStrCom);
+            [id(0x00000010)]
+            void OnFigChanged(short bFig);
+            [id(0x00000011)]
+            void OnTranslateMessage(
+                            long wParam, 
+                            long lParam);
+    };
+
+    [
+      uuid(DC25FBE7-50BA-469E-8A5D-4FA3488D6E0C),
+      helpstring("XMMR Control"),
+      control
+    ]
+    coclass XMMR {
+        [default] dispinterface _DXMMR;
+        [default, source] dispinterface _DXMMREvents;
+    };
+};

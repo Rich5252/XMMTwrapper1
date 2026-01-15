@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "XMMTwrapper1": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

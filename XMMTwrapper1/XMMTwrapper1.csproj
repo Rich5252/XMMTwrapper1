@@ -1,0 +1,136 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU;x86</Platforms>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	<TieredCompilation>false</TieredCompilation>
+	<ApplicationIcon>Untitled.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CWDecoderEngine - 98pc PARIS.cs" />
+    <Compile Remove="CWDecoderEngine - Best PARIS version.cs" />
+    <Compile Remove="CWDecoderEngine - Copy.cs" />
+    <Compile Remove="CWDecoderEngine - Early code.cs" />
+    <Compile Remove="CWDecoderEngine - First working attempt.cs" />
+    <Compile Remove="CWDecoderEngine - Good fixed wpm reader.cs" />
+    <Compile Remove="CWDecoderEngine - rms version pre Filters Select.cs" />
+    <Compile Remove="CWDecoderEngine - With Hann working to 40wpm.cs" />
+    <Compile Remove="CWDecoderEngine - WPM tracking improved - pre SchmittTrig squelch.cs" />
+    <Compile Remove="FormButtonArray - Pre Gemini Copy.cs" />
+    <Compile Remove="Helpers.cs" />
+    <Compile Remove="ITU_Prefix_Checker - Mini list.cs" />
+    <Compile Remove="LoggerV1.cs" />
+    <Compile Remove="LoggerV2.cs" />
+    <Compile Remove="MorseClock - 98pc PARIS.cs" />
+    <Compile Remove="MorseClock - Bad final dynamic tuning.cs" />
+    <Compile Remove="MorseClock - Best PARIS version so far.cs" />
+    <Compile Remove="MorseClock - Copy.cs" />
+    <Compile Remove="MorseClock - Early code.cs" />
+    <Compile Remove="MorseClock - First working attempt.cs" />
+    <Compile Remove="MorseClock - Good fixed wpm reader.cs" />
+    <Compile Remove="MorseClock - Good PARIS but poor E detect - pre dot filter additions.cs" />
+    <Compile Remove="MorseClock - Good tuning - Pre dynamic tuning - Copy.cs" />
+    <Compile Remove="MorseClock - Good tuning - Pre dynamic tuning.cs" />
+    <Compile Remove="MorseClock - Pre Bimodal Histogram .cs" />
+    <Compile Remove="MorseClock - Pre inteligent wpm tracker.cs" />
+    <Compile Remove="MorseClock - Pre tuning constant refactor.cs" />
+    <Compile Remove="MorseClock - rms version pre Filters select.cs" />
+    <Compile Remove="MorseClock - WPM tracking improved - pre SchmittTrig squelch  - Copy.cs" />
+    <Compile Remove="MorseClock - WPM tracking improved - pre SchmittTrig squelch .cs" />
+    <Compile Remove="MorseTuningConfig - WPM tracking improved - pre SchmittTrig squelch.cs" />
+    <Compile Remove="NamedPipeClient - ChatGPT version.cs" />
+    <Compile Remove="NamedPipeClient c# style.cs" />
+    <Compile Remove="OCXobject.cs" />
+    <Compile Remove="SpectrumInvoker.cs" />
+    <Compile Remove="XMMCOMconPointHost OLD.cs" />
+    <Compile Remove="XMMCOMconPointHostV2.cs" />
+    <Compile Remove="XMMCOMconPointHostV3.cs" />
+    <Compile Remove="XMMComDispatch.cs" />
+    <Compile Remove="XMMIDispatch.cs" />
+    <Compile Remove="XMMLvlOcxContracts.cs" />
+    <Compile Remove="XMMNativeDLL.cs" />
+    <Compile Remove="XmmrEventsSink old.cs" />
+    <Compile Remove="XmmrEventsSinkV2.cs" />
+    <Compile Remove="XmmrEventsSinkV3.cs" />
+    <Compile Remove="XmmrEventsSinkV4.cs" />
+    <Compile Remove="XmmrEventsSinkV5SyncEventGoodWithArgAnalyser - Copy.cs" />
+    <Compile Remove="XmmrMessageConstants.cs" />
+    <Compile Remove="XmmrNmmrContract.cs" />
+    <Compile Remove="XMMRocxContracts.cs" />
+    <Compile Remove="XMMSpecDrawViaDispatch.cs" />
+    <Compile Remove="XMMSpecOcxContracts.cs" />
+    <Compile Remove="XMMWaterOcxContracts.cs" />
+    <Compile Remove="XmmXYocxContracts.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Form1.SendButtonHandling.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="file1.ts" />
+    <None Remove="MorseClock - Best PARIS version so far %28no dynamic tune%29cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="XMMTLib">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>9fae7eb9-098b-4952-a234-cf460419d752</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="AxXMMTLib">
+      <WrapperTool>aximp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>9fae7eb9-098b-4952-a234-cf460419d752</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+    <COMReference Include="stdole">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>00020430-0000-0000-c000-000000000046</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Untitled.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ini-parser" Version="2.5.2" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="stdole" Version="17.14.40260" />
+    <PackageReference Include="System.IO.Ports" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>

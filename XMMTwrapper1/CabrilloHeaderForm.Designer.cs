@@ -1,0 +1,275 @@
+﻿namespace XMMTwrapper1
+{
+    partial class CabrilloHeaderForm
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CabrilloHeaderForm));
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            label4 = new Label();
+            label5 = new Label();
+            label6 = new Label();
+            tbContest = new TextBox();
+            tbCatOp = new TextBox();
+            tbCatTx = new TextBox();
+            tbCatPwr = new TextBox();
+            tbScore = new TextBox();
+            tbSoap = new TextBox();
+            btnExport = new Button();
+            btnCancel = new Button();
+            tbCallsign = new TextBox();
+            label7 = new Label();
+            tbOpNames = new TextBox();
+            label8 = new Label();
+            tbClub = new TextBox();
+            label9 = new Label();
+            SuspendLayout();
+            // 
+            // label1
+            // 
+            label1.Location = new Point(267, 7);
+            label1.Name = "label1";
+            label1.Size = new Size(86, 23);
+            label1.TabIndex = 0;
+            label1.Text = "Contest";
+            label1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label2
+            // 
+            label2.Location = new Point(267, 35);
+            label2.Name = "label2";
+            label2.Size = new Size(86, 23);
+            label2.TabIndex = 1;
+            label2.Text = "Category Op";
+            label2.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label3
+            // 
+            label3.Location = new Point(267, 64);
+            label3.Name = "label3";
+            label3.Size = new Size(86, 23);
+            label3.TabIndex = 2;
+            label3.Text = "Category Tx";
+            label3.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label4
+            // 
+            label4.Location = new Point(267, 93);
+            label4.Name = "label4";
+            label4.Size = new Size(86, 23);
+            label4.TabIndex = 3;
+            label4.Text = "Category Pwr";
+            label4.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label5
+            // 
+            label5.Location = new Point(267, 122);
+            label5.Name = "label5";
+            label5.Size = new Size(86, 23);
+            label5.TabIndex = 4;
+            label5.Text = "Claimed Score";
+            label5.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label6
+            // 
+            label6.Location = new Point(267, 151);
+            label6.Name = "label6";
+            label6.Size = new Size(86, 23);
+            label6.TabIndex = 5;
+            label6.Text = "Soapbox";
+            label6.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tbContest
+            // 
+            tbContest.Location = new Point(373, 7);
+            tbContest.Name = "tbContest";
+            tbContest.Size = new Size(185, 23);
+            tbContest.TabIndex = 6;
+            // 
+            // tbCatOp
+            // 
+            tbCatOp.Location = new Point(373, 36);
+            tbCatOp.Name = "tbCatOp";
+            tbCatOp.Size = new Size(185, 23);
+            tbCatOp.TabIndex = 7;
+            // 
+            // tbCatTx
+            // 
+            tbCatTx.Location = new Point(373, 65);
+            tbCatTx.Name = "tbCatTx";
+            tbCatTx.Size = new Size(185, 23);
+            tbCatTx.TabIndex = 8;
+            // 
+            // tbCatPwr
+            // 
+            tbCatPwr.Location = new Point(373, 94);
+            tbCatPwr.Name = "tbCatPwr";
+            tbCatPwr.Size = new Size(185, 23);
+            tbCatPwr.TabIndex = 9;
+            // 
+            // tbScore
+            // 
+            tbScore.Location = new Point(373, 123);
+            tbScore.Name = "tbScore";
+            tbScore.Size = new Size(185, 23);
+            tbScore.TabIndex = 10;
+            // 
+            // tbSoap
+            // 
+            tbSoap.Location = new Point(373, 152);
+            tbSoap.Multiline = true;
+            tbSoap.Name = "tbSoap";
+            tbSoap.Size = new Size(185, 86);
+            tbSoap.TabIndex = 11;
+            // 
+            // btnExport
+            // 
+            btnExport.Location = new Point(402, 255);
+            btnExport.Name = "btnExport";
+            btnExport.Size = new Size(75, 23);
+            btnExport.TabIndex = 12;
+            btnExport.Text = "Export";
+            btnExport.UseVisualStyleBackColor = true;
+            btnExport.Click += btnExport_Click;
+            // 
+            // btnCancel
+            // 
+            btnCancel.Location = new Point(483, 255);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(75, 23);
+            btnCancel.TabIndex = 13;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
+            // 
+            // tbCallsign
+            // 
+            tbCallsign.Location = new Point(77, 7);
+            tbCallsign.Name = "tbCallsign";
+            tbCallsign.Size = new Size(158, 23);
+            tbCallsign.TabIndex = 15;
+            // 
+            // label7
+            // 
+            label7.Location = new Point(1, 7);
+            label7.Name = "label7";
+            label7.Size = new Size(70, 23);
+            label7.TabIndex = 14;
+            label7.Text = "Callsign";
+            label7.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tbOpNames
+            // 
+            tbOpNames.Location = new Point(77, 36);
+            tbOpNames.Name = "tbOpNames";
+            tbOpNames.Size = new Size(158, 23);
+            tbOpNames.TabIndex = 17;
+            // 
+            // label8
+            // 
+            label8.Location = new Point(1, 37);
+            label8.Name = "label8";
+            label8.Size = new Size(70, 23);
+            label8.TabIndex = 16;
+            label8.Text = "Op name";
+            label8.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tbClub
+            // 
+            tbClub.Location = new Point(77, 65);
+            tbClub.Name = "tbClub";
+            tbClub.Size = new Size(158, 23);
+            tbClub.TabIndex = 19;
+            // 
+            // label9
+            // 
+            label9.Location = new Point(1, 65);
+            label9.Name = "label9";
+            label9.Size = new Size(70, 23);
+            label9.TabIndex = 18;
+            label9.Text = "Club ";
+            label9.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // CabrilloHeaderForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(570, 290);
+            Controls.Add(tbClub);
+            Controls.Add(label9);
+            Controls.Add(tbOpNames);
+            Controls.Add(label8);
+            Controls.Add(tbCallsign);
+            Controls.Add(label7);
+            Controls.Add(btnCancel);
+            Controls.Add(btnExport);
+            Controls.Add(tbSoap);
+            Controls.Add(tbScore);
+            Controls.Add(tbCatPwr);
+            Controls.Add(tbCatTx);
+            Controls.Add(tbCatOp);
+            Controls.Add(tbContest);
+            Controls.Add(label6);
+            Controls.Add(label5);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Name = "CabrilloHeaderForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "CabrilloHeaderForm";
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        #endregion
+
+        private Label label1;
+        private Label label2;
+        private Label label3;
+        private Label label4;
+        private Label label5;
+        private Label label6;
+        private TextBox tbContest;
+        private TextBox tbCatOp;
+        private TextBox tbCatTx;
+        private TextBox tbCatPwr;
+        private TextBox tbScore;
+        private TextBox tbSoap;
+        private Button btnExport;
+        private Button btnCancel;
+        private TextBox tbCallsign;
+        private Label label7;
+        private TextBox tbOpNames;
+        private TextBox tbClub;
+        private Label label8;
+        private Label label9;
+    }
+}
