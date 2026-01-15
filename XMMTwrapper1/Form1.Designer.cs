@@ -369,6 +369,7 @@ namespace XMMTwrapper1
             btnStopLogging.TabIndex = 67;
             btnStopLogging.Text = "Stop";
             btnStopLogging.UseVisualStyleBackColor = true;
+            btnStopLogging.Visible = false;
             btnStopLogging.Click += btnStopLogging_Click;
             // 
             // tbSNratio
@@ -386,6 +387,7 @@ namespace XMMTwrapper1
             btnStartLog.TabIndex = 66;
             btnStartLog.Text = "Start";
             btnStartLog.UseVisualStyleBackColor = true;
+            btnStartLog.Visible = false;
             btnStartLog.Click += btnStartLog_Click;
             // 
             // gbCwFilters
