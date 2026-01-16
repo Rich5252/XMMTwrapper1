@@ -1,8 +1,4 @@
-using AxXMMTLib;            //XMMR.ocx support for MMTTY
-using Constants;            //see XmmrOcxInteropConstants.cs - various constants/enum etc for XMMR/MMTTY
-using IniParser;            //ini file support
-using NAudio.Wave;          //audio device support
-using NmmrContract;         //see XmmrOcxInteropConstants.cs
+
 using System.Runtime.InteropServices;
 
 namespace XMMTwrapper1

@@ -108,6 +108,8 @@ namespace XMMTwrapper1
             }
         }
 
+        //the PC audio input device provides the audio with a default 1kHz tone
+        // used to decode the CW.
         private void PopulateAudioMenu()
         {
             // Clear existing items (except maybe a 'Refresh' button if you have one)

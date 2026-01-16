@@ -23,17 +23,17 @@
 // - "S/N" - uses FIR bandpass and then computes signal to noise ratio as input to MorseClock
 // - "Goertzel" - classic high speed IIR filter, low CPU load but not as good as FIR for noise rejection
 // - "RMS" - wideband signal level for comparison or wideband decode, needs good signals
+// - "Hilbert Analytic" - signal envelope and edge detection with phase noise rejection 
 //
 //PERFORMANCE METRICS
-// - see PARIS test audio files ~4dB S/N
-// - 98.7% accuracy scored using Levenshtein Benchmark Metric cf 88.6% using Fldigi
+// - see PARIS test audio files ~6dB S/N in 45Hz BW
+// - FIR gave 98.7% accuracy scored using Levenshtein Benchmark Metric cf 88.6% using Fldigi
 //
 //****************************************************************************************
 
 
 using NAudio.Wave;                          //audio support library
 using System.Collections.Concurrent;
-using System.ComponentModel.DataAnnotations;
 
 public class CWDecoderEngine
 {
@@ -145,10 +145,11 @@ public class CWDecoderEngine
     int _updateCounter = 0;
     double magSmoothed = 0;
     double SNratio= 0;
+
     //50% overlap of incoming audio stream version
+    //each 256 block is processed every 128 samples at 48kHz Fs (4.166ms per block)
     private void ProcessAudioLoop()
     {
-
         foreach (var buffer in _audioQueue.GetConsumingEnumerable())
         {
             float[] newSamples = ConvertToFloat(buffer);
@@ -264,6 +265,10 @@ public class CWDecoderEngine
                     break;
                 case "RMS":
                     _activeFilter = new RMSStrategy(_SampleRate, 256 /* blocksize */);
+                    _activeFilter.ScalingFactor = _InputScalingFactor;
+                    break;
+                case "Hilbert Analytic":            //HBA
+                    _activeFilter = new HilbertStrategy(127 /* taps */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
             }
@@ -432,7 +437,7 @@ public class AdaptiveThreshold
 
 
 
-    // Helpers for your CSV Logger
+    // Helpers for CSV Logger
     public double GetCurrentThreshold() => _noiseFloor + (_peakLevel - _noiseFloor) * (_isTone ? 0.25 : 0.60);
     public double GetPeak() => _peakLevel;
     public double GetNoise() => _noiseFloor;

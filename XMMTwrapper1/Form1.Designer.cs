@@ -369,7 +369,6 @@ namespace XMMTwrapper1
             btnStopLogging.TabIndex = 67;
             btnStopLogging.Text = "Stop";
             btnStopLogging.UseVisualStyleBackColor = true;
-            btnStopLogging.Visible = false;
             btnStopLogging.Click += btnStopLogging_Click;
             // 
             // tbSNratio
@@ -387,7 +386,6 @@ namespace XMMTwrapper1
             btnStartLog.TabIndex = 66;
             btnStartLog.Text = "Start";
             btnStartLog.UseVisualStyleBackColor = true;
-            btnStartLog.Visible = false;
             btnStartLog.Click += btnStartLog_Click;
             // 
             // gbCwFilters
@@ -444,8 +442,8 @@ namespace XMMTwrapper1
             rbCwFilter3.Name = "rbCwFilter3";
             rbCwFilter3.Size = new Size(56, 18);
             rbCwFilter3.TabIndex = 26;
-            rbCwFilter3.Tag = "S/N";
-            rbCwFilter3.Text = "S/N";
+            rbCwFilter3.Tag = "Hilbert Analytic";
+            rbCwFilter3.Text = "HBA";
             rbCwFilter3.TextAlign = ContentAlignment.MiddleRight;
             rbCwFilter3.UseVisualStyleBackColor = true;
             rbCwFilter3.CheckedChanged += OnCwFilterChanged;

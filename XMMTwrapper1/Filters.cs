@@ -451,3 +451,136 @@ public class RMSFilter
         return power;
     }
 }
+
+
+//***********************************************
+// Hilbert Transform FIR
+//***********************************************
+
+public class HilbertStrategy : ICWFilter
+{
+    private HilbertFIR _filter;
+    private double _lastPhase = 0;
+    public string Name => "Hilbert Phase-Gated";
+    public double TargetFrequency { get; set; } = 1000;
+    public double ScalingFactor { get; set; } = 200;
+
+    public HilbertStrategy(int taps = 63)
+    {
+        _filter = new HilbertFIR(taps);
+    }
+
+    public double ProcessBlock(float[] samples)
+    {
+        double sumMag = 0;
+        double sampleRate = 48000;
+
+        // Expected phase change per sample for our TargetFrequency
+        double expectedDelta = (2.0 * Math.PI * TargetFrequency) / sampleRate;
+        double tolerance = (2.0 * Math.PI * 20.0) / sampleRate; // 20Hz tolerance
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            var (I, Q) = _filter.GetIQ(samples[i]);
+            double magnitude = Math.Sqrt(I * I + Q * Q);
+
+            // Calculate instantaneous phase
+            double currentPhase = Math.Atan2(Q, I);
+            double deltaPhase = currentPhase - _lastPhase;
+
+            // Normalize delta to [-PI, PI]
+            while (deltaPhase <= -Math.PI) deltaPhase += 2 * Math.PI;
+            while (deltaPhase > Math.PI) deltaPhase -= 2 * Math.PI;
+
+            // FREQUENCY GATE: 
+            // If the phase rotation matches our target, it's a valid signal.
+            if (Math.Abs(deltaPhase - expectedDelta) < tolerance)
+            {
+                sumMag += magnitude;
+            }
+            else
+            {
+                // It's QRM or Noise—ignore the magnitude
+                sumMag += 0;
+            }
+
+            _lastPhase = currentPhase;
+        }
+        return sumMag / samples.Length * 50000 / ScalingFactor;
+    }
+}
+
+    /*
+    //Basic Hilbert Transform processing
+    public double ProcessBlock(float[] samples)
+    {
+        double sumMag = 0;
+        for (int i = 0; i < samples.Length; i++)
+        {
+            var (I, Q) = _filter.GetIQ(samples[i]);
+            // Instantaneous Magnitude: No more 1000Hz ripple!
+            sumMag += Math.Sqrt(I * I + Q * Q);
+        }
+        // Normalize for your AdaptiveThreshold
+        return sumMag / samples.Length * 50000 / ScalingFactor;
+    }
+    */
+
+public class HilbertFIR
+{
+    private readonly float[] _taps;
+    private readonly float[] _buffer;
+    private int _bufferIndex = 0;
+    private readonly int _delay;
+
+    public HilbertFIR(int n = 63) // N must be odd for a Type III/IV Hilbert FIR
+    {
+        _taps = new float[n];
+        _buffer = new float[n];
+        _delay = n / 2; // Required to align the 'Real' signal with the 'Imaginary' shift
+
+        for (int i = 0; i < n; i++)
+        {
+            int mid = i - n / 2;
+            if (mid == 0 || mid % 2 == 0)
+            {
+                _taps[i] = 0;
+            }
+            else
+            {
+                // Hilbert coefficient formula: 2 / (PI * mid)
+                _taps[i] = (float)(2.0 / (Math.PI * mid));
+
+                // Apply Blackman window to reduce Gibbs phenomenon
+                double alpha = 0.16;
+                double a0 = (1 - alpha) / 2.0;
+                double a1 = 0.5;
+                double a2 = alpha / 2.0;
+                double window = a0 - a1 * Math.Cos((2 * Math.PI * i) / (n - 1)) + a2 * Math.Cos((4 * Math.PI * i) / (n - 1));
+                _taps[i] *= (float)window;
+            }
+        }
+    }
+
+    public (float I, float Q) GetIQ(float sample)
+    {
+        _buffer[_bufferIndex] = sample;
+
+        // Q is the 90-degree shifted version (the Hilbert output)
+        float Q = 0;
+        int index = _bufferIndex;
+        for (int i = 0; i < _taps.Length; i++)
+        {
+            Q += _taps[i] * _buffer[index--];
+            if (index < 0) index = _taps.Length - 1;
+        }
+
+        // I is the original signal delayed to the center of the filter window
+        int delayIndex = (_bufferIndex - _delay + _buffer.Length) % _buffer.Length;
+        float I = _buffer[delayIndex];
+
+        if (++_bufferIndex >= _buffer.Length) _bufferIndex = 0;
+
+        return (I, Q);
+    }
+}

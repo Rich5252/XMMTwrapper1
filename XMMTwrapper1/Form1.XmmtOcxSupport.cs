@@ -10,17 +10,24 @@ namespace XMMTwrapper1
         // --- XMMR Data Structures and Indexes ---
         // See XmmrOcxInteropConstants.cs for XMMR.OCX defines and further details of data
 
+        //Some XMMR.ocs properties/methods and events can be used directly from axXMMR1
+        // but not all of them will work using the standard interop. Some events and calls
+        // are done via XMMSpecComMsgDispatch.cs helper class. This is due to data restrictions
+        // in the interop generated from the OCX type library that does not allow the old style
+        // VB6 data to be used directly. The main restrictions are around passing arrays of data
+        // via a pointer. The helper class uses late binding via reflection to access these.
+
         // VB6: Private m_nmmr(63) As Long
         // C#: A private array of 64 integers (0 to 63) to store the MMTTY engine status block.
         private readonly object _nmmrLock = new();
         private Nmmr _currentNmmr;   // last known full snapshot from OCX. NMMR[] contains MMTTY status/settings
 
-        private readonly System.Windows.Forms.Timer _specTimer = new() { Interval = 50 }; // 20 fps
         private XmmrRawEventHook? _hook;                //COMconnectionPointHost callbacks
 
         private MmttySwitchButtonGroup? _MmttyButtons;  //MMTTY standard button group
 
-
+        //these are the button controls available in XMMR.ocx for MMTTY
+        //and their corresponding MmttySwitchFlags values
         private void BuildMmttyButtons()
         {
             //create MMTTY buttons in Group1 container
@@ -61,6 +68,7 @@ namespace XMMTwrapper1
             DiscrimBtn3.Checked = (filter == 3);
         }
 
+        //see XmmrOcxInteropConstants.cs for Nmmr struct definition
         private Nmmr GetCurrentNmmr()
         {
             lock (_nmmrLock) return _currentNmmr;
@@ -69,6 +77,8 @@ namespace XMMTwrapper1
         void StartMmttyEngine()
         {
             Log.LogThreadDetails("StartMmttyEngine()", axXMMR1);
+
+            //start MMTTY engine via XMMR.ocx in hidden mode
             axXMMR1.InvokeCommand = "C:\\Ham\\MMTTY\\MMTTY.exe -m";
 
             // Connect to the MMTTY engine
