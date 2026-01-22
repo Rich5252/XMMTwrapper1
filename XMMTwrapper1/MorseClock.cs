@@ -79,6 +79,7 @@ public class MorseClock
         }
     }
 
+    private int stateCounter = 0;
     public void UpdateState(bool isTonePresent, int samplesInBlock)
     {
         lock (_lock)
@@ -154,6 +155,13 @@ public class MorseClock
                 {
                     ProcessSpace(adjusted);
                 }
+            }
+
+            if (isTonePresent != _lastState)    //tone state changed
+            {
+                //log time in same state
+                double sampleCount = (_totalSamplesProcessed - _lastTransitionSample);
+                Log.Perf($"STATE_CHANGE: {_lastState} for {sampleCount} samples ({(sampleCount * 1000.0) / 48000.0} ms)");
             }
 
             _lastState = isTonePresent;

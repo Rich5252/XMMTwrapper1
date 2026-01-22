@@ -5,6 +5,8 @@
 // All filters have a "Strategy" configuration call
 // All filters use ProcessBlock(float[] samples); and return a scalar level result
 //**********************************************
+using static HilbertStrategy;
+
 public interface ICWFilter
 {
     string Name { get; }
@@ -162,6 +164,15 @@ public class GoertzelFilter
 public class FIRStrategy : MorseFilterBase
 {
     private FIRFilter _filter;
+
+    private HilbertFIR _hilbert;
+    private HilbertCoherentDetector _coherentDetector;
+    private double _lastBlockConfidence = 0;
+    public override double SigConfidence() => _lastBlockConfidence;
+
+    private double[] _delayedMag = { 0.0, 0.0, 0.0 };        // For simple 2-output delay to accomodtae Hilbert delay line
+    private int _delayIndex = 0;
+
     public override string Name => "FIR Bandpass";
 
     public FIRStrategy(int sampleRate, double freq, double bw)
@@ -175,16 +186,51 @@ public class FIRStrategy : MorseFilterBase
     protected override void OnSettingsChanged()
     {
         _filter = new FIRFilter(_sampleRate, _tone, _bw, 511);
+        _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
+        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol);
     }
 
     public override double ProcessBlock(float[] samples)
     {
         double sumAbs = 0;
+        double mag = 0;
+        double sumConfidence = 0;         //from Hilbert processing
+
+        //For Hilbert processing - not used in this basic FIR
+        double targetDelta = (2.0 * Math.PI * _tone) / _sampleRate;
+        double radTol = (2.0 * Math.PI * _tol) / _sampleRate;
+
         for (int i = 0; i < samples.Length; i++)
         {
-            sumAbs += Math.Abs(_filter.Process(samples[i]));
+            //FIR bandpass filtering
+            float filteredSample = _filter.Process(samples[i]);
+            sumAbs += Math.Abs(filteredSample);
+
+            var (I, Q) = _hilbert.GetIQ(filteredSample);
+            var result = _coherentDetector.Update(I, Q);
+
+            sumConfidence += result.Confidence;
         }
-        return sumAbs / samples.Length * 50000 / _scaling;
+        mag = sumAbs / samples.Length * 50000 / _scaling;
+        _lastBlockConfidence = sumConfidence / samples.Length;      //this is picked up by decoder
+                                                                    //via SigConfidence() call
+
+        //delay line to match Hilbert filter delay 256 sample delay required for 511 tap Hilbert
+        //assumes 128 sample blocks, so only 2 block delay needed
+        //NOTE can not use overlap with hilbert and this simple delay line
+        _delayedMag[0] = _delayedMag[1];    //shift down
+        _delayedMag[1] = _delayedMag[2];
+        _delayedMag[2] = mag;               //put new result in newest slot
+
+        if (_delayIndex < 2)
+        {
+            _delayIndex++;
+            return mag;                     //initial condition, no delay yet
+        }
+        else
+        {
+            return _delayedMag[0];          // now matches Hilbert confidence output
+        }
     }
 }
 
@@ -355,6 +401,8 @@ public class HilbertStrategy : MorseFilterBase
 {
     private FIRFilter _preFilter;
     private HilbertFIR _hilbert;
+    private HilbertCoherentDetector _coherentDetector;
+
     private double _lastPhase = 0;
     public override string Name => "Hilbert Analytic";
 
@@ -374,6 +422,7 @@ public class HilbertStrategy : MorseFilterBase
     {
         _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
         _preFilter = new FIRFilter(_sampleRate, _tone, _bw, 511);
+        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol);
     }
 
     public override double ProcessBlock(float[] samples)
@@ -383,8 +432,8 @@ public class HilbertStrategy : MorseFilterBase
         float[] cleanSamples = _preFilter.Apply(samples);
 
         // Core math for 48kHz
-        double targetDelta = (2.0 * Math.PI * _tone) / 48000.0;
-        double radTol = (2.0 * Math.PI * _tol) / 48000.0;
+        double targetDelta = (2.0 * Math.PI * _tone) / _sampleRate;
+        double radTol = (2.0 * Math.PI * _tol) / _sampleRate;
 
         // This is for the 50% overlap continuity
         int stepSize = cleanSamples.Length / 2;
@@ -392,32 +441,12 @@ public class HilbertStrategy : MorseFilterBase
 
         for (int i = 0; i < cleanSamples.Length; i++)
         {
-            var (I, Q) = _hilbert.GetIQ(cleanSamples[i]);
+            var (I, Q) = _hilbert.GetIQ(cleanSamples[i]);   //compute in/out phase sample result
 
-            double magnitude = Math.Sqrt(I * I + Q * Q);
-            double currentPhase = Math.Atan2(Q, I);
+            var result = _coherentDetector.Update(I, Q);    //compute coherent detection result
 
-            // Calculate Phase Velocity
-            double deltaPhase = currentPhase - _lastPhase;
-            while (deltaPhase <= -Math.PI) deltaPhase += 2 * Math.PI;
-            while (deltaPhase > Math.PI) deltaPhase -= 2 * Math.PI;
-            _lastPhase = currentPhase;
-
-            // Compare against target (1000Hz = 7.5 degrees)
-            double phaseError = Math.Abs(deltaPhase - targetDelta);
-
-            double confidence = 0;
-            if (phaseError < radTol)
-                confidence = 1.0;
-            else if (phaseError < radTol * 2.5)
-                confidence = 1.0 - ((phaseError - radTol) / (radTol * 1.5));
-
-            sumConfidence += confidence;
-            sumMag += magnitude * confidence * confidence * confidence;
-
-            // Capture phase at the overlap boundary
-            if (i == stepSize - 1)
-                phaseForNextBlock = currentPhase;
+            sumConfidence += result.Confidence;
+            sumMag += result.Magnitude;
         }
 
         _lastBlockConfidence = sumConfidence / cleanSamples.Length;
@@ -468,6 +497,54 @@ public class HilbertStrategy : MorseFilterBase
             float I = _buffer[iIdx];
             _bufferIndex = (_bufferIndex + 1) % _taps.Length;
             return (I, Q);
+        }       
+    }
+
+    public struct CoherenceResult
+    {
+        public double Magnitude;
+        public double Confidence;
+    }
+
+    public class HilbertCoherentDetector
+    {
+        private double _lastPhase;
+        private readonly double _targetDelta;
+        private readonly double _radTol;
+
+        public HilbertCoherentDetector(double targetFreq, double sampleRate, double toleranceHz)
+        {
+            _targetDelta = (2.0 * Math.PI * targetFreq) / sampleRate;
+            _radTol = (2.0 * Math.PI * toleranceHz) / sampleRate;
+        }
+
+        // This is your "Inner Sample Code" extracted
+        public CoherenceResult Update(double I, double Q)
+        {
+            double magnitude = Math.Sqrt(I * I + Q * Q);
+            double currentPhase = Math.Atan2(Q, I);
+
+            // Phase Velocity (Frequency) calculation
+            double deltaPhase = currentPhase - _lastPhase;
+            while (deltaPhase <= -Math.PI) deltaPhase += 2 * Math.PI;
+            while (deltaPhase > Math.PI) deltaPhase -= 2 * Math.PI;
+
+            _lastPhase = currentPhase;
+
+            // Calculate Coherence (Confidence)
+            double phaseError = Math.Abs(deltaPhase - _targetDelta);
+            double confidence = 0;
+
+            if (phaseError < _radTol)
+                confidence = 1.0;
+            else if (phaseError < _radTol * 2.5)
+                confidence = 1.0 - ((phaseError - _radTol) / (_radTol * 1.5));
+
+            return new CoherenceResult
+            {
+                Magnitude = magnitude * Math.Pow(confidence, 3), // Cubic weighting
+                Confidence = confidence
+            };
         }
     }
 }

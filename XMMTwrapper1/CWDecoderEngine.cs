@@ -346,38 +346,11 @@ public class AdaptiveThreshold
     //Gaussian+median signal magnitude temporal filter version    
     private double[] _magHistory = new double[5]; // Gaussian window
     private double[] _medHistory = new double[3]; // Median window
+
+    //FIR + RMS + Goertzel all use this main logic
     public bool IsSignalPresent(double rawMag, double confidence = 1)
     {
-        double mag = rawMag;
-        if (GaussianFilter)
-        {
-            // 1. GAUSSIAN SMOOTHING (5-Point)
-            for (int i = 0; i < 4; i++) _magHistory[i] = _magHistory[i + 1];
-            _magHistory[4] = rawMag;
-
-            mag = (_magHistory[0] * 0.06) +
-                    (_magHistory[1] * 0.24) +
-                    (_magHistory[2] * 0.40) +
-                    (_magHistory[3] * 0.24) +
-                    (_magHistory[4] * 0.06);
-        }
-
-        if (MedianFilter)
-        {
-            // 2. MEDIAN FILTER (3-Point)
-            // Shift median history
-            _medHistory[0] = _medHistory[1];
-            _medHistory[1] = _medHistory[2];
-            _medHistory[2] = mag;
-
-            // To find the median of 3 values, we sort them or use a simple swap-based check
-            double a = _medHistory[0];
-            double b = _medHistory[1];
-            double c = _medHistory[2];
-
-            // Simple median of 3
-            mag = Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c));
-        }
+        double mag = ApplyTemporalFilters(rawMag, 5);       //5 point gaussian and median filtering
 
         // 3. DYNAMIC TRACKING (Peak and Noise)
         // 3.1. ALWAYS track noise floor so we know the environment
@@ -399,6 +372,7 @@ public class AdaptiveThreshold
             _peakLevel = (_peakLevel * 0.95) + (_noiseFloor * 0.05);
         }
 
+        //Ready to incorporate confidence weighting here if needed
         // 3.3. CALCULATE DYNAMIC RANGE
         range = _peakLevel - _noiseFloor;
 
@@ -420,12 +394,40 @@ public class AdaptiveThreshold
             meetsThreshold = (mag > lowerThreshold);
         }
 
-        /* Single threashold solution
-        double upperThreshold = _noiseFloor + (range * 0.50);
-        double lowerThreshold = _noiseFloor + (range * 0.20);
+        if (meetsThreshold && mag > SquelchLevel)    // && confidence > Config.MinConfidence)
+        {
+            _consecutiveHits++;
+            _consecutiveMisses = 0;
+            if (_consecutiveHits >= Config.MaxConsecutiveHits) _isTone = true;
+        }
+        else
+        {
+            _consecutiveMisses++;
+            _consecutiveHits = 0;
+            if (_consecutiveMisses >= Config.MaxConsecutiveMisses) _isTone = false;
+        }
 
-        bool meetsThreshold = _isTone ? (mag > lowerThreshold) : (mag > upperThreshold);
-        */
+        /* //FIR ONLY version
+        // 3.3. CALCULATE DYNAMIC RANGE
+        range = _peakLevel - _noiseFloor;
+
+        // 4. THRESHOLDS & DEBOUNCE
+        // SCHMITT TRIGGER (HYSTERESIS)
+        // Baseline thresholds based on current noise and peak range
+        double upperThreshold = _noiseFloor + (range * Config.THRESHOLD_UPPER_RATIO); // The "Engage" level
+        double lowerThreshold = _noiseFloor + (range * Config.THRESHOLD_LOWER_RATIO); // The "Hold" level (lowered slightly for better QSB)
+
+        bool meetsThreshold;
+        if (!_isTone)
+        {
+            // If SILENT: Must cross the high bar to start a Mark
+            meetsThreshold = (mag > upperThreshold);
+        }
+        else
+        {
+            // If TONING: Only need to stay above the low bar to continue the Mark
+            meetsThreshold = (mag > lowerThreshold);
+        }
 
         if (meetsThreshold && mag > SquelchLevel && confidence > Config.MinConfidence)
         {
@@ -439,6 +441,7 @@ public class AdaptiveThreshold
             _consecutiveHits = 0;
             if (_consecutiveMisses >= Config.MaxConsecutiveMisses) _isTone = false;
         }
+        */
 
         //track S/N
         if (markMeanSquare == 0) markMeanSquare = Math.Pow(mag, 2);
@@ -481,7 +484,7 @@ public class AdaptiveThreshold
     public bool IsHBASignalPresentA(double rawMag, double confidence)
     {
         // 1. Keep your 3-point Gaussian/Median smoothing here
-        double smoothedMag = ApplyTemporalFilters(rawMag);
+        double smoothedMag = ApplyTemporalFilters(rawMag, 3);
 
         // 2. INTELLIGENT TRACKING
         if (confidence > Config.MinConfidence && smoothedMag > SquelchLevel)
@@ -530,7 +533,7 @@ public class AdaptiveThreshold
     //after "P" log analysis, add mag * confidence to improve end of tone detection
     public bool IsHBASignalPresent(double mag, double confidence)
     {
-        double smoothedMag = ApplyTemporalFilters(mag);
+        double smoothedMag = ApplyTemporalFilters(mag, 3);
         double phaseWeightedMag = smoothedMag * confidence;
 
         // 1. DYNAMIC TRACKING (Strict update)
@@ -600,7 +603,7 @@ public class AdaptiveThreshold
     public bool IsHBASignalPresentB(double mag, double confidence)
     {
         // 1. Keep your 3-point Gaussian/Median smoothing here
-        double smoothedMag = ApplyTemporalFilters(mag);
+        double smoothedMag = ApplyTemporalFilters(mag, 3);
 
         // 2. ONLY update tracking if we have high confidence
         // This prevents the Threshold from 'spiking' due to noise
@@ -643,10 +646,10 @@ public class AdaptiveThreshold
         return _isTone;
     }
 
-    private double ApplyTemporalFilters(double rawMag){
+    private double ApplyTemporalFilters(double rawMag, int nPoint = 3){
         // 1. FILTERING (Keep the filters, but maybe reduce Gaussian to 3-point if lag is high)
         double mag = rawMag;
-        if (GaussianFilter)
+        if (GaussianFilter && nPoint == 3)
         {
             // 1. GAUSSIAN SMOOTHING (3-Point)
             _magHistory[0] = _magHistory[1];
@@ -657,6 +660,19 @@ public class AdaptiveThreshold
             mag = (_magHistory[0]* 0.25) +
                   (_magHistory[1]* 0.50) +
                   (_magHistory[2]* 0.25);
+        }
+
+        if (GaussianFilter && nPoint == 5)
+        {
+            // 1. GAUSSIAN SMOOTHING (5-Point)
+            for (int i = 0; i < 4; i++) _magHistory[i] = _magHistory[i + 1];
+            _magHistory[4] = rawMag;
+
+            mag = (_magHistory[0] * 0.06) +
+                    (_magHistory[1] * 0.24) +
+                    (_magHistory[2] * 0.40) +
+                    (_magHistory[3] * 0.24) +
+                    (_magHistory[4] * 0.06);
         }
 
         if (MedianFilter)
@@ -678,6 +694,7 @@ public class AdaptiveThreshold
         return mag;
     }
 
+    
     // Helpers for CSV Logger
     public double GetCurrentThreshold() => _noiseFloor + (_peakLevel - _noiseFloor) * (_isTone ? Config.THRESHOLD_LOWER_RATIO : Config.THRESHOLD_UPPER_RATIO);
     public double GetPeak() => _peakLevel;

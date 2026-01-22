@@ -80,7 +80,7 @@ namespace XMMTwrapper1
             {
                 this.BeginInvoke(new Action(() =>
                 {
-                    tbWPM.Text = wpm.ToString(); // Shows current WPM
+                   if (!cbFixWpm.Checked) tbWPM.Text = wpm.ToString(); // Shows current WPM
                 }));
             };
             PopulateAudioMenu();
