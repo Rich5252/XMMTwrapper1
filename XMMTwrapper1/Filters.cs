@@ -7,58 +7,100 @@
 //**********************************************
 public interface ICWFilter
 {
-    // Returns a magnitude value (0.0 to 1.0+) based on the input block
-    double ProcessBlock(float[] samples);
     string Name { get; }
+    double ProcessBlock(float[] samples);
 
+    // Common properties for UI binding
     double TargetFrequency { get; set; }
+    double filterBW { get; set; }
+    double Tolerance { get; set; }
     double ScalingFactor { get; set; }
 
+    // New method for logging internal states
+    double SigConfidence();
+    bool isHilbert();
 }
 
+//Common base class for filters
+public abstract class MorseFilterBase : ICWFilter
+{
+    public abstract string Name { get; }
+    protected int _sampleRate = 48000;
+
+    // Backing fields
+    protected double _tone = 1000;
+    protected double _bw = 75;
+    protected double _tol = 30;
+    protected double _scaling = 200;
+
+    public virtual double TargetFrequency
+    {
+        get => _tone;
+        set { _tone = value; OnSettingsChanged(); }
+    }
+    public virtual double filterBW
+    {
+        get => _bw;
+        set { _bw = value; OnSettingsChanged(); }
+    }
+    public virtual double Tolerance
+    {
+        get => _tol;
+        set { _tol = value; } // Usually doesn't require a filter rebuild
+    }
+    public virtual double ScalingFactor
+    {
+        get => _scaling;
+        set => _scaling = value;
+    }
+
+    public virtual double SigConfidence() => 1;         //default return. Hilbert overrides this
+    public virtual bool isHilbert() => false;           //default return. Hilbert overrides this
+
+    // Handled by individual filters
+    public abstract double ProcessBlock(float[] samples);
+
+    // This method is called whenever Freq or BW changes
+    protected virtual void OnSettingsChanged() { }
+}
 
 
 //***************************************************
 //Goertzel
 //***************************************************
-public class GoertzelStrategy : ICWFilter
+public class GoertzelStrategy : MorseFilterBase
 {
     private GoertzelFilter _filter;
-    public string Name => "Goertzel";
-    
-    public double ScalingFactor 
-        {
-            get => _ScalingFactor;
-            set { _ScalingFactor = value; }
-        }
-    public double TargetFrequency
+    public override string Name => "Goertzel";
+
+    // Constructor ensures the filter is built upon selection
+    public GoertzelStrategy(int sampleRate, double targetFreq, int blockSize)
     {
-        get => _freq;
-        set { _freq = value; Rebuild(); }
+        _sampleRate = sampleRate;
+        _tone = targetFreq;
+        // Note: For Goertzel, 'blockSize' determines the BW. 
+        // We set _bw here just to keep the base class in sync.
+        _bw = (double)sampleRate / blockSize;
+        OnSettingsChanged();
     }
 
-    private double _freq = 1000;                //default Filter target freq
-    private int _samplerate = 48000;
-    private int _blocksize = 256;
-    private double _ScalingFactor = 1000;
-
-    private void Rebuild()
+    // Triggered automatically by MorseFilterBase when _tone or _bw is changed
+    protected override void OnSettingsChanged()
     {
-        // 48k rate, new freq, 200Hz bw, 127 taps
-        _filter = new GoertzelFilter(TargetFrequency, _samplerate, _blocksize);
+        // Calculate block size based on bandwidth if you want dynamic BW,
+        // otherwise use a fixed block size (e.g., 256)
+        int blockSize = (int)((double)_sampleRate / _bw);
+        // Ensure blockSize is at least reasonable
+        if (blockSize < 64) blockSize = 64;
+
+        _filter = new GoertzelFilter(_tone, _sampleRate, blockSize);
     }
 
-    public GoertzelStrategy(double targetFreq, int sampleRate, int blockSize)
+    public override double ProcessBlock(float[] samples)
     {
-        _freq = targetFreq;
-        _samplerate = sampleRate;
-        _blocksize = blockSize;
-        _filter = new GoertzelFilter(targetFreq, sampleRate, blockSize);
-    }
-
-    public double ProcessBlock(float[] samples)
-    {
-        return _filter.CalculateMagnitude(samples) * 77 / _ScalingFactor;
+        // Goertzel returns power; we scale it to match the expected UI range.
+        // The 77 is your original empirical scaling constant.
+        return _filter.CalculateMagnitude(samples) * 77 / _scaling;
     }
 }
 
@@ -78,7 +120,7 @@ public class GoertzelFilter
         _blockSize = blockSize;
 
         // Calculate the coefficient
-        double k = (int)(0.5 + ((_blockSize * _targetFreq) / _sampleRate));
+        double k = (int)(0.5 + ((_blockSize * _targetFreq) / (double) _sampleRate));
         double omega = (2.0 * Math.PI * k) / _blockSize;
         _coeff = 2.0 * Math.Cos(omega);
 
@@ -117,54 +159,32 @@ public class GoertzelFilter
 //***********************************************
 // FIR
 //***********************************************
-public class FIRStrategy : ICWFilter
+public class FIRStrategy : MorseFilterBase
 {
     private FIRFilter _filter;
-    public string Name => "FIR Bandpass";
-    public double ScalingFactor { get; set; } = 200;
-    public double TargetFrequency
-    {
-        get => _freq;
-        set { _freq = value; Rebuild(); }
-    }
-    public double filterBW
-    {
-        get => _bw;
-        set { _bw = value; Rebuild(); }
-    }
+    public override string Name => "FIR Bandpass";
 
-    private double _freq = 1000;                //default Filter target freq
-    private int _samplerate = 48000;
-    private int _taps = 127;
-    private double _bw = 200;
-
-    private void Rebuild()
+    public FIRStrategy(int sampleRate, double freq, double bw)
     {
-        // 48k rate, new freq, 200Hz bw, 127 taps
-        _filter = new FIRFilter(_samplerate, _freq, _bw,  _taps);
-    }
-
-    public FIRStrategy(int sampleRate, double centerFreq, double bw, int taps)
-    {
-        _freq = centerFreq;
-        _taps = taps;
-        _samplerate = sampleRate;
+        _sampleRate = sampleRate;
+        _tone = freq;
         _bw = bw;
-
-        _filter = new FIRFilter(sampleRate, centerFreq, bw, taps);
+        OnSettingsChanged();
     }
 
+    protected override void OnSettingsChanged()
+    {
+        _filter = new FIRFilter(_sampleRate, _tone, _bw, 511);
+    }
 
-    //
-    public double ProcessBlock(float[] samples)
+    public override double ProcessBlock(float[] samples)
     {
         double sumAbs = 0;
         for (int i = 0; i < samples.Length; i++)
         {
-            float filtered = _filter.Process(samples[i]);
-            sumAbs += Math.Abs(filtered);
+            sumAbs += Math.Abs(_filter.Process(samples[i]));
         }
-        return sumAbs / samples.Length * 50000 / ScalingFactor;
+        return sumAbs / samples.Length * 50000 / _scaling;
     }
 }
 
@@ -216,133 +236,15 @@ public class FIRFilter
         return taps;
     }
 
-    //convolution of the block for each incoming sample
-    public float Process(float sample)
+    //filter an entire block
+    public float[] Apply(float[] samples)
     {
-        _buffer[_bufferIndex] = sample;
-        float output = 0;
-        int index = _bufferIndex;
-
-        for (int i = 0; i < _taps.Length; i++)
-        {
-            output += _taps[i] * _buffer[index--];
-            if (index < 0) index = _taps.Length - 1;
-        }
-
-        if (++_bufferIndex >= _taps.Length) _bufferIndex = 0;
-        return output;
-    }
-}
-
-//***********************************************
-// FIR S/N
-//***********************************************
-public class FIRSNStrategy : ICWFilter
-{
-    private FIRSNFilter _filter;
-    public string Name => "S/N";
-    public double ScalingFactor { get; set; } = 1000;
-    public double TargetFrequency
-    {
-        get => _freq;
-        set { _freq = value; Rebuild(); }
-    }
-    public double filterBW
-    {
-        get => _bw;
-        set { _bw = value; Rebuild(); }
-    }
-
-    private double _freq = 1000;                //default Filter target freq
-    private int _samplerate = 48000;
-    private int _taps = 255;
-    private double _bw = 75;
-
-    private void Rebuild()
-    {
-        // 48k rate, new freq, 200Hz bw, 127 taps
-        _filter = new FIRSNFilter(_samplerate, _freq, _bw, _taps);
-    }
-
-    public FIRSNStrategy(int sampleRate, double centerFreq, double bw, int taps)
-    {
-        _freq = centerFreq;
-        _taps = taps;
-        _samplerate = sampleRate;
-        _bw = bw;
-
-        _filter = new FIRSNFilter(sampleRate, centerFreq, bw, taps);
-    }
-
-
-    //
-    public double ProcessBlock(float[] samples)
-    {
-        double sumAbs = 0;
-        double sumRaw = 0;
+        float[] output = new float[samples.Length];
         for (int i = 0; i < samples.Length; i++)
         {
-            float filtered = _filter.Process(samples[i]);
-            sumAbs += Math.Abs(filtered);
-            sumRaw += Math.Abs(samples[i]);
+            output[i] = Process(samples[i]);
         }
-        double FIRoutputLevel = sumAbs / samples.Length * 50000 / ScalingFactor;
-        sumRaw = sumRaw / samples.Length * 7777 / ScalingFactor;
-        //double SNratio = 20 * Math.Log10(FIRoutputLevel / sumRaw) * 1000 / ScalingFactor;
-        double noise = Math.Pow(sumRaw, 2) - Math.Pow(FIRoutputLevel, 2);
-        double threshold = 0.0001;
-        if (noise < threshold) noise = threshold;
-        double SNratio = Math.Pow(FIRoutputLevel, 2) / noise / ScalingFactor;
-        return SNratio;
-    }
-}
-
-public class FIRSNFilter
-{
-    private readonly float[] _taps;
-    private readonly float[] _buffer;
-    private int _bufferIndex = 0;
-
-    public FIRSNFilter(int sampleRate, double centerFreq, double bandwidth, int tapCount = 127)
-    {
-        _taps = DesignBandPass(sampleRate, centerFreq, bandwidth, tapCount);
-        _buffer = new float[tapCount];
-    }
-
-    private float[] DesignBandPass(int rate, double center, double bw, int n)
-    {
-        float[] taps = new float[n];
-        double fLow = (center - bw / 2.0) / rate;
-        double fHigh = (center + bw / 2.0) / rate;
-
-        for (int i = 0; i < n; i++)
-        {
-            if (i == n / 2) // Handle division by zero at center
-            {
-                taps[i] = (float)(2.0 * (fHigh - fLow));
-            }
-            else
-            {
-                double mid = i - n / 2.0;
-                taps[i] = (float)((Math.Sin(2 * Math.PI * fHigh * mid) - Math.Sin(2 * Math.PI * fLow * mid)) / (Math.PI * mid));
-            }
-            // Apply Hamming window to reduce ripples
-            //taps[i] *= (float)(0.54 - 0.46 * Math.Cos(2 * Math.PI * i / (n - 1)));
-
-            // --- BLACKMAN WINDOW ---
-            // Provides much better stop-band rejection than Hamming
-            double alpha = 0.16; // Standard Blackman coefficient
-            double a0 = (1 - alpha) / 2.0;
-            double a1 = 0.5;
-            double a2 = alpha / 2.0;
-
-            double window = a0
-                            - a1 * Math.Cos((2 * Math.PI * i) / (n - 1))
-                            + a2 * Math.Cos((4 * Math.PI * i) / (n - 1));
-
-            taps[i] *= (float)window;
-        }
-        return taps;
+        return output;
     }
 
     //convolution of the block for each incoming sample
@@ -362,49 +264,42 @@ public class FIRSNFilter
         return output;
     }
 }
-
 
 
 // ****************************************
 // RMS
 //******************************************
-public class RMSStrategy : ICWFilter
+public class RMSStrategy : MorseFilterBase
 {
     private RMSFilter _filter;
-    public string Name => "RMS";
-    public double ScalingFactor { get; set; } = 1000;
-    public double TargetFrequency
-    {
-        get => _freq;
-        set { _freq = value; Rebuild(); }
-    }
-    public double filterBW
-    {
-        get => _bw;
-        set { _bw = value; Rebuild(); }
-    }
-
-    private double _freq = 1000;                //default Filter target freq
-    private int _samplerate = 48000;
-    private int _size = 256;
-    private double _bw = 200;
-
-    private void Rebuild()
-    {
-        // 48k rate, new freq, 200Hz bw, 127 taps
-        _filter = new RMSFilter(_samplerate, _size);
-    }
+    public override string Name => "RMS";
 
     public RMSStrategy(int sampleRate, int size)
     {
-        _samplerate = sampleRate;
-        _size = size;
-        _filter = new RMSFilter(sampleRate, size);
+        _sampleRate = sampleRate;
+        // Use the initial size to set our internal BW
+        _bw = (double)sampleRate / size;
+        OnSettingsChanged();
     }
 
-    public double ProcessBlock(float[] samples)
+    protected override void OnSettingsChanged()
     {
-        return _filter.CalculateMagnitude(samples) / 18.7 / ScalingFactor;
+        // Calculate block size based on the BW slider
+        // Higher BW = smaller block (faster response)
+        // Lower BW = larger block (more smoothing)
+        int blockSize = (int)((double)_sampleRate / _bw);
+
+        // Safety bounds for block size
+        if (blockSize < 32) blockSize = 32;
+        if (blockSize > 4096) blockSize = 4096;
+
+        _filter = new RMSFilter(_sampleRate, blockSize);
+    }
+
+    public override double ProcessBlock(float[] samples)
+    {
+        // 18.7 is your existing empirical normalization constant
+        return _filter.CalculateMagnitude(samples) / 18.7 / _scaling;
     }
 }
 
@@ -424,7 +319,7 @@ public class RMSFilter
         _blockSize = blockSize;
 
         // Calculate the coefficient
-        double k = (int)(0.5 + ((_blockSize * _targetFreq) / _sampleRate));
+        double k = (int)(0.5 + ((_blockSize * _targetFreq) / (double)_sampleRate));
         double omega = (2.0 * Math.PI * k) / _blockSize;
         _coeff = 2.0 * Math.Cos(omega);
 
@@ -456,131 +351,123 @@ public class RMSFilter
 //***********************************************
 // Hilbert Transform FIR
 //***********************************************
-
-public class HilbertStrategy : ICWFilter
+public class HilbertStrategy : MorseFilterBase
 {
-    private HilbertFIR _filter;
+    private FIRFilter _preFilter;
+    private HilbertFIR _hilbert;
     private double _lastPhase = 0;
-    public string Name => "Hilbert Phase-Gated";
-    public double TargetFrequency { get; set; } = 1000;
-    public double ScalingFactor { get; set; } = 200;
+    public override string Name => "Hilbert Analytic";
 
-    public HilbertStrategy(int taps = 63)
+    private double _lastBlockConfidence = 0;
+    public override double SigConfidence() => _lastBlockConfidence;
+    public override bool isHilbert() => true;   
+
+    public HilbertStrategy(int sampleRate, double freq, double bw)
     {
-        _filter = new HilbertFIR(taps);
+        _sampleRate = sampleRate;
+        _tone = freq;
+        _bw = bw;
+        OnSettingsChanged();
     }
 
-    public double ProcessBlock(float[] samples)
+    protected override void OnSettingsChanged()
     {
+        _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
+        _preFilter = new FIRFilter(_sampleRate, _tone, _bw, 511);
+    }
+
+    public override double ProcessBlock(float[] samples)
+    {
+        double sumConfidence = 0;
         double sumMag = 0;
-        double sampleRate = 48000;
+        float[] cleanSamples = _preFilter.Apply(samples);
 
-        // Expected phase change per sample for our TargetFrequency
-        double expectedDelta = (2.0 * Math.PI * TargetFrequency) / sampleRate;
-        double tolerance = (2.0 * Math.PI * 20.0) / sampleRate; // 20Hz tolerance
+        // Core math for 48kHz
+        double targetDelta = (2.0 * Math.PI * _tone) / 48000.0;
+        double radTol = (2.0 * Math.PI * _tol) / 48000.0;
 
-        for (int i = 0; i < samples.Length; i++)
+        // This is for the 50% overlap continuity
+        int stepSize = cleanSamples.Length / 2;
+        double phaseForNextBlock = 0;
+
+        for (int i = 0; i < cleanSamples.Length; i++)
         {
-            var (I, Q) = _filter.GetIQ(samples[i]);
+            var (I, Q) = _hilbert.GetIQ(cleanSamples[i]);
+
             double magnitude = Math.Sqrt(I * I + Q * Q);
-
-            // Calculate instantaneous phase
             double currentPhase = Math.Atan2(Q, I);
-            double deltaPhase = currentPhase - _lastPhase;
 
-            // Normalize delta to [-PI, PI]
+            // Calculate Phase Velocity
+            double deltaPhase = currentPhase - _lastPhase;
             while (deltaPhase <= -Math.PI) deltaPhase += 2 * Math.PI;
             while (deltaPhase > Math.PI) deltaPhase -= 2 * Math.PI;
-
-            // FREQUENCY GATE: 
-            // If the phase rotation matches our target, it's a valid signal.
-            if (Math.Abs(deltaPhase - expectedDelta) < tolerance)
-            {
-                sumMag += magnitude;
-            }
-            else
-            {
-                // It's QRM or Noise—ignore the magnitude
-                sumMag += 0;
-            }
-
             _lastPhase = currentPhase;
+
+            // Compare against target (1000Hz = 7.5 degrees)
+            double phaseError = Math.Abs(deltaPhase - targetDelta);
+
+            double confidence = 0;
+            if (phaseError < radTol)
+                confidence = 1.0;
+            else if (phaseError < radTol * 2.5)
+                confidence = 1.0 - ((phaseError - radTol) / (radTol * 1.5));
+
+            sumConfidence += confidence;
+            sumMag += magnitude * confidence * confidence * confidence;
+
+            // Capture phase at the overlap boundary
+            if (i == stepSize - 1)
+                phaseForNextBlock = currentPhase;
         }
-        return sumMag / samples.Length * 50000 / ScalingFactor;
+
+        _lastBlockConfidence = sumConfidence / cleanSamples.Length;
+
+        // Crucial: Hand off the phase for the next block's first delta calculation
+        // If you are NOT using overlap, just leave _lastPhase as is.
+        // _lastPhase = phaseForNextBlock; 
+
+        // Return weighted magnitude
+        return (sumMag / cleanSamples.Length) * 50000 / _scaling;
     }
-}
 
-    /*
-    //Basic Hilbert Transform processing
-    public double ProcessBlock(float[] samples)
+    public class HilbertFIR
     {
-        double sumMag = 0;
-        for (int i = 0; i < samples.Length; i++)
+        private readonly float[] _taps;
+        private readonly float[] _buffer;
+        private int _bufferIndex = 0;
+        private readonly int _mid;
+
+        public HilbertFIR(int taps = 511)
         {
-            var (I, Q) = _filter.GetIQ(samples[i]);
-            // Instantaneous Magnitude: No more 1000Hz ripple!
-            sumMag += Math.Sqrt(I * I + Q * Q);
-        }
-        // Normalize for your AdaptiveThreshold
-        return sumMag / samples.Length * 50000 / ScalingFactor;
-    }
-    */
+            _taps = new float[taps];
+            _buffer = new float[taps];
+            _mid = (taps - 1) / 2;
 
-public class HilbertFIR
-{
-    private readonly float[] _taps;
-    private readonly float[] _buffer;
-    private int _bufferIndex = 0;
-    private readonly int _delay;
-
-    public HilbertFIR(int n = 63) // N must be odd for a Type III/IV Hilbert FIR
-    {
-        _taps = new float[n];
-        _buffer = new float[n];
-        _delay = n / 2; // Required to align the 'Real' signal with the 'Imaginary' shift
-
-        for (int i = 0; i < n; i++)
-        {
-            int mid = i - n / 2;
-            if (mid == 0 || mid % 2 == 0)
+            for (int i = 0; i < taps; i++)
             {
-                _taps[i] = 0;
-            }
-            else
-            {
-                // Hilbert coefficient formula: 2 / (PI * mid)
-                _taps[i] = (float)(2.0 / (Math.PI * mid));
+                int n = i - _mid;
+                if (n == 0 || n % 2 == 0) _taps[i] = 0;
+                else _taps[i] = (float)(2.0 / (Math.PI * n));
 
-                // Apply Blackman window to reduce Gibbs phenomenon
-                double alpha = 0.16;
-                double a0 = (1 - alpha) / 2.0;
-                double a1 = 0.5;
-                double a2 = alpha / 2.0;
-                double window = a0 - a1 * Math.Cos((2 * Math.PI * i) / (n - 1)) + a2 * Math.Cos((4 * Math.PI * i) / (n - 1));
+                // Hamming window for 48kHz precision
+                double window = 0.54 - 0.46 * Math.Cos(2 * Math.PI * i / (taps - 1));
                 _taps[i] *= (float)window;
             }
         }
-    }
 
-    public (float I, float Q) GetIQ(float sample)
-    {
-        _buffer[_bufferIndex] = sample;
-
-        // Q is the 90-degree shifted version (the Hilbert output)
-        float Q = 0;
-        int index = _bufferIndex;
-        for (int i = 0; i < _taps.Length; i++)
+        public (float I, float Q) GetIQ(float sample)
         {
-            Q += _taps[i] * _buffer[index--];
-            if (index < 0) index = _taps.Length - 1;
+            _buffer[_bufferIndex] = sample;
+            float Q = 0;
+            for (int i = 0; i < _taps.Length; i++)
+            {
+                int idx = (_bufferIndex - i + _taps.Length) % _taps.Length;
+                Q += _taps[i] * _buffer[idx];
+            }
+            int iIdx = (_bufferIndex - _mid + _taps.Length) % _taps.Length;
+            float I = _buffer[iIdx];
+            _bufferIndex = (_bufferIndex + 1) % _taps.Length;
+            return (I, Q);
         }
-
-        // I is the original signal delayed to the center of the filter window
-        int delayIndex = (_bufferIndex - _delay + _buffer.Length) % _buffer.Length;
-        float I = _buffer[delayIndex];
-
-        if (++_bufferIndex >= _buffer.Length) _bufferIndex = 0;
-
-        return (I, Q);
     }
 }

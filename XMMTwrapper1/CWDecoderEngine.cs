@@ -31,9 +31,11 @@
 //
 //****************************************************************************************
 
-
+using Microsoft.VisualStudio.OLE.Interop;
 using NAudio.Wave;                          //audio support library
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Drawing.Text;
 
 public class CWDecoderEngine
 {
@@ -44,21 +46,39 @@ public class CWDecoderEngine
     private AdaptiveThreshold _adaptor = new AdaptiveThreshold();
     private MorseClock _clock = new MorseClock();
 
-    public Action<double> OnMagnitudeUpdated;
+    //setup messaging to Form UI
+    public Action<double, double> OnMagnitudeUpdated;
     public Action<double> OnSNratioUpdated;
     public Action<bool> OnToneDetected;
     public Action<string> OnSequenceChanged;
     public Action<char> OnCharacterDecoded;
     public Action<int> OnWpmChanged;
 
-    public double TargetFrequency { get; set; } = 1000.0;
-    public double FIRbw { get; set; } = 50.0;           //need to refresh filet to take new value
-    private double _InputScalingFactor = 200;
+    //Params adjustable from UI
+    private double _TargetFrequency = 1000.0;
+    public double TargetFrequency {
+        get => _TargetFrequency;
+        set { _TargetFrequency = value; _activeFilter.TargetFrequency = _TargetFrequency; }
+    }
 
+    private double _FIRbw = 50.0;
+    public double FIRbw {
+        get => _FIRbw;
+        set { _FIRbw = value; _activeFilter.filterBW = _FIRbw; }        //now filters adjustable on the fly
+    }     
+
+    private double _InputScalingFactor = 200;
+    private double _HBAtol = 30;                        //HBA discrim tolerance (Hz)
     public void SetInputScale(double _SF)
     {
         _InputScalingFactor = _SF;
         _activeFilter.ScalingFactor = _InputScalingFactor;
+    }
+
+    public void SetTolerance(double _tol)
+    {
+        _HBAtol = _tol;
+        _activeFilter.Tolerance = _HBAtol;
     }
 
     public void SetSquelchLevel(double _level) => _adaptor.SquelchLevel = _level;
@@ -103,7 +123,7 @@ public class CWDecoderEngine
         _clock.SetSampleRate(_SampleRate);
 
         //_activeFilter = new GoertzelStrategy(TargetFrequency, _SampleRate, 256 /* buffersize */);    //default filter
-        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, 511 /* taps */);    //default filter
+        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */);    //default filter
         _activeFilter.ScalingFactor = _InputScalingFactor;
 
 
@@ -150,31 +170,47 @@ public class CWDecoderEngine
     //each 256 block is processed every 128 samples at 48kHz Fs (4.166ms per block)
     private void ProcessAudioLoop()
     {
+        int processBlockSize = 128;         //if size == step then no overlap
+        int processBlockStep = 128;         //represents 50% overlap for 256 blocksize
+        bool isTone = false;
         foreach (var buffer in _audioQueue.GetConsumingEnumerable())
         {
             float[] newSamples = ConvertToFloat(buffer);
             _residualBuffer.AddRange(newSamples);
 
             // Slide window by 128 samples (50% overlap of a 256 block)
-            while (_residualBuffer.Count >= 256)
+            while (_residualBuffer.Count >= processBlockSize)
             {
                 // 1. Get the current 256 block
-                float[] block = _residualBuffer.GetRange(0, 256).ToArray();
+                float[] block = _residualBuffer.GetRange(0, processBlockSize).ToArray();
 
-                // 2. SLIDE: Only remove 128 samples, not 256
-                _residualBuffer.RemoveRange(0, 128);
+                // 2. SLIDE: Only remove 128 samples, not 256 if 50% overlap wanted
+                processBlockStep = (_activeFilter.isHilbert() ? processBlockSize : 128);    //no overlap for Hilbert Analytic
+                _residualBuffer.RemoveRange(0, processBlockStep);
 
                 // 3. Process
                 // Unified call regardless of strategy
                 double mag = _activeFilter.ProcessBlock(block);         //filter and return scaler magnitude
-                bool isTone = _adaptor.IsSignalPresent(mag);
+                double confidence = _activeFilter.SigConfidence();      //Hibert phase lock confidence (0.0 to 1.0)
+                if (!_activeFilter.isHilbert())
+                {
+                    isTone = _adaptor.IsSignalPresent(mag, confidence);
+                }
+                else
+                {
+                    isTone = _adaptor.IsHBASignalPresent(mag, confidence);
+                }
+                
                 SNratio = _adaptor.SNratio;                             //pick up the current SN measurement for UI
 
+                
                 // Inside ProcessAudioLoop, after IsSignalPresent(mag):
                 if (_csvLogger != null)
                 {
+                    long millis = sw.ElapsedMilliseconds;
                     // Record the decision-making data
-                    _csvLogger.WriteLine($"{_clock.GetTotalSamples()},{mag:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
+                    _csvLogger.WriteLine($"{millis},{_clock.GetTotalSamples()},{mag:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)},{confidence:F4}");
+                    //_csvLogger.WriteLine($"{_clock.GetTotalSamples()},{mag:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
                 }
 
                 if (magSmoothed == 0) { magSmoothed = mag; }
@@ -182,15 +218,15 @@ public class CWDecoderEngine
                 _updateCounter++;
                 if (_updateCounter >= 50)
                 {
-                    OnMagnitudeUpdated?.Invoke(magSmoothed);
+                    OnMagnitudeUpdated?.Invoke(magSmoothed, confidence);
                     OnToneDetected?.Invoke(isTone);
                     OnSNratioUpdated?.Invoke(SNratio);
                     _updateCounter = 0;
                 }
 
-                // 4. Update Clock with ONLY 128 samples of "time" 
-                // because we are now pulsing the clock twice as often
-                _clock.UpdateState(isTone, 128);
+                // 4. Update Clock with given samples of "time" for accurate timing
+                // This also allows overlap processing to work correctly
+                _clock.UpdateState(isTone, processBlockStep);
             }
         }
     }
@@ -213,11 +249,13 @@ public class CWDecoderEngine
         return samples;
     }
 
-    public void SetWPM(int wpm) => _clock.SetDotLength(1200.0 / wpm);
+    public void SetWpm(int wpm) => _clock.SetWpm(wpm);
+    public bool FixWpm(bool fix) => _clock.FixWpm(fix);
 
     // Diagnostic logging. Call from UI
     private readonly object _logLock = new object();
     private StreamWriter _csvLogger;
+    Stopwatch sw;
     public void StartLogging()
     {
         EnableLogging(LoggingFilePath);
@@ -226,8 +264,16 @@ public class CWDecoderEngine
     {
         lock (_logLock)
         {
-            _csvLogger = new StreamWriter(filePath);
-            _csvLogger.WriteLine("Timestamp,Magnitude,Threshold,IsToning,State");
+            sw = Stopwatch.StartNew();
+            try
+            {
+                _csvLogger = new StreamWriter(filePath);
+                _csvLogger.WriteLine("Millis,#samples,Magnitude,Threshold,IsToning,State,Confidence"); 
+            }
+            catch 
+            {
+                MessageBox.Show("Error creating log file. Check if file is already open");
+            } 
         }
     
     }
@@ -237,6 +283,7 @@ public class CWDecoderEngine
         {
             if (_csvLogger != null)
             {
+                sw.Stop();
                 _csvLogger.Close();
                 _csvLogger?.Dispose();
                 _csvLogger = null;
@@ -252,15 +299,11 @@ public class CWDecoderEngine
             switch (filterName)
             {
                 case "FIR Bandpass":
-                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, 511 /* Taps */);
-                    _activeFilter.ScalingFactor = _InputScalingFactor;
-                    break;
-                case "S/N":
-                    _activeFilter = new FIRSNStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, 511 /* Taps */);
+                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Goertzel":
-                    _activeFilter = new GoertzelStrategy(TargetFrequency, _SampleRate, 256 /* blocksize */);
+                    _activeFilter = new GoertzelStrategy(_SampleRate, TargetFrequency, 256 /* blocksize */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "RMS":
@@ -268,7 +311,7 @@ public class CWDecoderEngine
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Hilbert Analytic":            //HBA
-                    _activeFilter = new HilbertStrategy(127 /* taps */);
+                    _activeFilter = new HilbertStrategy( _SampleRate, TargetFrequency, FIRbw /* BW */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
             }
@@ -298,13 +341,12 @@ public class AdaptiveThreshold
     
     public double SquelchLevel { get; set; } = 0.01;        //set from UI
     public bool GaussianFilter = true;                      //diagnostic option
-    public bool MedianFilter = true;                        //diagnostic option
-
+    public bool MedianFilter = true;                        //diagnostic option 
 
     //Gaussian+median signal magnitude temporal filter version    
     private double[] _magHistory = new double[5]; // Gaussian window
     private double[] _medHistory = new double[3]; // Median window
-    public bool IsSignalPresent(double rawMag)
+    public bool IsSignalPresent(double rawMag, double confidence = 1)
     {
         double mag = rawMag;
         if (GaussianFilter)
@@ -385,7 +427,7 @@ public class AdaptiveThreshold
         bool meetsThreshold = _isTone ? (mag > lowerThreshold) : (mag > upperThreshold);
         */
 
-        if (meetsThreshold && mag > SquelchLevel)
+        if (meetsThreshold && mag > SquelchLevel && confidence > Config.MinConfidence)
         {
             _consecutiveHits++;
             _consecutiveMisses = 0;
@@ -435,10 +477,209 @@ public class AdaptiveThreshold
         return _isTone;
     }
 
+    //initial logic
+    public bool IsHBASignalPresentA(double rawMag, double confidence)
+    {
+        // 1. Keep your 3-point Gaussian/Median smoothing here
+        double smoothedMag = ApplyTemporalFilters(rawMag);
 
+        // 2. INTELLIGENT TRACKING
+        if (confidence > Config.MinConfidence && smoothedMag > SquelchLevel)
+        {
+            // High confidence signal: Update Peak
+            if (smoothedMag > _peakLevel) _peakLevel = smoothedMag;
+            else _peakLevel = (_peakLevel * 0.99) + (smoothedMag * 0.01);
+        }
+        else if (!_isTone)
+        {
+            // Low confidence + No active tone: Update Noise Floor
+            _noiseFloor = (_noiseFloor * 0.99) + (smoothedMag * 0.01);
+
+            // Decay peak slowly toward noise to stay adaptive
+            _peakLevel = (_peakLevel * 0.995) + (_noiseFloor * 0.005);
+        }
+
+        range = Math.Max(0.001, _peakLevel - _noiseFloor);
+
+        // 3. SCHMITT TRIGGER WITH CONFIDENCE
+        double upperThreshold = _noiseFloor + (range * Config.THRESHOLD_UPPER_RATIO);
+        double lowerThreshold = _noiseFloor + (range * Config.THRESHOLD_LOWER_RATIO);
+
+        // Meets criteria if Magnitude is right AND we have a phase-lock
+        bool looksLikeTone = (confidence > Config.MinConfidence) &&
+                             (_isTone ? smoothedMag > lowerThreshold : smoothedMag > upperThreshold);
+
+        // 4. DEBOUNCE      
+        if (looksLikeTone && smoothedMag > SquelchLevel)
+        {
+            _consecutiveHits++;
+            _consecutiveMisses = 0;
+            if (_consecutiveHits >= Config.MaxConsecutiveHits) _isTone = true;
+        }
+        else
+        {
+            _consecutiveMisses++;
+            _consecutiveHits = 0;
+            if (_consecutiveMisses >= Config.MaxConsecutiveMisses) _isTone = false;
+        }
+        
+
+        return _isTone;
+    }
+
+    //after "P" log analysis, add mag * confidence to improve end of tone detection
+    public bool IsHBASignalPresent(double mag, double confidence)
+    {
+        double smoothedMag = ApplyTemporalFilters(mag);
+        double phaseWeightedMag = smoothedMag * confidence;
+
+        // 1. DYNAMIC TRACKING (Strict update)
+        // Inside IsSignalPresentB
+        if (confidence > 0.92 && smoothedMag > SquelchLevel)
+        {
+            // Update Peak while toning
+            if (smoothedMag > _peakLevel) _peakLevel = smoothedMag;
+            else _peakLevel = (_peakLevel * 0.98) + (smoothedMag * 0.02);
+        }
+        else if (!_isTone)
+        {
+            // Silent: Force the Peak down towards the Noise Floor
+            // This is what prevents the 0.73 overshoot in your log.
+            _noiseFloor = (_noiseFloor * 0.99) + (smoothedMag * 0.01);
+            _peakLevel = (_peakLevel * 0.85) + (_noiseFloor * 0.15);
+        }
+
+        // Calculate Range with a safety floor
+        double currentRange = Math.Max(0.1, _peakLevel - _noiseFloor);
+
+        // HYSTERESIS TUNING
+        // While TONING: Keep the bar low (25%) to hold the Dah
+        double lowerThreshold = _noiseFloor + (currentRange * 0.25);
+
+        // While SILENT: Use a 40% bar instead of 50-60%
+        // This prevents the '0.69' jump you saw.
+        double upperThreshold = _noiseFloor + (currentRange * 0.38);
+
+        // EXTRA SAFETY: Clamp the Upper Threshold
+        // Never let the 'start' bar be higher than, say, 0.5 if we are in a quiet patch.
+        upperThreshold = Math.Min(upperThreshold, 0.55);
+
+        // 3. LOGIC
+        bool meetsThreshold = _isTone ? (smoothedMag > lowerThreshold) : (smoothedMag > upperThreshold);
+
+        // REQUIRE high confidence to START, but only moderate to HOLD
+        bool confidenceGate = _isTone ? (confidence > 0.45) : (confidence > 0.90);
+
+        if (meetsThreshold && confidenceGate && smoothedMag > SquelchLevel)
+        {
+            _consecutiveHits++;
+            _consecutiveMisses = 0;
+            if (_consecutiveHits >= 2) _isTone = true;
+        }
+        else
+        {
+            _consecutiveMisses++;
+            _consecutiveHits = 0;
+
+            // Use the mag*conf product for the fast stop
+            if (phaseWeightedMag < lowerThreshold || confidence < 0.3)
+            {
+                if (_consecutiveMisses >= 2) _isTone = false;
+            }
+            else
+            {
+                // Hang-time to prevent splitting Dahs during minor fades
+                if (_consecutiveMisses >= 8) _isTone = false;
+            }
+        }
+
+        return _isTone;
+    }
+
+    //pretty good results with 70Hz BW HBA filter + 50Hz tol bw
+    public bool IsHBASignalPresentB(double mag, double confidence)
+    {
+        // 1. Keep your 3-point Gaussian/Median smoothing here
+        double smoothedMag = ApplyTemporalFilters(mag);
+
+        // 2. ONLY update tracking if we have high confidence
+        // This prevents the Threshold from 'spiking' due to noise
+        if (confidence > 0.9 && smoothedMag > SquelchLevel)
+        {
+            if (smoothedMag > _peakLevel) _peakLevel = smoothedMag;
+            else _peakLevel = (_peakLevel * 0.98) + (smoothedMag * 0.02);
+        }
+        else if (!_isTone)
+        {
+            // Only update noise floor when we are SURE there is no tone
+            _noiseFloor = (_noiseFloor * 0.99) + (smoothedMag * 0.01);
+        }
+
+        // 3. Dynamic Range
+        double currentRange = Math.Max(0.01, _peakLevel - _noiseFloor);
+        double upperThreshold = _noiseFloor + (currentRange * Config.THRESHOLD_UPPER_RATIO);
+        double lowerThreshold = _noiseFloor + (currentRange * Config.THRESHOLD_LOWER_RATIO);
+
+        // 4. THE DEBOUNCE (The Core)
+        // We require phase lock to START a tone, but we are more lenient to CONTINUE it
+        bool meetsCriteria = _isTone
+            ? (smoothedMag > lowerThreshold && (confidence > 0.45)) // Already toning? Just stay above the bar.
+            : (smoothedMag > upperThreshold && confidence > 0.85); // Starting? Need Phase Lock.
+
+        if (meetsCriteria)
+        {
+            _consecutiveHits++;
+            _consecutiveMisses = 0;
+            if (_consecutiveHits >= 2) _isTone = true; // Fast attack (2 blocks ~10ms)
+        }
+        else
+        {
+            _consecutiveMisses++;
+            _consecutiveHits = 0;
+            // Moderate decay (3 blocks ~15ms) to prevent chatter
+            if (_consecutiveMisses >= 5) _isTone = false;       //was 3
+        }
+
+        return _isTone;
+    }
+
+    private double ApplyTemporalFilters(double rawMag){
+        // 1. FILTERING (Keep the filters, but maybe reduce Gaussian to 3-point if lag is high)
+        double mag = rawMag;
+        if (GaussianFilter)
+        {
+            // 1. GAUSSIAN SMOOTHING (3-Point)
+            _magHistory[0] = _magHistory[1];
+            _magHistory[1] = _magHistory[2];
+            _magHistory[2] = rawMag;
+
+            // Apply Gaussian weights: 1/4, 1/2, 1/4
+            mag = (_magHistory[0]* 0.25) +
+                  (_magHistory[1]* 0.50) +
+                  (_magHistory[2]* 0.25);
+        }
+
+        if (MedianFilter)
+        {
+            // 2. MEDIAN FILTER (3-Point)
+            // Shift median history
+            _medHistory[0] = _medHistory[1];
+            _medHistory[1] = _medHistory[2];
+            _medHistory[2] = mag;
+
+            // To find the median of 3 values, we sort them or use a simple swap-based check
+            double a = _medHistory[0];
+            double b = _medHistory[1];
+            double c = _medHistory[2];
+
+            // Simple median of 3
+            mag = Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c));
+        }
+        return mag;
+    }
 
     // Helpers for CSV Logger
-    public double GetCurrentThreshold() => _noiseFloor + (_peakLevel - _noiseFloor) * (_isTone ? 0.25 : 0.60);
+    public double GetCurrentThreshold() => _noiseFloor + (_peakLevel - _noiseFloor) * (_isTone ? Config.THRESHOLD_LOWER_RATIO : Config.THRESHOLD_UPPER_RATIO);
     public double GetPeak() => _peakLevel;
     public double GetNoise() => _noiseFloor;
 }

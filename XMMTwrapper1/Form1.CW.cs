@@ -25,7 +25,7 @@ namespace XMMTwrapper1
             _decoder = new CWDecoderEngine();
 
             // Subscribe to the engine's events
-            _decoder.OnMagnitudeUpdated = (mag) =>
+            _decoder.OnMagnitudeUpdated = (mag, confidence) =>
             {
                 this.BeginInvoke(new Action(() =>
                 {
@@ -36,6 +36,7 @@ namespace XMMTwrapper1
                     //scaled value
                     double val = Math.Max(0, (magdB + 50) / (30 + 50));         //clamp to above zero
                     SignalStrength = Math.Min(1000, (int)(val * 1000));         //max 1000, used to drive axxMMRlevel control
+                    tbConfidence.Text = confidence.ToString("F2");
                 }));
             };
 
@@ -194,7 +195,11 @@ namespace XMMTwrapper1
         {
             _decoder.FIRbw = (double)tbBW.Value;
             _decoder.ChangeFilter(CurrentCWfilterName);     //need to update instance
+        }
 
+        private void tbTolerance_ValueChanged(object sender, EventArgs e)
+        {
+            _decoder.SetTolerance((double)tbTolerance.Value);
         }
 
         //clear text boxes containing received text
@@ -214,7 +219,36 @@ namespace XMMTwrapper1
         private void tbWPM_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             //reset WPM to default
-            _decoder.SetWPM(25);            //TODO make value a user setting
+            if (!cbFixWpm.Checked) _decoder.SetWpm(25);            //TODO make value a user setting
+        }
+
+        private void tbWPM_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (cbFixWpm.Checked && e.KeyChar == (char)Keys.Enter)
+            {
+                int wpmValue = TextToInt(tbWPM.Text);
+                if (wpmValue > 0)
+                {
+                    _decoder.SetWpm(wpmValue);
+                }
+            }
+        }
+
+        private void cbFixWpm_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbFixWpm.Checked)
+            {
+                int wpmValue = TextToInt(tbWPM.Text);
+                if (wpmValue > 0)
+                {
+                    _decoder.FixWpm(true);
+                    _decoder.SetWpm(wpmValue);
+                }
+            }
+            else
+            {
+                _decoder.FixWpm(false);
+            }
         }
 
         private void SendSquelchFromXMMLevel(int eLevel)

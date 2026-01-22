@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace XMMTwrapper1
 {
     public partial class Form1 : Form
-    {   
+    {
         private string lastChar = "";                   //remember last char from RTTY decoder                                                       //to sort out errors in cr/lf
 
         // This will automatically save to: C:\YourAppPath\settings.ini
@@ -160,7 +160,7 @@ namespace XMMTwrapper1
             base.OnFormClosed(e);
         }
 
-        
+
 
         string strWordReceived = "";            //build word to see if its a callsign
         private void DisplayNextChar(string s)
@@ -264,7 +264,7 @@ namespace XMMTwrapper1
             UpdateButtonMacros();
         }
 
-        
+
         //double click in suggested callsign list copies entry to DXcall text box
         private void tbCallSignList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -291,6 +291,7 @@ namespace XMMTwrapper1
         {
             _QSOlogger.OpenLogDirectory();
         }
+
 
     }
 }

@@ -45,6 +45,9 @@ namespace XMMTwrapper1
             DiscrimBtn3 = new RadioButton();
             tbBW = new NumericUpDown();
             gbCWcontrols = new GroupBox();
+            cbFixWpm = new CheckBox();
+            tbConfidence = new TextBox();
+            tbTolerance = new NumericUpDown();
             label13 = new Label();
             label12 = new Label();
             label11 = new Label();
@@ -124,6 +127,7 @@ namespace XMMTwrapper1
             gbRttyFilters.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)tbBW).BeginInit();
             gbCWcontrols.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tbTolerance).BeginInit();
             gbCwFilters.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)sbAudioLevel).BeginInit();
             statusStrip1.SuspendLayout();
@@ -284,6 +288,9 @@ namespace XMMTwrapper1
             // 
             // gbCWcontrols
             // 
+            gbCWcontrols.Controls.Add(cbFixWpm);
+            gbCWcontrols.Controls.Add(tbConfidence);
+            gbCWcontrols.Controls.Add(tbTolerance);
             gbCWcontrols.Controls.Add(label13);
             gbCWcontrols.Controls.Add(label12);
             gbCWcontrols.Controls.Add(label11);
@@ -305,6 +312,33 @@ namespace XMMTwrapper1
             gbCWcontrols.TabStop = false;
             gbCWcontrols.Visible = false;
             // 
+            // cbFixWpm
+            // 
+            cbFixWpm.AutoSize = true;
+            cbFixWpm.Location = new Point(92, 128);
+            cbFixWpm.Name = "cbFixWpm";
+            cbFixWpm.Size = new Size(15, 14);
+            cbFixWpm.TabIndex = 75;
+            cbFixWpm.UseVisualStyleBackColor = true;
+            cbFixWpm.CheckedChanged += cbFixWpm_CheckedChanged;
+            // 
+            // tbConfidence
+            // 
+            tbConfidence.Location = new Point(65, 75);
+            tbConfidence.Name = "tbConfidence";
+            tbConfidence.Size = new Size(40, 23);
+            tbConfidence.TabIndex = 74;
+            // 
+            // tbTolerance
+            // 
+            tbTolerance.Location = new Point(16, 76);
+            tbTolerance.Name = "tbTolerance";
+            tbTolerance.Size = new Size(42, 23);
+            tbTolerance.TabIndex = 73;
+            tbTolerance.Value = new decimal(new int[] { 30, 0, 0, 0 });
+            tbTolerance.ValueChanged += tbTolerance_ValueChanged;
+            tbTolerance.KeyUp += tbTolerance_ValueChanged;
+            // 
             // label13
             // 
             label13.AutoSize = true;
@@ -317,7 +351,7 @@ namespace XMMTwrapper1
             // label12
             // 
             label12.AutoSize = true;
-            label12.Location = new Point(66, 128);
+            label12.Location = new Point(58, 128);
             label12.Name = "label12";
             label12.Size = new Size(36, 15);
             label12.TabIndex = 71;
@@ -475,12 +509,13 @@ namespace XMMTwrapper1
             // 
             // tbWPM
             // 
-            tbWPM.Location = new Point(65, 146);
+            tbWPM.Location = new Point(58, 146);
             tbWPM.Name = "tbWPM";
-            tbWPM.Size = new Size(37, 23);
+            tbWPM.Size = new Size(46, 23);
             tbWPM.TabIndex = 59;
             tbWPM.Text = "25";
             tbWPM.TextAlign = HorizontalAlignment.Center;
+            tbWPM.KeyPress += tbWPM_KeyPress;
             tbWPM.MouseDoubleClick += tbWPM_MouseDoubleClick;
             // 
             // pnlKeyIndicator
@@ -626,7 +661,7 @@ namespace XMMTwrapper1
             gbRttyCW.Controls.Add(btnCW);
             gbRttyCW.Location = new Point(12, 148);
             gbRttyCW.Name = "gbRttyCW";
-            gbRttyCW.Size = new Size(62, 49);
+            gbRttyCW.Size = new Size(58, 49);
             gbRttyCW.TabIndex = 29;
             gbRttyCW.TabStop = false;
             // 
@@ -1051,6 +1086,7 @@ namespace XMMTwrapper1
             ((System.ComponentModel.ISupportInitialize)tbBW).EndInit();
             gbCWcontrols.ResumeLayout(false);
             gbCWcontrols.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tbTolerance).EndInit();
             gbCwFilters.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)sbAudioLevel).EndInit();
             statusStrip1.ResumeLayout(false);
@@ -1150,5 +1186,8 @@ namespace XMMTwrapper1
         private ToolStripMenuItem exportLogToolStripMenuItem;
         private ToolStripMenuItem exportCabrilloToolStripMenuItem;
         private ToolStripMenuItem openLogDirectoryToolStripMenuItem;
+        private NumericUpDown tbTolerance;
+        private TextBox tbConfidence;
+        private CheckBox cbFixWpm;
     }
 }

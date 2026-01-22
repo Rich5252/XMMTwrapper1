@@ -22,6 +22,7 @@
     <Compile Remove="CWDecoderEngine - rms version pre Filters Select.cs" />
     <Compile Remove="CWDecoderEngine - With Hann working to 40wpm.cs" />
     <Compile Remove="CWDecoderEngine - WPM tracking improved - pre SchmittTrig squelch.cs" />
+    <Compile Remove="Filters - Various Hilbert Diagnostic attempts pre full 4800Fs.cs" />
     <Compile Remove="FormButtonArray - Pre Gemini Copy.cs" />
     <Compile Remove="Helpers.cs" />
     <Compile Remove="ITU_Prefix_Checker - Mini list.cs" />

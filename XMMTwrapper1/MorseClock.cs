@@ -51,6 +51,7 @@ public class MorseClock
 
     private double _dotMs = 1200.0 / 25.0;
     private double _currentWPM = 25;
+    private bool _FixWpm = false;
 
     // --- TRACKING BUCKETS ---
     private List<double> _dotHistory = new();
@@ -64,15 +65,16 @@ public class MorseClock
     private readonly object _lock = new object();
 
     public void SetSampleRate(int rate) => _sampleRate = rate;
-
+    
     public long GetTotalSamples() => _totalSamplesProcessed;
 
-    public void SetDotLength(double ms)
+    public bool FixWpm(bool fix) => _FixWpm = fix;
+    public void SetWpm(int Wpm)
     {
         lock (_lock)
         {
-            _dotMs = ms;
-            _currentWPM = 1200 / ms;
+            _dotMs = 1200 / Wpm;
+            _currentWPM = Wpm;
             SeedDotDashHistory(_currentWPM);        //Initialize history to force reset
         }
     }
@@ -281,14 +283,14 @@ public class MorseClock
         // 3. WPM Update & Sanity
         double newWpm = 1200.0 / _dotMs;
 
-        // If we drift into impossible territory, hard reset to a "Contest Center" of 28 WPM
-        if (newWpm > 40 || newWpm < 15)
+        // If we drift into impossible territory, hard reset to a "Contest Center" of 25 WPM
+        if (newWpm > 42 || newWpm < 15)
         {
             SeedDotDashHistory(25.0);
             return;
         }
 
-        _currentWPM = newWpm;
+        if (!_FixWpm) _currentWPM = newWpm;
         OnWpmChanged?.Invoke((int)_currentWPM);
     }
 

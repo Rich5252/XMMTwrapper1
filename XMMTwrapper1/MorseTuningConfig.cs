@@ -1,6 +1,6 @@
 ﻿
 
-// --- TUNING CONSTANTS (The "Engine" Settings) ---
+// --- TUNING CONSTANTS (Real world "Engine" Settings) ---
 public static class Config
 {
     //***************************************************************
@@ -8,7 +8,8 @@ public static class Config
     //***************************************************************
     public const int MaxConsecutiveHits = 2;            //loop hits needed for _IsTone
     public const int MaxConsecutiveMisses = 7;          //loop misses needed for !_IsTone
-   
+    public const double MinConfidence = 0.9;           //was 0.95   Hilbert confidence to accept Tone
+
 
     //***************************************************************
     //MORSE CLOCK
@@ -32,7 +33,7 @@ public static class Config
     public const double THRESHOLD_LOWER_RATIO = 0.17;
     public const double DEBOUNCE_RATIO = 0.22;          //was 0.25
     public const double IDLE_DECODE_RATIO = 4;          // More patient idle timer
-    public const int FILTER_COMPENSATION_MS = -6;       //was +4 // Start low and use Calibration tool
+    public const int FILTER_COMPENSATION_MS = -6;       //was -6 // Start low and use Calibration tool
 
     // STATISTICS
     public const int HISTORY_BUCKET_SIZE = 25;     //was 25
@@ -40,6 +41,8 @@ public static class Config
     
 }
 
+
+// --- TUNING CONSTANTS FOR PARIS EXPERIMENT (The "Engine" Settings) ---
 public static class ConfigPARIS
 {
     //***************************************************************
