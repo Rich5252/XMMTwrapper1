@@ -61,7 +61,7 @@ public class CWDecoderEngine
         set { _TargetFrequency = value; _activeFilter.TargetFrequency = _TargetFrequency; }
     }
 
-    private double _FIRbw = 50.0;
+    private double _FIRbw = 45.0;
     public double FIRbw {
         get => _FIRbw;
         set { _FIRbw = value; _activeFilter.filterBW = _FIRbw; }        //now filters adjustable on the fly
@@ -99,10 +99,11 @@ public class CWDecoderEngine
         Log.Mark($"Switched to filter: {filter.Name}");
     }
 
+    private char lastChar = '\0';
     public CWDecoderEngine()
     {
         Task.Factory.StartNew(() => ProcessAudioLoop(), TaskCreationOptions.LongRunning);
-        _clock.OnCharacterDecoded = (c) => OnCharacterDecoded?.Invoke(c);
+        _clock.OnCharacterDecoded = (c) => { lastChar = c; OnCharacterDecoded?.Invoke(c); };
         _clock.OnSequenceChanged = (s) => OnSequenceChanged?.Invoke(s);
         _clock.OnWpmChanged = (i) => OnWpmChanged?.Invoke(i);
     }
@@ -163,8 +164,11 @@ public class CWDecoderEngine
 
 
     int _updateCounter = 0;
-    double magSmoothed = 0;
+    double magSmoothed = 0;                 //exp avg of magnitude for UI
     double SNratio= 0;
+
+    double magFiltered = 0;
+    double confFiltered = 0;
 
     //50% overlap of incoming audio stream version
     //each 256 block is processed every 128 samples at 48kHz Fs (4.166ms per block)
@@ -194,7 +198,7 @@ public class CWDecoderEngine
                 double confidence = _activeFilter.SigConfidence();      //Hibert phase lock confidence (0.0 to 1.0)
                 if (!_activeFilter.isHilbert())
                 {
-                    isTone = _adaptor.IsSignalPresent(mag, confidence);
+                    (isTone, magFiltered, confFiltered) = _adaptor.IsSignalPresent(mag, confidence);
                 }
                 else
                 {
@@ -209,8 +213,8 @@ public class CWDecoderEngine
                 {
                     long millis = sw.ElapsedMilliseconds;
                     // Record the decision-making data
-                    _csvLogger.WriteLine($"{millis},{_clock.GetTotalSamples()},{mag:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)},{confidence:F4}");
-                    //_csvLogger.WriteLine($"{_clock.GetTotalSamples()},{mag:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
+                    _csvLogger.WriteLine($"{millis},{_clock.GetTotalSamples()},{magFiltered:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4}, {lastChar}");
+                    //_csvLogger.WriteLine($"{_clock.GetTotalSamples()},{magFiltered:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
                 }
 
                 if (magSmoothed == 0) { magSmoothed = mag; }
@@ -268,7 +272,7 @@ public class CWDecoderEngine
             try
             {
                 _csvLogger = new StreamWriter(filePath);
-                _csvLogger.WriteLine("Millis,#samples,Magnitude,Threshold,IsToning,State,Confidence"); 
+                _csvLogger.WriteLine("Millis,#samples,Magnitude,Threshold,IsToning,State,Confidence, lastChar"); 
             }
             catch 
             {
@@ -346,12 +350,17 @@ public class AdaptiveThreshold
     //Gaussian+median signal magnitude temporal filter version    
     private double[] _magHistory = new double[5]; // Gaussian window
     private double[] _medHistory = new double[3]; // Median window
+    private double[] _confGausHistory = new double[5]; // Gaussian window
+    private double[] _confMedHistory = new double[3]; // Median window
+
+
 
     //FIR + RMS + Goertzel all use this main logic
-    public bool IsSignalPresent(double rawMag, double confidence = 1)
+    public (bool, double, double) IsSignalPresent(double rawMag, double confidence = 1)
     {
-        double mag = ApplyTemporalFilters(rawMag, 5);       //5 point gaussian and median filtering
-
+        double mag = ApplyTemporalFilters(rawMag, 5, _magHistory, _medHistory);       //5 point gaussian and median filtering
+        double conf = ApplyTemporalFilters(confidence, 3, _confGausHistory, _confMedHistory); //confidence filtering
+        
         // 3. DYNAMIC TRACKING (Peak and Noise)
         // 3.1. ALWAYS track noise floor so we know the environment
         _noiseFloor = (_noiseFloor * 0.995) + (mag * 0.005);
@@ -383,18 +392,27 @@ public class AdaptiveThreshold
         double lowerThreshold = _noiseFloor + (range * Config.THRESHOLD_LOWER_RATIO); // The "Hold" level (lowered slightly for better QSB)
 
         bool meetsThreshold;
+        double signalPower = (mag * mag) / upperThreshold;
         if (!_isTone)
         {
             // If SILENT: Must cross the high bar to start a Mark
-            meetsThreshold = (mag > upperThreshold);
+            double confidenceAdjust = (conf > 0.98 ? 1.4 : 1);
+            //meetsThreshold = (mag * confidenceAdjust > upperThreshold);
+
+            meetsThreshold = signalPower * confidenceAdjust > upperThreshold;
         }
         else
         {
             // If TONING: Only need to stay above the low bar to continue the Mark
-            meetsThreshold = (mag > lowerThreshold);
+            // confidence adjust to avoid drop outs
+            //confidenceAdjust = (conf > 0.92  ? 1.4 : 1);
+            //double confidenceAdjust = 1.0 + (Math.Max(0, conf - 0.5) * 1.0);
+            //meetsThreshold = (mag * confidenceAdjust > lowerThreshold);
+
+            meetsThreshold = signalPower > (lowerThreshold * 0.7);
         }
 
-        if (meetsThreshold && mag > SquelchLevel)    // && confidence > Config.MinConfidence)
+        if (meetsThreshold && mag > SquelchLevel)    /// && conf > Config.MinConfidence)
         {
             _consecutiveHits++;
             _consecutiveMisses = 0;
@@ -429,7 +447,7 @@ public class AdaptiveThreshold
             meetsThreshold = (mag > lowerThreshold);
         }
 
-        if (meetsThreshold && mag > SquelchLevel && confidence > Config.MinConfidence)
+        if (meetsThreshold && mag > SquelchLevel && conf > Config.MinConfidence)
         {
             _consecutiveHits++;
             _consecutiveMisses = 0;
@@ -477,14 +495,14 @@ public class AdaptiveThreshold
             }
         }
 
-        return _isTone;
+        return (_isTone, mag, conf);
     }
 
     //initial logic
     public bool IsHBASignalPresentA(double rawMag, double confidence)
     {
         // 1. Keep your 3-point Gaussian/Median smoothing here
-        double smoothedMag = ApplyTemporalFilters(rawMag, 3);
+        double smoothedMag = ApplyTemporalFilters(rawMag, 3, _magHistory, _medHistory);
 
         // 2. INTELLIGENT TRACKING
         if (confidence > Config.MinConfidence && smoothedMag > SquelchLevel)
@@ -533,7 +551,7 @@ public class AdaptiveThreshold
     //after "P" log analysis, add mag * confidence to improve end of tone detection
     public bool IsHBASignalPresent(double mag, double confidence)
     {
-        double smoothedMag = ApplyTemporalFilters(mag, 3);
+        double smoothedMag = ApplyTemporalFilters(mag, 3, _magHistory, _medHistory);
         double phaseWeightedMag = smoothedMag * confidence;
 
         // 1. DYNAMIC TRACKING (Strict update)
@@ -603,7 +621,7 @@ public class AdaptiveThreshold
     public bool IsHBASignalPresentB(double mag, double confidence)
     {
         // 1. Keep your 3-point Gaussian/Median smoothing here
-        double smoothedMag = ApplyTemporalFilters(mag, 3);
+        double smoothedMag = ApplyTemporalFilters(mag, 3, _magHistory, _medHistory);
 
         // 2. ONLY update tracking if we have high confidence
         // This prevents the Threshold from 'spiking' due to noise
@@ -646,47 +664,47 @@ public class AdaptiveThreshold
         return _isTone;
     }
 
-    private double ApplyTemporalFilters(double rawMag, int nPoint = 3){
+    private double ApplyTemporalFilters(double rawMag, int nPoint, double[] gHistory, double[] mHistory){
         // 1. FILTERING (Keep the filters, but maybe reduce Gaussian to 3-point if lag is high)
         double mag = rawMag;
         if (GaussianFilter && nPoint == 3)
         {
             // 1. GAUSSIAN SMOOTHING (3-Point)
-            _magHistory[0] = _magHistory[1];
-            _magHistory[1] = _magHistory[2];
-            _magHistory[2] = rawMag;
+            gHistory[0] = gHistory[1];
+            gHistory[1] = gHistory[2];
+            gHistory[2] = rawMag;
 
             // Apply Gaussian weights: 1/4, 1/2, 1/4
-            mag = (_magHistory[0]* 0.25) +
-                  (_magHistory[1]* 0.50) +
-                  (_magHistory[2]* 0.25);
+            mag = (gHistory[0]* 0.25) +
+                  (gHistory[1]* 0.50) +
+                  (gHistory[2]* 0.25);
         }
 
         if (GaussianFilter && nPoint == 5)
         {
             // 1. GAUSSIAN SMOOTHING (5-Point)
-            for (int i = 0; i < 4; i++) _magHistory[i] = _magHistory[i + 1];
-            _magHistory[4] = rawMag;
+            for (int i = 0; i < 4; i++) gHistory[i] = gHistory[i + 1];
+            gHistory[4] = rawMag;
 
-            mag = (_magHistory[0] * 0.06) +
-                    (_magHistory[1] * 0.24) +
-                    (_magHistory[2] * 0.40) +
-                    (_magHistory[3] * 0.24) +
-                    (_magHistory[4] * 0.06);
+            mag = (gHistory[0] * 0.06) +
+                    (gHistory[1] * 0.24) +
+                    (gHistory[2] * 0.40) +
+                    (gHistory[3] * 0.24) +
+                    (gHistory[4] * 0.06);
         }
 
         if (MedianFilter)
         {
             // 2. MEDIAN FILTER (3-Point)
             // Shift median history
-            _medHistory[0] = _medHistory[1];
-            _medHistory[1] = _medHistory[2];
-            _medHistory[2] = mag;
+            mHistory[0] = mHistory[1];
+            mHistory[1] = mHistory[2];
+            mHistory[2] = mag;
 
             // To find the median of 3 values, we sort them or use a simple swap-based check
-            double a = _medHistory[0];
-            double b = _medHistory[1];
-            double c = _medHistory[2];
+            double a = mHistory[0];
+            double b = mHistory[1];
+            double c = mHistory[2];
 
             // Simple median of 3
             mag = Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c));

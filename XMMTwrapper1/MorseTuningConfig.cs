@@ -7,7 +7,7 @@ public static class Config
     //CWDecoderEngine
     //***************************************************************
     public const int MaxConsecutiveHits = 2;            //loop hits needed for _IsTone
-    public const int MaxConsecutiveMisses = 7;          //loop misses needed for !_IsTone
+    public const int MaxConsecutiveMisses = 7;          //was 7     loop misses needed for !_IsTone
     public const double MinConfidence = 0.9;           //was 0.95   Hilbert confidence to accept Tone
 
 
@@ -49,7 +49,7 @@ public static class ConfigPARIS
     //CWDecoderEngine
     //***************************************************************
     public const int MaxConsecutiveHits = 2;
-    public const int MaxConsecutiveMisses = 6;
+    public const int MaxConsecutiveMisses = 6;      //"best" code actually has hard coded = 4
 
 
     //***************************************************************

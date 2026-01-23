@@ -170,7 +170,7 @@ public class FIRStrategy : MorseFilterBase
     private double _lastBlockConfidence = 0;
     public override double SigConfidence() => _lastBlockConfidence;
 
-    private double[] _delayedMag = { 0.0, 0.0, 0.0 };        // For simple 2-output delay to accomodtae Hilbert delay line
+    private double[] _delayedMag = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };        // For simple 2-output delay to accomodtae Hilbert delay line
     private int _delayIndex = 0;
 
     public override string Name => "FIR Bandpass";
@@ -212,7 +212,7 @@ public class FIRStrategy : MorseFilterBase
             sumConfidence += result.Confidence;
         }
         mag = sumAbs / samples.Length * 50000 / _scaling;
-        _lastBlockConfidence = sumConfidence / samples.Length;      //this is picked up by decoder
+        double conf = sumConfidence / samples.Length;      //this is picked up by decoder
                                                                     //via SigConfidence() call
 
         //delay line to match Hilbert filter delay 256 sample delay required for 511 tap Hilbert
@@ -220,17 +220,11 @@ public class FIRStrategy : MorseFilterBase
         //NOTE can not use overlap with hilbert and this simple delay line
         _delayedMag[0] = _delayedMag[1];    //shift down
         _delayedMag[1] = _delayedMag[2];
-        _delayedMag[2] = mag;               //put new result in newest slot
+        _delayedMag[2] = conf;               //put new result in newest slot
 
-        if (_delayIndex < 2)
-        {
-            _delayIndex++;
-            return mag;                     //initial condition, no delay yet
-        }
-        else
-        {
-            return _delayedMag[0];          // now matches Hilbert confidence output
-        }
+        _lastBlockConfidence = _delayedMag[1];
+
+        return mag;          // now matches Hilbert confidence output
     }
 }
 
