@@ -117,7 +117,7 @@ public class CWDecoderEngine
         {
             DeviceNumber = deviceIndex,
             WaveFormat = new WaveFormat(48000, 16, 1),
-            BufferMilliseconds = 10
+            BufferMilliseconds = 50
         };
 
         _SampleRate = _waveIn.WaveFormat.SampleRate;
@@ -131,9 +131,12 @@ public class CWDecoderEngine
         _waveIn.DataAvailable += (s, e) => {
             if (!_audioQueue.IsAddingCompleted)
             {
-                byte[] data = new byte[e.BytesRecorded];
-                Array.Copy(e.Buffer, data, e.BytesRecorded);
-                _audioQueue.Add(data);
+                lock (_filterLock)
+                {
+                    byte[] data = new byte[e.BytesRecorded];
+                    Array.Copy(e.Buffer, data, e.BytesRecorded);
+                    _audioQueue.Add(data);
+                }
             }
         };
 

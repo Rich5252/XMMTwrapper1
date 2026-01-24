@@ -108,8 +108,26 @@ public class MorseClock
             // 3. Adaptive Debounce
             if (elapsedMs < _dotMs * Config.DEBOUNCE_RATIO) return;
 
+            //ignore very small durations to avoid noise
+            //if your dotMs * DEBOUNCE_RATIO gets too small.
+            if (elapsedMs < Math.Max(Config.DOT_MINIMUM_MS, _dotMs * Config.DEBOUNCE_RATIO)) return;
+
             // 4. Compensation
-            long adjusted = (long)elapsedMs + Config.FILTER_COMPENSATION_MS;
+            //long adjusted = (long)elapsedMs + Config.FILTER_COMPENSATION_MS;
+
+            // 4. ASYMMETRICAL COMPENSATION
+            // Subtract from Marks, Add to Spaces to recover the "True" duration.
+            long adjusted;
+            if (_lastState) // We just finished a TONE (Falling Edge)
+            {
+                // -14ms is your identified "sweet spot"
+                adjusted = (long)elapsedMs - Config.FILTER_COMPENSATION_MS;         //Config.MARK_OFFSET_MS;
+            }
+            else // We just finished a SPACE (Rising Edge)
+            {
+                // Adding 14ms back to the space keeps the total Cadence (Dot+Gap) correct.
+                adjusted = (long)elapsedMs + Config.FILTER_COMPENSATION_MS;           //Config.MARK_OFFSET_MS;
+            }
 
             // 5. LOOK-FORWARD LOGIC (The "E" Filter)
             if (_lastState && !isTonePresent) // Falling Edge (End of Mark)

@@ -7,7 +7,7 @@ public static class Config
     //CWDecoderEngine
     //***************************************************************
     public const int MaxConsecutiveHits = 2;            //loop hits needed for _IsTone
-    public const int MaxConsecutiveMisses = 7;          //was 7     loop misses needed for !_IsTone
+    public const int MaxConsecutiveMisses = 6;          //was 7     loop misses needed for !_IsTone
     public const double MinConfidence = 0.9;           //was 0.95   Hilbert confidence to accept Tone
 
 
@@ -16,8 +16,8 @@ public static class Config
     //***************************************************************
     // MARK CLASSIFICATION
     // Increased to 2.5 to prevent "Heavy Dots" from becoming "Dashes"
-    public const double DASH_THRESHOLD_RATIO = 1.7;         //was 1.9, 1.8
-    public const double DOT_MINIMUM_MS = 24;                // max 40wpm
+    public const double DASH_THRESHOLD_RATIO = 1.9;         //was 1.7, 1.9, 1.8
+    public const double DOT_MINIMUM_MS = 24;                // max 50wpm
     public const double MIN_DOT_WINDOW = 0.4;               //compared to currect dotMs
     public const double MAX_DOT_WINDOW = 1.5;               //was 3
     public const double MIN_DASH_WINDOW = 2;
@@ -33,7 +33,9 @@ public static class Config
     public const double THRESHOLD_LOWER_RATIO = 0.17;
     public const double DEBOUNCE_RATIO = 0.22;          //was 0.25
     public const double IDLE_DECODE_RATIO = 4;          // More patient idle timer
-    public const int FILTER_COMPENSATION_MS = -6;       //was -6 // Start low and use Calibration tool
+    public const int FILTER_COMPENSATION_MS = 7;       //was -6 // Start low and use Calibration tool
+                                                       //now subtracted from measured dot/dash lengths
+                                                       //  and added to measured spaces
 
     // STATISTICS
     public const int HISTORY_BUCKET_SIZE = 25;     //was 25
