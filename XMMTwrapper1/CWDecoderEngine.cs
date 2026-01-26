@@ -27,7 +27,8 @@
 //
 //PERFORMANCE METRICS
 // - see PARIS test audio files ~6dB S/N in 45Hz BW
-// - FIR gave 98.7% accuracy scored using Levenshtein Benchmark Metric cf 88.6% using Fldigi
+// - earlier FIR gave 98.7% accuracy scored using Levenshtein Benchmark Metric cf 88.6% using Fldigi
+// - new FIR/Hilbert hybrid has 100% success rate at 6dB S/N on PARIS test (48kFs, 512 taps, 45Hz selected BW)
 //
 //****************************************************************************************
 
@@ -173,8 +174,28 @@ public class CWDecoderEngine
     double magFiltered = 0;
     double confFiltered = 0;
 
-    //50% overlap of incoming audio stream version
-    //each 256 block is processed every 128 samples at 48kHz Fs (4.166ms per block)
+    //OLD - 50% overlap of incoming audio stream version
+    //OLD - each 256 block is processed every 128 samples at 48kHz Fs (2.666ms per block)
+    //OLD - although final code with FIR/Hilbert hybrid does not need overlap and uses 128 samples/block
+
+    //NEW ********* Decimation  ******************
+    // Because audio stream is pre-filtered by SDR we can decimate directly without additional pre-filter.
+    // We should stay with magnitude output (input to CW Clock) every 2.666ms for timing consistency.
+    // So if we decimate by 4, giving 12kHz sample rate, then we need to process every 32 samples (2.666ms).
+    // The filters are being fed continuous data and already buffer incoming smaller sample blocks as required by # taps.
+    // The big benefit is that the ratio between Fs and taps reduce with a corresponding reduction in bandwidth.
+    // We can also increase FIR taps to give even better selectivity with no CPU cost penalty.
+    //  (e.g. set 45Hz BW -> 512 taps at 48kHz = 327Hz ENBW, but 1024 taps at 12kHz = 70Hz ENBBW giving 7dB S/N improvement).
+    //  ( 512 taps at 12kHz = 90Hz ENBW still much better than 48kHz case -> 6dB better)
+    // However we wait and see if the narrow filters cause too much smear & ringing on fast code elements.
+    // There will be some added latency due to lower Fs and more taps but that should not be a big issue for CW.
+    //
+    // For later consider further decimation and an FFT based filter bank approach.
+    // A 128 point FFT at 6kHz Fs gives 47Hz bins, so we can have a bank of overlapping filters covering the CW band.
+    // Gemini reports at 6kFs FIR 512 taps gives 41Hz ENB (6.1 MIPS) cf 256 FFT gives 40.5Hz ENB (3.8MIPS) both 2.66ms o/p.
+    //   (needs checking)
+    //NEW *****************************************
+
     private void ProcessAudioLoop()
     {
         int processBlockSize = 128;         //if size == step then no overlap
@@ -465,37 +486,41 @@ public class AdaptiveThreshold
         */
 
         //track S/N
-        if (markMeanSquare == 0) markMeanSquare = Math.Pow(mag, 2);
-        if (spaceMeanSquare == 0) spaceMeanSquare = Math.Pow(mag, 2);
-        if (true)    //mag > SquelchLevel)
+        /*        if (markMeanSquare == 0) markMeanSquare = Math.Pow(mag, 2);
+                if (spaceMeanSquare == 0) spaceMeanSquare = Math.Pow(mag, 2);
+                if (true)    //mag > SquelchLevel)
+                {
+                    if (_isTone)
+                    {
+                        if (markMeanSquareCount <= spaceMeanSquareCount)
+                        {
+                            markMeanSquare = markMeanSquare * 0.99 + Math.Pow(mag, 2) * 0.01;
+                            markMeanSquareCount++;
+                        }
+                    }
+                    else
+                    {
+                        if (markMeanSquareCount > spaceMeanSquare)
+                        {
+                            spaceMeanSquare = spaceMeanSquare * 0.99 + Math.Pow(mag, 2) * 0.01;
+                            spaceMeanSquareCount++;
+                        }
+                    }
+                    if (markMeanSquareCount == spaceMeanSquareCount)
+                    {
+                        markMeanSquareCount = spaceMeanSquareCount = 1;     //avoid overrun on counter
+                    }
+        */
+        if (_isTone)    markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
+        else            spaceMeanSquare = spaceMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
+
+        // S/N not (S+N)/N
+        double MarkEnergy = (markMeanSquare - spaceMeanSquare); // / 2;      // 2 is window correction factor for tone
+
+        SNratio = 100;       
+        if (MarkEnergy > 0.00000001 && spaceMeanSquare > 0.00000001)
         {
-            if (_isTone)
-            {
-                if (markMeanSquareCount <= spaceMeanSquareCount)
-                {
-                    markMeanSquare = markMeanSquare * 0.99 + Math.Pow(mag, 2) * 0.01;
-                    markMeanSquareCount++;
-                }
-            }
-            else
-            {
-                if (markMeanSquareCount > spaceMeanSquare)
-                {
-                    spaceMeanSquare = spaceMeanSquare * 0.99 + Math.Pow(mag, 2) * 0.01;
-                    spaceMeanSquareCount++;
-                }
-            }
-            if (markMeanSquareCount == spaceMeanSquareCount)
-            {
-                markMeanSquareCount = spaceMeanSquareCount = 1;     //avoid overrun on counter
-            }
-            // S/N not (S+N)/N
-            double MarkEnergy = ((markMeanSquare - spaceMeanSquare) / markMeanSquareCount) / 2;      // 2 is window correction factor for tone
-            SNratio = 100;
-            if (spaceMeanSquare > 0.0000001)
-            {
-                SNratio = 10 * Math.Log10(MarkEnergy / (spaceMeanSquare / spaceMeanSquareCount));
-            }
+            SNratio = 10 * Math.Log10(MarkEnergy / (spaceMeanSquare));      // / spaceMeanSquareCount));
         }
 
         return (_isTone, mag, conf);

@@ -229,7 +229,7 @@ public class MorseClock
         if (isValidDot || isValidDash) UpdateSpeedTracking();
     }
 
-   
+    private bool isLastCharSpace = true;
     private void ProcessSpace(long duration)
     {
         //LogSignalHealth(duration, false);
@@ -244,13 +244,15 @@ public class MorseClock
         // Tier 2: Letter Space (Trigger Decode)
         else if (duration >= _dotMs * Config.LETTER_SPACE_MIN_RATIO && duration < _dotMs * Config.WORD_SPACE_MIN_RATIO)
         {
-            DecodeBuffer();
+            if (DecodeBuffer()) isLastCharSpace = false;        //only reset if something was decoded
         }
         // Tier 3: Word Space
         else if (duration >= _dotMs * Config.WORD_SPACE_MIN_RATIO)
         {
-            DecodeBuffer();
+            if (isLastCharSpace) return;    //avoid multiple spaces (cant be a word end if last char was space)
+            DecodeBuffer();                 //word end on first space
             OnCharacterDecoded?.Invoke(' ');
+            isLastCharSpace = true;
         }
     }
 
@@ -357,16 +359,17 @@ public class MorseClock
     }
     */
     
-    private void DecodeBuffer()
+    private bool DecodeBuffer()
     {
         string sequence = _currentSymbolBuffer.ToString();
-        if (string.IsNullOrEmpty(sequence)) return;
+        if (string.IsNullOrEmpty(sequence)) return false;       //nothing to decode
 
         char result = MorseTable.Lookup(sequence);
         if (result != '\0') OnCharacterDecoded?.Invoke(result);
 
         _currentSymbolBuffer.Clear();
         OnSequenceChanged?.Invoke("");
+        return true;                                //decoded
     }
 
     private double GetElapsedMs() => ((_totalSamplesProcessed - _lastTransitionSample) / _sampleRate) * 1000.0;
