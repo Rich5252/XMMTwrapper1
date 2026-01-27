@@ -127,8 +127,8 @@ public class MorseClock
             if (_lastToneState && !isTonePresent) // Falling Edge (End of Mark)
             {
                 // A mark is "Suspicious" only if it's extremely short AND we have a stable history.
-                // If it's > 45% of a dot, it's almost certainly a real 'E' or part of a character.
-                if (_dotHistory.Count < 5 || adjusted >= _dotMs * 0.5)
+                // If it's > 50% of a dot, it's almost certainly a real 'E' or part of a character.
+                if (_dotHistory.Count < 5 || adjusted >= Config.DOT_MINIMUM_MS)     //_dotMs * 0.5)
                 {
                     ProcessMark(adjusted);
                     _pendingMarkDuration = 0;
