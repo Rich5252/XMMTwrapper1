@@ -45,6 +45,7 @@ namespace XMMTwrapper1
             DiscrimBtn3 = new RadioButton();
             tbBW = new NumericUpDown();
             gbCWcontrols = new GroupBox();
+            cbAutoSquelch = new CheckBox();
             cbFixWpm = new CheckBox();
             tbConfidence = new TextBox();
             tbTolerance = new NumericUpDown();
@@ -277,7 +278,7 @@ namespace XMMTwrapper1
             // 
             // tbBW
             // 
-            tbBW.Location = new Point(158, 38);
+            tbBW.Location = new Point(158, 47);
             tbBW.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
             tbBW.Name = "tbBW";
             tbBW.Size = new Size(40, 23);
@@ -288,6 +289,7 @@ namespace XMMTwrapper1
             // 
             // gbCWcontrols
             // 
+            gbCWcontrols.Controls.Add(cbAutoSquelch);
             gbCWcontrols.Controls.Add(cbFixWpm);
             gbCWcontrols.Controls.Add(tbConfidence);
             gbCWcontrols.Controls.Add(tbTolerance);
@@ -311,6 +313,19 @@ namespace XMMTwrapper1
             gbCWcontrols.TabIndex = 64;
             gbCWcontrols.TabStop = false;
             gbCWcontrols.Visible = false;
+            // 
+            // cbAutoSquelch
+            // 
+            cbAutoSquelch.AutoSize = true;
+            cbAutoSquelch.CheckAlign = ContentAlignment.MiddleRight;
+            cbAutoSquelch.Location = new Point(101, 10);
+            cbAutoSquelch.Name = "cbAutoSquelch";
+            cbAutoSquelch.Size = new Size(97, 19);
+            cbAutoSquelch.TabIndex = 76;
+            cbAutoSquelch.Text = "Auto Squelch";
+            cbAutoSquelch.TextAlign = ContentAlignment.MiddleRight;
+            cbAutoSquelch.UseVisualStyleBackColor = true;
+            cbAutoSquelch.CheckedChanged += cbAutoSquelch_CheckedChanged;
             // 
             // cbFixWpm
             // 
@@ -360,7 +375,7 @@ namespace XMMTwrapper1
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new Point(158, 18);
+            label11.Location = new Point(158, 27);
             label11.Name = "label11";
             label11.Size = new Size(25, 15);
             label11.TabIndex = 70;
@@ -369,7 +384,7 @@ namespace XMMTwrapper1
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(120, 19);
+            label10.Location = new Point(120, 28);
             label10.Name = "label10";
             label10.Size = new Size(32, 15);
             label10.TabIndex = 69;
@@ -377,7 +392,7 @@ namespace XMMTwrapper1
             // 
             // tbToneFreq
             // 
-            tbToneFreq.Location = new Point(117, 37);
+            tbToneFreq.Location = new Point(117, 46);
             tbToneFreq.Name = "tbToneFreq";
             tbToneFreq.Size = new Size(35, 23);
             tbToneFreq.TabIndex = 68;
@@ -499,11 +514,13 @@ namespace XMMTwrapper1
             // 
             // sbAudioLevel
             // 
-            sbAudioLevel.Location = new Point(111, 63);
+            sbAudioLevel.AutoSize = false;
+            sbAudioLevel.Location = new Point(111, 72);
             sbAudioLevel.Maximum = 1000;
             sbAudioLevel.Name = "sbAudioLevel";
-            sbAudioLevel.Size = new Size(104, 45);
+            sbAudioLevel.Size = new Size(104, 26);
             sbAudioLevel.TabIndex = 62;
+            sbAudioLevel.TickStyle = TickStyle.None;
             sbAudioLevel.Value = 506;
             sbAudioLevel.Scroll += sbAudioLevel_Scroll;
             // 
@@ -1189,5 +1206,6 @@ namespace XMMTwrapper1
         private NumericUpDown tbTolerance;
         private TextBox tbConfidence;
         private CheckBox cbFixWpm;
+        private CheckBox cbAutoSquelch;
     }
 }

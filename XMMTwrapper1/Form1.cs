@@ -291,7 +291,5 @@ namespace XMMTwrapper1
         {
             _QSOlogger.OpenLogDirectory();
         }
-
-
     }
 }

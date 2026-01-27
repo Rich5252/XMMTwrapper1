@@ -10,6 +10,10 @@ public static class Config
     public const int MaxConsecutiveMisses = 6;          //was 7     loop misses needed for !_IsTone
     public const double MinConfidence = 0.9;           //was 0.95   Hilbert confidence to accept Tone
 
+    public const double SquelchNoiseAvgFactor = 0.9995;         //exp avg factors
+    public const double SquelchSignalAvgFactor = 0.99;
+    public const double AutoSquelchLevelFactor = 0.5;           //20% above noise floor
+
 
     //***************************************************************
     //MORSE CLOCK

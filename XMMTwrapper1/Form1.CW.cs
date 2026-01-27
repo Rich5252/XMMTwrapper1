@@ -2,6 +2,7 @@
 // 
 
 
+using Constants;
 using NAudio.Wave;
 
 namespace XMMTwrapper1
@@ -46,6 +47,13 @@ namespace XMMTwrapper1
                 {
                     // Update a SN ratio text box
                     tbSNratio.Text = SN.ToString("F1");
+                    if (cbAutoSquelch.Checked)
+                    {
+                        //send new squelch level to decoder based on signal level
+                        double SQlevel = _decoder.GetSquelchLevel(out SQlevel);
+                        //set the bar
+                        axXMMR1.PostMmttyMessage((int)RxmMessage.SetSqLevel, (int)XMMlevelFromSquelch(SQlevel));
+                    }
                 }));
             };
 
@@ -80,7 +88,7 @@ namespace XMMTwrapper1
             {
                 this.BeginInvoke(new Action(() =>
                 {
-                   if (!cbFixWpm.Checked) tbWPM.Text = wpm.ToString(); // Shows current WPM
+                    if (!cbFixWpm.Checked) tbWPM.Text = wpm.ToString(); // Shows current WPM
                 }));
             };
             PopulateAudioMenu();
@@ -263,6 +271,21 @@ namespace XMMTwrapper1
             double level = Math.Pow(10, dB / 20);                       //calculate linear value for decoder
             _decoder.SetSquelchLevel(level);
         }
-    }
 
+        private double XMMlevelFromSquelch(double level)
+        {
+            //inverse of above
+            double dB = 20 * Math.Log10(level);
+            double dBmin = -50;
+            double dBmax = 30;
+            double eLevel = (dB - dBmin) / (dBmax - dBmin) * 1000.0 - 3;      //rescale to user control set value
+            eLevel = Math.Max(0, Math.Min(1000, eLevel));                     //clamp to control range
+            return eLevel;
+        }
+
+        private void cbAutoSquelch_CheckedChanged(object sender, EventArgs e)
+        {
+            _decoder.SetAutoSquelch(cbAutoSquelch.Checked);
+        }
+    }
 }

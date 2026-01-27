@@ -83,6 +83,8 @@ public class CWDecoderEngine
     }
 
     public void SetSquelchLevel(double _level) => _adaptor.SquelchLevel = _level;
+    public double GetSquelchLevel(out double level) => level = _adaptor.SquelchLevel;
+    public void SetAutoSquelch(bool bAuto) => _adaptor.AutoSquelch = bAuto;
     public void SetGaussian(bool bGF) => _adaptor.GaussianFilter = bGF;     //can be set on the fly
     public void SetMedian(bool bM) => _adaptor.GaussianFilter = bM;         //can be set on the fly
 
@@ -356,10 +358,10 @@ public class AdaptiveThreshold
     private double _peakLevel = 0.01;
     private double range = 0.01;
     private bool _isTone = false;
-    private double spaceMeanSquare = 0;
+    private double spaceMeanSquare = 0;     //for S/N display
     private double markMeanSquare = 0;
-    private double spaceMeanSquareCount = 1;       //need to count accumulator to correctly scale power
-    private double markMeanSquareCount = 1;         //  for SNratio calc
+    private double markRMSsquelch = 0;      //for auto squelch tracking
+    private double spaceRMSsquelch = 0; 
 
     public double SNratio { get; set; } = 0;
 
@@ -368,13 +370,15 @@ public class AdaptiveThreshold
     private int _consecutiveMisses = 0;         //init count
     
     public double SquelchLevel { get; set; } = 0.01;        //set from UI
+    public bool AutoSquelch { get; set; } = false; 
+    
     public bool GaussianFilter = true;                      //diagnostic option
     public bool MedianFilter = true;                        //diagnostic option 
 
     //Gaussian+median signal magnitude temporal filter version    
-    private double[] _magHistory = new double[5]; // Gaussian window
-    private double[] _medHistory = new double[3]; // Median window
-    private double[] _confGausHistory = new double[5]; // Gaussian window
+    private double[] _magGaussHistory = new double[5]; // Gaussian window
+    private double[] _magMedHistory = new double[3]; // Median window
+    private double[] _confGaussHistory = new double[5]; // Gaussian window
     private double[] _confMedHistory = new double[3]; // Median window
 
 
@@ -382,8 +386,8 @@ public class AdaptiveThreshold
     //FIR + RMS + Goertzel all use this main logic
     public (bool, double, double) IsSignalPresent(double rawMag, double confidence = 1)
     {
-        double mag = ApplyTemporalFilters(rawMag, 5, _magHistory, _medHistory);       //5 point gaussian and median filtering
-        double conf = ApplyTemporalFilters(confidence, 3, _confGausHistory, _confMedHistory); //confidence filtering
+        double mag = ApplyTemporalFilters(rawMag, 5, _magGaussHistory, _magMedHistory);       //5 point gaussian and median filtering
+        double conf = ApplyTemporalFilters(confidence, 3, _confGaussHistory, _confMedHistory); //confidence filtering
         
         // 3. DYNAMIC TRACKING (Peak and Noise)
         // 3.1. ALWAYS track noise floor so we know the environment
@@ -511,8 +515,24 @@ public class AdaptiveThreshold
                         markMeanSquareCount = spaceMeanSquareCount = 1;     //avoid overrun on counter
                     }
         */
-        if (_isTone)    markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
-        else            spaceMeanSquare = spaceMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
+        int MarkSpaceRatio = 0;
+        if (_isTone)
+        {
+            markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
+            markRMSsquelch = markRMSsquelch * Config.SquelchSignalAvgFactor + mag * (1 - Config.SquelchSignalAvgFactor);
+            MarkSpaceRatio++;
+        }
+        else
+        {
+            spaceMeanSquare = spaceMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
+            spaceRMSsquelch = spaceRMSsquelch * Config.SquelchNoiseAvgFactor + mag * (1 - Config.SquelchNoiseAvgFactor);
+            MarkSpaceRatio--;
+        }
+
+        if (MarkSpaceRatio < -1000) { MarkSpaceRatio = 0; markRMSsquelch = spaceRMSsquelch; }    //reset if no tone for long time
+        if (AutoSquelch)
+            SquelchLevel = spaceRMSsquelch + (markRMSsquelch - spaceRMSsquelch) * Config.AutoSquelchLevelFactor;   //set squelch 30%
+        
 
         // S/N not (S+N)/N
         double MarkEnergy = (markMeanSquare - spaceMeanSquare); // / 2;      // 2 is window correction factor for tone
@@ -530,7 +550,7 @@ public class AdaptiveThreshold
     public bool IsHBASignalPresentA(double rawMag, double confidence)
     {
         // 1. Keep your 3-point Gaussian/Median smoothing here
-        double smoothedMag = ApplyTemporalFilters(rawMag, 3, _magHistory, _medHistory);
+        double smoothedMag = ApplyTemporalFilters(rawMag, 3, _magGaussHistory, _magMedHistory);
 
         // 2. INTELLIGENT TRACKING
         if (confidence > Config.MinConfidence && smoothedMag > SquelchLevel)
@@ -579,7 +599,7 @@ public class AdaptiveThreshold
     //after "P" log analysis, add mag * confidence to improve end of tone detection
     public bool IsHBASignalPresent(double mag, double confidence)
     {
-        double smoothedMag = ApplyTemporalFilters(mag, 3, _magHistory, _medHistory);
+        double smoothedMag = ApplyTemporalFilters(mag, 3, _magGaussHistory, _magMedHistory);
         double phaseWeightedMag = smoothedMag * confidence;
 
         // 1. DYNAMIC TRACKING (Strict update)
@@ -649,7 +669,7 @@ public class AdaptiveThreshold
     public bool IsHBASignalPresentB(double mag, double confidence)
     {
         // 1. Keep your 3-point Gaussian/Median smoothing here
-        double smoothedMag = ApplyTemporalFilters(mag, 3, _magHistory, _medHistory);
+        double smoothedMag = ApplyTemporalFilters(mag, 3, _magGaussHistory, _magMedHistory);
 
         // 2. ONLY update tracking if we have high confidence
         // This prevents the Threshold from 'spiking' due to noise
