@@ -362,6 +362,7 @@ public class AdaptiveThreshold
     private double markMeanSquare = 0;
     private double markRMSsquelch = 0;      //for auto squelch tracking
     private double spaceRMSsquelch = 0; 
+    private int MarkSpaceRatio = 0;        //for auto squelch reset
 
     public double SNratio { get; set; } = 0;
 
@@ -515,7 +516,7 @@ public class AdaptiveThreshold
                         markMeanSquareCount = spaceMeanSquareCount = 1;     //avoid overrun on counter
                     }
         */
-        int MarkSpaceRatio = 0;
+        
         if (_isTone)
         {
             markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
