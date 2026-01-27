@@ -45,7 +45,7 @@ public class MorseClock
     private double _sampleRate = 48000.0;
     private long _totalSamplesProcessed = 0;
     private long _lastTransitionSample = 0;
-    private bool _lastState = false;
+    private bool _lastToneState = false;
     private long _pendingMarkDuration = 0; // New class-level variable
     private StringBuilder _currentSymbolBuffer = new StringBuilder();
 
@@ -80,6 +80,7 @@ public class MorseClock
     }
 
     private int stateCounter = 0;
+    private long _noiseCarryoverMs = 0;
     public void UpdateState(bool isTonePresent, int samplesInBlock)
     {
         lock (_lock)
@@ -87,7 +88,99 @@ public class MorseClock
             _totalSamplesProcessed += samplesInBlock;
 
             // 1. Idle/Same State Management
-            if (isTonePresent == _lastState)
+            if (isTonePresent == _lastToneState)
+            {
+                if (!isTonePresent && _currentSymbolBuffer.Length > 0)
+                {
+                    // Include carryover in the silence calculation
+                    double silenceMs = GetElapsedMs() + _noiseCarryoverMs;
+
+                    if (_pendingMarkDuration > 0 && silenceMs > _dotMs * 0.5)
+                    {
+                        // If we timeout while holding a tiny mark, it was noise
+                        _noiseCarryoverMs += (long)_pendingMarkDuration;
+                        _pendingMarkDuration = 0;
+                    }
+
+                    if (silenceMs > _dotMs * Config.IDLE_DECODE_RATIO)
+                    {
+                        _noiseCarryoverMs = 0; // Clear carryover on decode
+                        DecodeBuffer();
+                    }
+                }
+                return;
+            }
+
+            double elapsedMs = GetElapsedMs();
+
+            // 3. Adaptive Debounce
+            if (elapsedMs < Math.Max(Config.DOT_MINIMUM_MS, _dotMs * Config.DEBOUNCE_RATIO)) return;
+
+            // 4. ASYMMETRICAL COMPENSATION
+            long adjusted;
+            if (_lastToneState) // Falling Edge
+                adjusted = (long)elapsedMs - Config.FILTER_COMPENSATION_MS;
+            else // Rising Edge
+                adjusted = (long)elapsedMs + Config.FILTER_COMPENSATION_MS;
+
+            // 5. LOOK-FORWARD LOGIC (The "Noise vs. Element" Filter)
+            if (_lastToneState && !isTonePresent) // Falling Edge (End of Mark)
+            {
+                // A mark is "Suspicious" only if it's extremely short AND we have a stable history.
+                // If it's > 45% of a dot, it's almost certainly a real 'E' or part of a character.
+                if (_dotHistory.Count < 5 || adjusted >= _dotMs * 0.5)
+                {
+                    ProcessMark(adjusted);
+                    _pendingMarkDuration = 0;
+                }
+                else
+                {
+                    // This is a "Blip." Hold it to see what the following space looks like.
+                    _pendingMarkDuration = adjusted;
+                }
+            }
+            else if (!_lastToneState && isTonePresent) // Rising Edge (End of Space)
+            {
+                if (_pendingMarkDuration > 0)
+                {
+                    // The "Trap": If the space after a tiny blip is long (>80% of a dot), 
+                    // the blip was noise. We add the blip AND this space to the PREVIOUS space.
+                    if (adjusted > _dotMs * 0.8)
+                    {
+                        // We DON'T call ProcessSpace(adjusted). 
+                        // We tell the system: "That noise spike didn't happen, just keep the space going."
+                        // This is done by calling ProcessSpace with the cumulative total.
+                        ProcessSpace(adjusted + _pendingMarkDuration, isContinuation: true);
+                        Log.Perf($"NOISE_TRAP: Merged {adjusted + _pendingMarkDuration}ms into existing silence.");
+                    }
+                    else
+                    {
+                        // The space was tight! The blip was a real (short) dot.
+                        ProcessMark(_pendingMarkDuration);
+                        ProcessSpace(adjusted);
+                    }
+                    _pendingMarkDuration = 0;
+                }
+                else
+                {
+                    ProcessSpace(adjusted);
+                }
+            }
+
+            _lastToneState = isTonePresent;
+            _lastTransitionSample = _totalSamplesProcessed;
+        }
+    }
+
+    /*
+    public void UpdateState(bool isTonePresent, int samplesInBlock)
+    {
+        lock (_lock)
+        {
+            _totalSamplesProcessed += samplesInBlock;
+
+            // 1. Idle/Same State Management
+            if (isTonePresent == _lastToneState)
             {
                 if (!isTonePresent && _currentSymbolBuffer.Length > 0)
                 {
@@ -118,24 +211,25 @@ public class MorseClock
             // 4. ASYMMETRICAL COMPENSATION
             // Subtract from Marks, Add to Spaces to recover the "True" duration.
             long adjusted;
-            if (_lastState) // We just finished a TONE (Falling Edge)
+            if (_lastToneState) // We just finished a TONE (Falling Edge)
             {
-                // -14ms is your identified "sweet spot"
+                // -7ms is your identified "sweet spot"
                 adjusted = (long)elapsedMs - Config.FILTER_COMPENSATION_MS;         //Config.MARK_OFFSET_MS;
             }
             else // We just finished a SPACE (Rising Edge)
             {
-                // Adding 14ms back to the space keeps the total Cadence (Dot+Gap) correct.
+                // Adding 7ms back to the space keeps the total Cadence (Dot+Gap) correct.
                 adjusted = (long)elapsedMs + Config.FILTER_COMPENSATION_MS;           //Config.MARK_OFFSET_MS;
             }
 
             // 5. LOOK-FORWARD LOGIC (The "E" Filter)
-            if (_lastState && !isTonePresent) // Falling Edge (End of Mark)
+            if (_lastToneState && !isTonePresent) // Falling Edge (End of Mark)
             {
-                // If the mark is suspiciously short (e.g., < 45% of a dot), hold it
-                // If we have no history, don't try to "Look Forward"—we don't know enough to filter yet.
+                // If the mark is suspiciously short (e.g., < 50% of a dot), hold it
+                // If we have no history, don't try to "Look Forward" — we don't know enough to filter yet.
                 if (_dotHistory.Count < 5 || adjusted >= _dotMs * 0.5)
                 {
+                    //so if valid mark or no history yet, process immediately
                     ProcessMark(adjusted);
                     _pendingMarkDuration = 0;
                 }
@@ -144,7 +238,7 @@ public class MorseClock
                     _pendingMarkDuration = adjusted;
                 }
             }
-            else if (!_lastState && isTonePresent) // Rising Edge (End of Space)
+            else if (!_lastToneState && isTonePresent) // Rising Edge (End of Space)
             {
                 if (_pendingMarkDuration > 0)
                 {
@@ -156,18 +250,17 @@ public class MorseClock
                         // NOISE DETECTED: Discard the pending mark.
                         // Instead of calling ProcessSpace for just this gap, 
                         // we could optionally add the noise duration to the total space.
-                        LogSignalHealth(adjusted, false);
-                        _pendingMarkDuration = 0;
-                        ProcessSpace(adjusted);
+                        //LogSignalHealth(adjusted, false);                     
+                        ProcessSpace(adjusted + _pendingMarkDuration);
                     }
                     else
                     {
                         // VALID DOT: It was short, but followed by a tight element space.
-                        LogSignalHealth(_pendingMarkDuration, true);
+                        //LogSignalHealth(_pendingMarkDuration, true);
                         ProcessMark(_pendingMarkDuration);
-                        _pendingMarkDuration = 0;
                         ProcessSpace(adjusted);
                     }
+                    _pendingMarkDuration = 0;
                 }
                 else
                 {
@@ -175,22 +268,26 @@ public class MorseClock
                 }
             }
 
-            if (isTonePresent != _lastState)    //tone state changed
+            if (isTonePresent != _lastToneState)    //tone state changed
             {
                 //log time in same state
                 double sampleCount = (_totalSamplesProcessed - _lastTransitionSample);
-                Log.Perf($"STATE_CHANGE: {_lastState} for {sampleCount} samples ({(sampleCount * 1000.0) / 48000.0} ms)");
+                Log.Perf($"STATE_CHANGE: {_lastToneState} for {sampleCount} samples ({(sampleCount * 1000.0) / 48000.0} ms)");
             }
 
-            _lastState = isTonePresent;
+            _lastToneState = isTonePresent;
             _lastTransitionSample = _totalSamplesProcessed;
         }
     }
+    */
 
-   
+
     private void ProcessMark(long duration)
     {
         //LogSignalHealth(duration, true);
+
+        // 1. Reset the space accumulator because the silence has ended
+        _lastSpaceDuration = 0;
 
         // 1. DASH CLASSIFICATION
         bool isDash = duration > (_dotMs * Config.DASH_THRESHOLD_RATIO);
@@ -230,24 +327,35 @@ public class MorseClock
     }
 
     private bool isLastCharSpace = true;
-    private void ProcessSpace(long duration)
+    private long _lastSpaceDuration = 0;
+    private void ProcessSpace(long duration, bool isContinuation = false)
     {
         //LogSignalHealth(duration, false);
+        //Continuation means we are merging noise into existing space, so skip processing
+        if (isContinuation)
+        {
+            // Add this "noise + gap" to the previous gap instead of starting a new one
+            _lastSpaceDuration += duration;
+        }
+        else
+        {
+            _lastSpaceDuration = duration;
+        }
 
         // Tier 1: Element Space (Internal Timing)
-        if (duration < _dotMs * Config.LETTER_SPACE_MIN_RATIO)
+        if (_lastSpaceDuration < _dotMs * Config.LETTER_SPACE_MIN_RATIO)
         {
             _spaceHistory.Add((double)duration);
             if (_spaceHistory.Count > Config.HISTORY_BUCKET_SIZE) _spaceHistory.RemoveAt(0);
             UpdateSpeedTracking();
         }
         // Tier 2: Letter Space (Trigger Decode)
-        else if (duration >= _dotMs * Config.LETTER_SPACE_MIN_RATIO && duration < _dotMs * Config.WORD_SPACE_MIN_RATIO)
+        else if (_lastSpaceDuration >= _dotMs * Config.LETTER_SPACE_MIN_RATIO && duration < _dotMs * Config.WORD_SPACE_MIN_RATIO)
         {
             if (DecodeBuffer()) isLastCharSpace = false;        //only reset if something was decoded
         }
         // Tier 3: Word Space
-        else if (duration >= _dotMs * Config.WORD_SPACE_MIN_RATIO)
+        else if (_lastSpaceDuration >= _dotMs * Config.WORD_SPACE_MIN_RATIO)
         {
             if (isLastCharSpace) return;    //avoid multiple spaces (cant be a word end if last char was space)
             DecodeBuffer();                 //word end on first space
@@ -484,6 +592,6 @@ public static class MorseTable
         {
             return result;
         }
-        return '?'; // Return a question mark for unknown sequences
+        return '~'; // Return a tilda mark for unknown sequences
     }
 }
