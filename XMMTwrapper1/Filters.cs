@@ -28,6 +28,8 @@ public abstract class MorseFilterBase : ICWFilter
 {
     public abstract string Name { get; }
     protected int _sampleRate = 48000;
+    protected int _overlapFactor = 1;      //default no overlap, 2 = 50% overlap etc
+    protected int _blockSize = 128;
 
     // Backing fields
     protected double _tone = 1000;
@@ -175,11 +177,13 @@ public class FIRStrategy : MorseFilterBase
 
     public override string Name => "FIR Bandpass";
 
-    public FIRStrategy(int sampleRate, double freq, double bw)
+    public FIRStrategy(int sampleRate, double freq, double bw, int SampleBlockSize = 128, int OverlapFactor = 1)
     {
         _sampleRate = sampleRate;
         _tone = freq;
         _bw = bw;
+        _blockSize = SampleBlockSize;
+        _overlapFactor = OverlapFactor;
         OnSettingsChanged();
     }
 
@@ -187,7 +191,7 @@ public class FIRStrategy : MorseFilterBase
     {
         _filter = new FIRFilter(_sampleRate, _tone, _bw, 511);
         _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
-        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol);
+        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol, _blockSize, _overlapFactor);
     }
 
     public override double ProcessBlock(float[] samples)
@@ -214,6 +218,7 @@ public class FIRStrategy : MorseFilterBase
         mag = sumAbs / samples.Length * 50000 / _scaling;
         double conf = sumConfidence / samples.Length;      //this is picked up by decoder
                                                                     //via SigConfidence() call
+        _coherentDetector.AdjustForSampleOverlap();         //necessary for phase continuity with overlap
 
         //delay line to match Hilbert filter delay 256 sample delay required for 511 tap Hilbert
         //assumes 128 sample blocks, so only 2 block delay needed
@@ -502,14 +507,16 @@ public class HilbertStrategy : MorseFilterBase
 
     public class HilbertCoherentDetector
     {
-        private double _lastPhase;
+        private double _lastPhase = 0;
         private readonly double _targetDelta;
         private readonly double _radTol;
+        private readonly double _lastPhaseSampleOverlapAdjust;
 
-        public HilbertCoherentDetector(double targetFreq, double sampleRate, double toleranceHz)
+        public HilbertCoherentDetector(double targetFreq, double sampleRate, double toleranceHz, int smapleBlockSize = 128, int sampleStepSize = 128)
         {
             _targetDelta = (2.0 * Math.PI * targetFreq) / sampleRate;
             _radTol = (2.0 * Math.PI * toleranceHz) / sampleRate;
+            _lastPhaseSampleOverlapAdjust = -(_targetDelta * (smapleBlockSize - sampleStepSize));    // For overlap handling
         }
 
         // This is your "Inner Sample Code" extracted
@@ -539,6 +546,14 @@ public class HilbertStrategy : MorseFilterBase
                 Magnitude = magnitude * Math.Pow(confidence, 3), // Cubic weighting
                 Confidence = confidence
             };
+        }
+
+        public void AdjustForSampleOverlap()
+        {
+            //should be called at end of block processing
+            _lastPhase += _lastPhaseSampleOverlapAdjust;          //rotate back to where we would be at start of next block
+            while (_lastPhase <= -Math.PI) _lastPhase += 2 * Math.PI;
+            while (_lastPhase > Math.PI) _lastPhase -= 2 * Math.PI;
         }
     }
 }

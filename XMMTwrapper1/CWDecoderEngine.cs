@@ -91,7 +91,10 @@ public class CWDecoderEngine
     // Thread safety lock
     private readonly object _filterLock = new object();     //used when changing
     private ICWFilter _activeFilter;
-    private int _SampleRate = 48000;
+    private int _SampleRateAudioIn = 48000;
+    private int _decimation = 8;               //decimation factor
+    private int _SampleRate = 48000;            //after decimation
+    private int _BaseBlockSize = 128;         //base filter block size for 48000Hz == 2.666ms
 
     public string LoggingFilePath { get; set; } = "C:\\Users\\office2\\Documents\\Ham Radio\\VScode\\XMMTwrapper_C#\\XMMTwrapper1\\CWlogTemporalFilter.csv";
 
@@ -119,15 +122,15 @@ public class CWDecoderEngine
         _waveIn = new WaveInEvent
         {
             DeviceNumber = deviceIndex,
-            WaveFormat = new WaveFormat(48000, 16, 1),
+            WaveFormat = new WaveFormat(_SampleRateAudioIn, 16, 1),
             BufferMilliseconds = 50
         };
 
-        _SampleRate = _waveIn.WaveFormat.SampleRate;
+        _SampleRate = _waveIn.WaveFormat.SampleRate / _decimation;
         _clock.SetSampleRate(_SampleRate);
 
         //_activeFilter = new GoertzelStrategy(TargetFrequency, _SampleRate, 256 /* buffersize */);    //default filter
-        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */);    //default filter
+        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize, _decimation);    //default filter
         _activeFilter.ScalingFactor = _InputScalingFactor;
 
 
@@ -200,12 +203,12 @@ public class CWDecoderEngine
 
     private void ProcessAudioLoop()
     {
-        int processBlockSize = 128;         //if size == step then no overlap
-        int processBlockStep = 128;         //represents 50% overlap for 256 blocksize
+        int processBlockSize = _BaseBlockSize / _decimation;                     //if size == step then no overlap
+        int processBlockStep = processBlockSize;
         bool isTone = false;
         foreach (var buffer in _audioQueue.GetConsumingEnumerable())
         {
-            float[] newSamples = ConvertToFloat(buffer);
+            float[] newSamples = ConvertToFloat(buffer, _decimation);
             _residualBuffer.AddRange(newSamples);
 
             // Slide window by 128 samples (50% overlap of a 256 block)
@@ -215,7 +218,7 @@ public class CWDecoderEngine
                 float[] block = _residualBuffer.GetRange(0, processBlockSize).ToArray();
 
                 // 2. SLIDE: Only remove 128 samples, not 256 if 50% overlap wanted
-                processBlockStep = (_activeFilter.isHilbert() ? processBlockSize : 128);    //no overlap for Hilbert Analytic
+                //processBlockStep = (_activeFilter.isHilbert() ? processBlockSize : 128);    //no overlap for Hilbert Analytic
                 _residualBuffer.RemoveRange(0, processBlockStep);
 
                 // 3. Process
@@ -261,18 +264,18 @@ public class CWDecoderEngine
         }
     }
 
-    private float[] ConvertToFloat(byte[] buffer)
+    private float[] ConvertToFloat(byte[] buffer, int decimate = 1)
     {
         int bytesPerSample = 2; // 16-bit
         int channels = _waveIn.WaveFormat.Channels;
         int monoSampleCount = buffer.Length / (bytesPerSample * channels);
-        float[] samples = new float[monoSampleCount];
+        float[] samples = new float[monoSampleCount / decimate];
 
         for (int i = 0; i < monoSampleCount; i++)
         {
             int offset = i * bytesPerSample * channels;
             short s = (short)((buffer[offset + 1] << 8) | buffer[offset]);
-            samples[i] = s / 32768f;
+            samples[i / decimate] = s / 32768f;
             // Note: If stereo, this ignores the second channel to save CPU. 
             // For CW, one channel is usually sufficient.
         }
@@ -329,7 +332,7 @@ public class CWDecoderEngine
             switch (filterName)
             {
                 case "FIR Bandpass":
-                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */);
+                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize, _decimation);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Goertzel":
