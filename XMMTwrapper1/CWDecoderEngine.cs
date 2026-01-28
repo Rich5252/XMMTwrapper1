@@ -363,8 +363,8 @@ public class AdaptiveThreshold
     private bool _isTone = false;
     private double spaceMeanSquare = 0;     //for S/N display
     private double markMeanSquare = 0;
-    private double markRMSsquelch = 0;      //for auto squelch tracking
-    private double spaceRMSsquelch = 0; 
+    private double markMeanSquelch = 0;      //for auto squelch tracking
+    private double spaceMeanSquelch = 0; 
     private int MarkSpaceRatio = 0;        //for auto squelch reset
 
     public double SNratio { get; set; } = 0;
@@ -373,7 +373,7 @@ public class AdaptiveThreshold
     private int _consecutiveHits = 0;           //init count
     private int _consecutiveMisses = 0;         //init count
     
-    public double SquelchLevel { get; set; } = 0.01;        //set from UI
+    public double SquelchLevel { get; set; } = 0.005;        //set from UI
     public bool AutoSquelch { get; set; } = false; 
     
     public bool GaussianFilter = true;                      //diagnostic option
@@ -523,20 +523,20 @@ public class AdaptiveThreshold
         if (_isTone)
         {
             markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
-            markRMSsquelch = markRMSsquelch * Config.SquelchSignalAvgFactor + mag * (1 - Config.SquelchSignalAvgFactor);
+            markMeanSquelch = markMeanSquelch * Config.SquelchSignalAvgFactor + mag * (1 - Config.SquelchSignalAvgFactor);
             MarkSpaceRatio++;
         }
         else
         {
             spaceMeanSquare = spaceMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
-            spaceRMSsquelch = spaceRMSsquelch * Config.SquelchNoiseAvgFactor + mag * (1 - Config.SquelchNoiseAvgFactor);
+            spaceMeanSquelch = spaceMeanSquelch * Config.SquelchNoiseAvgFactor + mag * (1 - Config.SquelchNoiseAvgFactor);
             MarkSpaceRatio--;
         }
 
-        if (MarkSpaceRatio < -1000) { MarkSpaceRatio = 0; markRMSsquelch = spaceRMSsquelch; }    //reset if no tone for long time
+        if (MarkSpaceRatio < -1000) { MarkSpaceRatio = 0; markMeanSquelch = spaceMeanSquelch; }    //reset if no tone for long time
         if (AutoSquelch)
-            SquelchLevel = spaceRMSsquelch + (markRMSsquelch - spaceRMSsquelch) * Config.AutoSquelchLevelFactor;   //set squelch 30%
-        
+            SquelchLevel = spaceMeanSquelch + (markMeanSquelch - spaceMeanSquelch) * Config.AutoSquelchLevelFactor;   //set squelch
+        SquelchLevel = Math.Max(SquelchLevel, 0.005);    //minimum squelch
 
         // S/N not (S+N)/N
         double MarkEnergy = (markMeanSquare - spaceMeanSquare); // / 2;      // 2 is window correction factor for tone

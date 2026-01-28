@@ -385,6 +385,9 @@ public class MorseClock
     {
         if (_dotHistory.Count < 3) return;
 
+        double targetDotMs = GetTrimmedMeanDotMs();         //discard outlyers and average the rest
+
+        /*
         // 1. Use a Weighted Average instead of Median for faster "pivot"
         double currentAverage = 0;
         double weightSum = 0;
@@ -396,6 +399,7 @@ public class MorseClock
             weightSum += w;
         }
         double targetDotMs = currentAverage / weightSum;
+        */
 
         // 2. ASYMMETRIC GATE
         // We slow down (increase dotMs) faster than we speed up (decrease dotMs).
@@ -428,6 +432,22 @@ public class MorseClock
 
         if (!_FixWpm) _currentWPM = newWpm;
         OnWpmChanged?.Invoke((int)_currentWPM);
+    }
+
+    public double GetTrimmedMeanDotMs()
+    {
+        if (_dotHistory.Count < 3) return _dotMs; // Initial PARIS value
+
+        // 1. Sort a copy of the history
+        var sorted = _dotHistory.OrderBy(x => x).ToList();
+
+        // 2. Discard the Outliers (the "Noise" jitter)
+        // For a history of 10, remove the 2 shortest and 2 longest
+        int trimCount = Math.Max(1, sorted.Count / 5);
+        var stableSamples = sorted.Skip(trimCount).Take(sorted.Count - (trimCount * 2));
+
+        // 3. Return the average of the "Stable" middle
+        return stableSamples.Average();
     }
 
     /*
@@ -466,7 +486,7 @@ public class MorseClock
         }
     }
     */
-    
+
     private bool DecodeBuffer()
     {
         string sequence = _currentSymbolBuffer.ToString();
