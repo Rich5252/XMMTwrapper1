@@ -191,7 +191,7 @@ public class FIRStrategy : MorseFilterBase
     {
         _filter = new FIRFilter(_sampleRate, _tone, _bw, 511);
         _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
-        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol, _blockSize, _overlapFactor);
+        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol, _blockSize, _blockSize/_overlapFactor);
     }
 
     public override double ProcessBlock(float[] samples)

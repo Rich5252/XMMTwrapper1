@@ -93,7 +93,7 @@ public class CWDecoderEngine
     private ICWFilter _activeFilter;
     private int _SampleRateAudioIn = 48000;
     private int _decimation = 8;               //decimation factor
-    private int _SampleRate = 48000;            //after decimation
+    private int _SampleRate = 6000;            //after decimation
     private int _BaseBlockSize = 128;         //base filter block size for 48000Hz == 2.666ms
 
     public string LoggingFilePath { get; set; } = "C:\\Users\\office2\\Documents\\Ham Radio\\VScode\\XMMTwrapper_C#\\XMMTwrapper1\\CWlogTemporalFilter.csv";
@@ -130,7 +130,7 @@ public class CWDecoderEngine
         _clock.SetSampleRate(_SampleRate);
 
         //_activeFilter = new GoertzelStrategy(TargetFrequency, _SampleRate, 256 /* buffersize */);    //default filter
-        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize, _decimation);    //default filter
+        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize/_decimation, 1);    //default filter
         _activeFilter.ScalingFactor = _InputScalingFactor;
 
 
@@ -339,7 +339,7 @@ public class CWDecoderEngine
             switch (filterName)
             {
                 case "FIR Bandpass":
-                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize, _decimation);
+                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize / _decimation, 1);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Goertzel":
