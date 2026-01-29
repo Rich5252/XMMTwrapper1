@@ -208,10 +208,10 @@ public class CWDecoderEngine
         bool isTone = false;
         foreach (var buffer in _audioQueue.GetConsumingEnumerable())
         {
-            float[] newSamples = ConvertToFloat(buffer, _decimation);
+            float[] newSamples = ConvertToFloat(buffer, _decimation);       //decimation done here
             _residualBuffer.AddRange(newSamples);
 
-            // Slide window by 128 samples (50% overlap of a 256 block)
+            // Slide window by processBlockStep (buffer contains decimated samples)
             while (_residualBuffer.Count >= processBlockSize)
             {
                 // 1. Get the current 256 block
@@ -270,12 +270,19 @@ public class CWDecoderEngine
         int channels = _waveIn.WaveFormat.Channels;
         int monoSampleCount = buffer.Length / (bytesPerSample * channels);
         float[] samples = new float[monoSampleCount / decimate];
-
+        float sAvg = 0;
         for (int i = 0; i < monoSampleCount; i++)
         {
             int offset = i * bytesPerSample * channels;
-            short s = (short)((buffer[offset + 1] << 8) | buffer[offset]);
-            samples[i / decimate] = s / 32768f;
+            short s = (short)((buffer[offset + 1] << 8) | buffer[offset]);  //get next sample (little-endian)
+
+            //decimation by averaging filter (relies on pre-filtering in SDR)
+            sAvg += s;
+            if (i % decimate == 0) 
+            {
+                samples[i / decimate] = sAvg / (float) decimate / 32768f;        //store decimated sample avg
+                sAvg = 0;
+            }            
             // Note: If stereo, this ignores the second channel to save CPU. 
             // For CW, one channel is usually sufficient.
         }

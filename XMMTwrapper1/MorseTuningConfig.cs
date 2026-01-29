@@ -10,9 +10,9 @@ public static class Config
     public const int MaxConsecutiveMisses = 6;          //was 7     loop misses needed for !_IsTone
     public const double MinConfidence = 0.9;           //was 0.95   Hilbert confidence to accept Tone
 
-    public const double SquelchNoiseAvgFactor = 0.9995;         //exp avg factors
-    public const double SquelchSignalAvgFactor = 0.99;
-    public const double AutoSquelchLevelFactor = 0.5;           //20% above noise floor
+    public const double SquelchNoiseAvgFactor = 0.9995;         //exp avg factors, slow decay
+    public const double SquelchSignalAvgFactor = 0.99;          //fast attack
+    public const double AutoSquelchLevelFactor = 0.45;           //fraction above noise floor (was 0.5)
 
 
     //***************************************************************
@@ -41,10 +41,11 @@ public static class Config
                                                        //now subtracted from measured dot/dash lengths
                                                        //  and added to measured spaces
 
-    // STATISTICS
-    public const int HISTORY_BUCKET_SIZE = 25;     //was 25
-    public const double ADAPTATION_BASE_WEIGHT = 0.04;
-    
+    // WPM STATISTICS
+    public const int HISTORY_BUCKET_SIZE = 45;     //was 25
+    public const double WpmSpeedUpRate = 0.05;      //was 0.05
+    public const double WpmSlowDownRate = 0.15;
+
 }
 
 

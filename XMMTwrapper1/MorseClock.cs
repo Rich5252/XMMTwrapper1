@@ -145,7 +145,7 @@ public class MorseClock
                 {
                     // The "Trap": If the space after a tiny blip is long (>80% of a dot), 
                     // the blip was noise. We add the blip AND this space to the PREVIOUS space.
-                    if (adjusted > _dotMs * 0.8)
+                    if (adjusted > _dotMs * 0.8 || _pendingMarkDuration < Config.DOT_MINIMUM_MS)
                     {
                         // We DON'T call ProcessSpace(adjusted). 
                         // We tell the system: "That noise spike didn't happen, just keep the space going."
@@ -407,7 +407,7 @@ public class MorseClock
 
         // If delta > 0, the station is SLOWER than our clock (Trust this more)
         // If delta < 0, the station is FASTER than our clock (Be skeptical, could be noise)
-        double trackingRate = (delta > 0) ? 0.15 : 0.05; // 15% adjustment for slow-down, 5% for speed-up
+        double trackingRate = (delta > 0) ? Config.WpmSlowDownRate : Config.WpmSpeedUpRate; // 15% adjustment for slow-down, 5% for speed-up
 
         double maxChange = _dotMs * trackingRate;
 

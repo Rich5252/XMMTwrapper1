@@ -320,9 +320,9 @@ namespace XMMTwrapper1
             cbAutoSquelch.CheckAlign = ContentAlignment.MiddleRight;
             cbAutoSquelch.Location = new Point(101, 10);
             cbAutoSquelch.Name = "cbAutoSquelch";
-            cbAutoSquelch.Size = new Size(97, 19);
+            cbAutoSquelch.Size = new Size(95, 19);
             cbAutoSquelch.TabIndex = 76;
-            cbAutoSquelch.Text = "Auto Squelch";
+            cbAutoSquelch.Text = "Squelch AGC";
             cbAutoSquelch.TextAlign = ContentAlignment.MiddleRight;
             cbAutoSquelch.UseVisualStyleBackColor = true;
             cbAutoSquelch.CheckedChanged += cbAutoSquelch_CheckedChanged;
