@@ -540,7 +540,7 @@ public class AdaptiveThreshold
             MarkSpaceRatio--;
         }
 
-        if (MarkSpaceRatio < -1000) { MarkSpaceRatio = 0; markMeanSquelch = spaceMeanSquelch; }    //reset if no tone for long time
+        if (MarkSpaceRatio < -1500) { MarkSpaceRatio = 0; markMeanSquelch = spaceMeanSquelch; }    //reset if no tone for long time
         if (AutoSquelch)
             SquelchLevel = spaceMeanSquelch + (markMeanSquelch - spaceMeanSquelch) * Config.AutoSquelchLevelFactor;   //set squelch
         SquelchLevel = Math.Max(SquelchLevel, 0.005);    //minimum squelch

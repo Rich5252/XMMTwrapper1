@@ -189,7 +189,7 @@ public class FIRStrategy : MorseFilterBase
 
     protected override void OnSettingsChanged()
     {
-        _filter = new FIRFilter(_sampleRate, _tone, _bw, 511);
+        _filter = new FIRFilter(_sampleRate, _tone, _bw, 512);
         _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
         _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol, _blockSize, _blockSize/_overlapFactor);
     }
@@ -241,10 +241,12 @@ public class FIRFilter
 
     public FIRFilter(int sampleRate, double centerFreq, double bandwidth, int tapCount = 127)
     {
-        _taps = DesignBandPass(sampleRate, centerFreq, bandwidth, tapCount);
+        //_taps = DesignBandPass(sampleRate, centerFreq, bandwidth, tapCount);
+        _taps = DesignBandPass2(sampleRate, centerFreq, bandwidth, tapCount);
         _buffer = new float[tapCount];
     }
 
+    //original bandpass FIR filter for 48kHz Fs. best ENB ~330Hz for 45Hz BW
     private float[] DesignBandPass(int rate, double center, double bw, int nTaps)
     {
         float[] taps = new float[nTaps];
@@ -279,6 +281,57 @@ public class FIRFilter
             taps[i] *= (float)window;
         }
         return taps;
+    }
+
+    public static float[] DesignBandPass2(double sampleRate, double center, double bw, int taps)
+    {
+        //recommended 400 taps for 12kHz Fs 100Hz bw
+        double lowCutoff = center - (bw / 2.0);
+        double highCutoff = center + (bw / 2.0);
+        float[] coefs = new float[taps];
+        double fLow = lowCutoff / sampleRate;
+        double fHigh = highCutoff / sampleRate;
+        int M = taps - 1;
+
+        for (int i = 0; i < taps; i++)
+        {
+            double n = i - M / 2.0;
+
+            if (n == 0)
+            {
+                // Center tap calculation (Difference of the two sinc functions at 0)
+                coefs[i] = (float)(2 * (fHigh - fLow));
+            }
+            else
+            {
+                // Standard Sinc-based Bandpass formula
+                double argHigh = 2 * Math.PI * fHigh * n;
+                double argLow = 2 * Math.PI * fLow * n;
+                coefs[i] = (float)((Math.Sin(argHigh) - Math.Sin(argLow)) / (Math.PI * n));
+            }
+
+            // Apply Hamming Window to reduce spectral leakage (side-lobes)
+            double window = 0.54 - 0.46 * Math.Cos(2 * Math.PI * i / M);
+            coefs[i] *= (float)window;
+        }
+
+        // Normalization: Ensure Unity Gain (1.0) at the center frequency
+        double midFreq = (lowCutoff + highCutoff) / 2.0;
+        double omegaMid = 2 * Math.PI * midFreq / sampleRate;
+
+        double realSum = 0;
+        double imagSum = 0;
+        for (int i = 0; i < taps; i++)
+        {
+            realSum += coefs[i] * Math.Cos(i * omegaMid);
+            imagSum += coefs[i] * Math.Sin(i * omegaMid);
+        }
+        float magnitudeAtCenter = (float)Math.Sqrt(realSum * realSum + imagSum * imagSum);
+
+        for (int i = 0; i < taps; i++)
+            coefs[i] /= magnitudeAtCenter;
+
+        return coefs;
     }
 
     //filter an entire block
@@ -420,7 +473,7 @@ public class HilbertStrategy : MorseFilterBase
     protected override void OnSettingsChanged()
     {
         _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
-        _preFilter = new FIRFilter(_sampleRate, _tone, _bw, 511);
+        _preFilter = new FIRFilter(_sampleRate, _tone, _bw, 512);
         _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol);
     }
 
