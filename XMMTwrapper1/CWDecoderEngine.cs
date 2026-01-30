@@ -92,8 +92,8 @@ public class CWDecoderEngine
     private readonly object _filterLock = new object();     //used when changing
     private ICWFilter _activeFilter;
     private int _SampleRateAudioIn = 48000;
-    private int _decimation = 8;               //decimation factor
-    private int _SampleRate = 6000;            //after decimation
+    private int _decimation = 4;               //decimation factor
+    private int _SampleRate = 12000;            //after decimation
     private int _BaseBlockSize = 128;         //base filter block size for 48000Hz == 2.666ms
 
     public string LoggingFilePath { get; set; } = "C:\\Users\\office2\\Documents\\Ham Radio\\VScode\\XMMTwrapper_C#\\XMMTwrapper1\\CWlogTemporalFilter.csv";
@@ -343,11 +343,11 @@ public class CWDecoderEngine
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Goertzel":
-                    _activeFilter = new GoertzelStrategy(_SampleRate, TargetFrequency, 256 /* blocksize */);
+                    _activeFilter = new GoertzelStrategy(_SampleRate, TargetFrequency, _BaseBlockSize / _decimation /* blocksize */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "RMS":
-                    _activeFilter = new RMSStrategy(_SampleRate, 256 /* blocksize */);
+                    _activeFilter = new RMSStrategy(_SampleRate, _BaseBlockSize / _decimation /* blocksize */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Hilbert Analytic":            //HBA

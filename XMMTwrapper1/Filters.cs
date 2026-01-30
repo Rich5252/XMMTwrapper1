@@ -245,21 +245,21 @@ public class FIRFilter
         _buffer = new float[tapCount];
     }
 
-    private float[] DesignBandPass(int rate, double center, double bw, int n)
+    private float[] DesignBandPass(int rate, double center, double bw, int nTaps)
     {
-        float[] taps = new float[n];
+        float[] taps = new float[nTaps];
         double fLow = (center - bw / 2.0) / rate;
         double fHigh = (center + bw / 2.0) / rate;
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < nTaps; i++)
         {
-            if (i == n / 2) // Handle division by zero at center
+            if (i == nTaps / 2) // Handle division by zero at center
             {
                 taps[i] = (float)(2.0 * (fHigh - fLow));
             }
             else
             {
-                double mid = i - n / 2.0;
+                double mid = i - nTaps / 2.0;
                 taps[i] = (float)((Math.Sin(2 * Math.PI * fHigh * mid) - Math.Sin(2 * Math.PI * fLow * mid)) / (Math.PI * mid));
             }
             // Apply Hamming window to reduce ripples
@@ -273,8 +273,8 @@ public class FIRFilter
             double a2 = alpha / 2.0;
 
             double window = a0
-                            - a1 * Math.Cos((2 * Math.PI * i) / (n - 1))
-                            + a2 * Math.Cos((4 * Math.PI * i) / (n - 1));
+                            - a1 * Math.Cos((2 * Math.PI * i) / (nTaps - 1))
+                            + a2 * Math.Cos((4 * Math.PI * i) / (nTaps - 1));
 
             taps[i] *= (float)window;
         }
