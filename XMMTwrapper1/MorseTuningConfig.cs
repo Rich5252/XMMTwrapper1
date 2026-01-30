@@ -10,9 +10,9 @@ public static class Config
     public const int MaxConsecutiveMisses = 6;          //was 7     loop misses needed for !_IsTone
     public const double MinConfidence = 0.9;           //was 0.95   Hilbert confidence to accept Tone
 
-    public const double SquelchNoiseAvgFactor = 0.9995;         //exp avg factors, slow decay
+    public const double SquelchNoiseAvgFactor = 0.9996;         //exp avg factors, slow decay was 0.9995, 0.99975
     public const double SquelchSignalAvgFactor = 0.99;          //fast attack
-    public const double AutoSquelchLevelFactor = 0.45;           //fraction above noise floor (was 0.5)
+    public const double AutoSquelchLevelFactor = 0.455;           //fraction above noise floor (was 0.5, 0.45)
 
 
     //***************************************************************

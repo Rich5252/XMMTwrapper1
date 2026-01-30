@@ -62,7 +62,7 @@ public class CWDecoderEngine
         set { _TargetFrequency = value; _activeFilter.TargetFrequency = _TargetFrequency; }
     }
 
-    private double _FIRbw = 45.0;
+    private double _FIRbw = 40.0;               //default
     public double FIRbw {
         get => _FIRbw;
         set { _FIRbw = value; _activeFilter.filterBW = _FIRbw; }        //now filters adjustable on the fly
@@ -381,7 +381,7 @@ public class AdaptiveThreshold
     private int _consecutiveMisses = 0;         //init count
     
     public double SquelchLevel { get; set; } = 0.005;        //set from UI
-    public bool AutoSquelch { get; set; } = false; 
+    public bool AutoSquelch { get; set; } = true;           //default AGC on
     
     public bool GaussianFilter = true;                      //diagnostic option
     public bool MedianFilter = true;                        //diagnostic option 
@@ -531,16 +531,16 @@ public class AdaptiveThreshold
         {
             markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
             markMeanSquelch = markMeanSquelch * Config.SquelchSignalAvgFactor + mag * (1 - Config.SquelchSignalAvgFactor);
-            MarkSpaceRatio++;
+            MarkSpaceRatio = 0;         //doing ratio causes resets because of ratio of dits to dahs which is not what we want
         }
         else
         {
             spaceMeanSquare = spaceMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
             spaceMeanSquelch = spaceMeanSquelch * Config.SquelchNoiseAvgFactor + mag * (1 - Config.SquelchNoiseAvgFactor);
-            MarkSpaceRatio--;
+            MarkSpaceRatio--;   //count no marks (no signal) to force reset
         }
 
-        if (MarkSpaceRatio < -1500) { MarkSpaceRatio = 0; markMeanSquelch = spaceMeanSquelch; }    //reset if no tone for long time
+        if (MarkSpaceRatio < -1500) { MarkSpaceRatio = 0; markMeanSquelch = spaceMeanSquelch; }    //reset if no tone for 4 sec
         if (AutoSquelch)
             SquelchLevel = spaceMeanSquelch + (markMeanSquelch - spaceMeanSquelch) * Config.AutoSquelchLevelFactor;   //set squelch
         SquelchLevel = Math.Max(SquelchLevel, 0.005);    //minimum squelch

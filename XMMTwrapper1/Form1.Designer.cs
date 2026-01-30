@@ -283,7 +283,7 @@ namespace XMMTwrapper1
             tbBW.Name = "tbBW";
             tbBW.Size = new Size(40, 23);
             tbBW.TabIndex = 29;
-            tbBW.Value = new decimal(new int[] { 45, 0, 0, 0 });
+            tbBW.Value = new decimal(new int[] { 40, 0, 0, 0 });
             tbBW.ValueChanged += tbBW_ValueChanged;
             tbBW.KeyUp += tbBW_ValueChanged;
             // 
@@ -318,6 +318,8 @@ namespace XMMTwrapper1
             // 
             cbAutoSquelch.AutoSize = true;
             cbAutoSquelch.CheckAlign = ContentAlignment.MiddleRight;
+            cbAutoSquelch.Checked = true;
+            cbAutoSquelch.CheckState = CheckState.Checked;
             cbAutoSquelch.Location = new Point(101, 10);
             cbAutoSquelch.Name = "cbAutoSquelch";
             cbAutoSquelch.Size = new Size(95, 19);
