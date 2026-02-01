@@ -151,7 +151,7 @@ public class MorseClock
                         // We tell the system: "That noise spike didn't happen, just keep the space going."
                         // This is done by calling ProcessSpace with the cumulative total.
                         ProcessSpace(adjusted + _pendingMarkDuration, isContinuation: true);
-                        Log.Perf($"NOISE_TRAP: Merged {adjusted + _pendingMarkDuration}ms into existing silence.");
+                        Log.Perf($"NOISE_TRAP: Merged {adjusted} + {_pendingMarkDuration}ms into existing silence.");
                     }
                     else
                     {

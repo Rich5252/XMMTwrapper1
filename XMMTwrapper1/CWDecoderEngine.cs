@@ -531,7 +531,7 @@ public class AdaptiveThreshold
         {
             markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
             markMeanSquelch = markMeanSquelch * Config.SquelchSignalAvgFactor + mag * (1 - Config.SquelchSignalAvgFactor);
-            MarkSpaceRatio = 0;         //doing ratio causes resets because of ratio of dits to dahs which is not what we want
+            MarkSpaceRatio = 0;         //reset (ratio didnt work because depends on numbers of dits and dahs in message)
         }
         else
         {
