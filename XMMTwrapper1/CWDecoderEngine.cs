@@ -37,6 +37,7 @@ using NAudio.Wave;                          //audio support library
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing.Text;
+using System.Threading.Channels;
 
 public class CWDecoderEngine
 {
@@ -92,8 +93,8 @@ public class CWDecoderEngine
     private readonly object _filterLock = new object();     //used when changing
     private ICWFilter _activeFilter;
     private int _SampleRateAudioIn = 48000;
-    private int _decimation = 4;               //decimation factor
-    private int _SampleRate = 12000;            //after decimation
+    private int _decimation = 1;               //decimation factor - this version passed decimation decision to individual filters
+    private int _SampleRate = 48000;            //after decimation
     private int _BaseBlockSize = 128;         //base filter block size for 48000Hz == 2.666ms
 
     public string LoggingFilePath { get; set; } = "C:\\Users\\office2\\Documents\\Ham Radio\\VScode\\XMMTwrapper_C#\\XMMTwrapper1\\CWlogTemporalFilter.csv";
@@ -126,11 +127,11 @@ public class CWDecoderEngine
             BufferMilliseconds = 50
         };
 
-        _SampleRate = _waveIn.WaveFormat.SampleRate / _decimation;
-        _clock.SetSampleRate(_SampleRate);
+        _SampleRate = _waveIn.WaveFormat.SampleRate;
+        _clock.SetSampleRate(_SampleRate);                  //all filters get data at audio sample rate
 
         //_activeFilter = new GoertzelStrategy(TargetFrequency, _SampleRate, 256 /* buffersize */);    //default filter
-        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize/_decimation, 1);    //default filter
+        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize);    //default filter
         _activeFilter.ScalingFactor = _InputScalingFactor;
 
 
@@ -203,18 +204,19 @@ public class CWDecoderEngine
 
     private void ProcessAudioLoop()
     {
-        int processBlockSize = _BaseBlockSize / _decimation;                     //if size == step then no overlap
-        int processBlockStep = processBlockSize;
+        int processBlockSize = _BaseBlockSize;                     //if size == step then no overlap
+        int processBlockStep = processBlockSize;                    //this version passes decimation decision and processing
+                                                                    // to individual filters
         bool isTone = false;
         foreach (var buffer in _audioQueue.GetConsumingEnumerable())
         {
-            float[] newSamples = ConvertToFloat(buffer, _decimation);       //decimation done here
+            float[] newSamples = ConvertToFloat(buffer);       //convert left ch wav file to float
             _residualBuffer.AddRange(newSamples);
 
             // Slide window by processBlockStep (buffer contains decimated samples)
             while (_residualBuffer.Count >= processBlockSize)
             {
-                // 1. Get the current 256 block
+                // 1. Get the current 128 block
                 float[] block = _residualBuffer.GetRange(0, processBlockSize).ToArray();
 
                 // 2. SLIDE: Only remove 128 samples, not 256 if 50% overlap wanted
@@ -264,25 +266,18 @@ public class CWDecoderEngine
         }
     }
 
-    private float[] ConvertToFloat(byte[] buffer, int decimate = 1)
+    private float[] ConvertToFloat(byte[] buffer)
     {
         int bytesPerSample = 2; // 16-bit
         int channels = _waveIn.WaveFormat.Channels;
         int monoSampleCount = buffer.Length / (bytesPerSample * channels);
-        float[] samples = new float[monoSampleCount / decimate];
-        float sAvg = 0;
+        float[] samples = new float[monoSampleCount];
         for (int i = 0; i < monoSampleCount; i++)
         {
             int offset = i * bytesPerSample * channels;
             short s = (short)((buffer[offset + 1] << 8) | buffer[offset]);  //get next sample (little-endian)
-
-            //decimation by averaging filter (relies on pre-filtering in SDR)
-            sAvg += s;
-            if (i % decimate == 0) 
-            {
-                samples[i / decimate] = sAvg / (float) decimate / 32768f;        //store decimated sample avg
-                sAvg = 0;
-            }            
+            samples[i] = s / 32768f;
+     
             // Note: If stereo, this ignores the second channel to save CPU. 
             // For CW, one channel is usually sufficient.
         }
@@ -339,15 +334,15 @@ public class CWDecoderEngine
             switch (filterName)
             {
                 case "FIR Bandpass":
-                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize / _decimation, 1);
+                    _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Goertzel":
-                    _activeFilter = new GoertzelStrategy(_SampleRate, TargetFrequency, _BaseBlockSize / _decimation /* blocksize */);
+                    _activeFilter = new GoertzelStrategy(_SampleRate, TargetFrequency, _BaseBlockSize /* blocksize */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "RMS":
-                    _activeFilter = new RMSStrategy(_SampleRate, _BaseBlockSize / _decimation /* blocksize */);
+                    _activeFilter = new RMSStrategy(_SampleRate, _BaseBlockSize /* blocksize */);
                     _activeFilter.ScalingFactor = _InputScalingFactor;
                     break;
                 case "Hilbert Analytic":            //HBA
@@ -431,20 +426,25 @@ public class AdaptiveThreshold
         double lowerThreshold = _noiseFloor + (range * Config.THRESHOLD_LOWER_RATIO); // The "Hold" level (lowered slightly for better QSB)
 
         bool meetsThreshold;
+        double confidenceAdjust = 1;
         double signalPower = (mag * mag) / upperThreshold;
         if (!_isTone)
         {
             // If SILENT: Must cross the high bar to start a Mark
-            double confidenceAdjust = (conf > 0.98 ? 1.4 : 1);
+            confidenceAdjust = (conf > 098 ? 1.4 : 1);                  //was 0.98, 1.4, 1
+            if (confidenceAdjust > 1)
+            {
+                mag = mag;
+            }
             //meetsThreshold = (mag * confidenceAdjust > upperThreshold);
 
-            meetsThreshold = signalPower * confidenceAdjust > upperThreshold;
+            meetsThreshold = (signalPower * confidenceAdjust) > upperThreshold;
         }
         else
         {
             // If TONING: Only need to stay above the low bar to continue the Mark
             // confidence adjust to avoid drop outs
-            //confidenceAdjust = (conf > 0.92  ? 1.4 : 1);
+            confidenceAdjust = (conf > 0.8  ? 2 : 1);
             //double confidenceAdjust = 1.0 + (Math.Max(0, conf - 0.5) * 1.0);
             //meetsThreshold = (mag * confidenceAdjust > lowerThreshold);
 
@@ -776,4 +776,26 @@ public class AdaptiveThreshold
     public double GetCurrentThreshold() => _noiseFloor + (_peakLevel - _noiseFloor) * (_isTone ? Config.THRESHOLD_LOWER_RATIO : Config.THRESHOLD_UPPER_RATIO);
     public double GetPeak() => _peakLevel;
     public double GetNoise() => _noiseFloor;
+}
+
+public class Decimation
+{
+    public float[] Apply(float[] inBuffer, int _decimationFactor)
+    {
+        float[] outBuffer = new float[inBuffer.Length / _decimationFactor];
+
+        float sAvg = 0;
+        for (int i = 0; i < inBuffer.Length; i++)
+        {
+            //decimation by averaging filter (relies on pre-filtering in SDR)
+            sAvg += inBuffer[i];
+            if (i % _decimationFactor == 0)
+            {
+                outBuffer[i / _decimationFactor] = sAvg / (float)_decimationFactor;        //store decimated sample avg
+                sAvg = 0;
+            }
+        }
+
+        return outBuffer;
+    }
 }

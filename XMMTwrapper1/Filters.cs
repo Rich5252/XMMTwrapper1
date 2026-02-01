@@ -5,6 +5,7 @@
 // All filters have a "Strategy" configuration call
 // All filters use ProcessBlock(float[] samples); and return a scalar level result
 //**********************************************
+using Microsoft.Internal.VisualStudio.Shell.Interop;
 using static HilbertStrategy;
 
 public interface ICWFilter
@@ -30,10 +31,11 @@ public abstract class MorseFilterBase : ICWFilter
     protected int _sampleRate = 48000;
     protected int _overlapFactor = 1;      //default no overlap, 2 = 50% overlap etc
     protected int _blockSize = 128;
+    protected int _decimationFactor = 4;
 
     // Backing fields
     protected double _tone = 1000;
-    protected double _bw = 75;
+    protected double _bw = 40;
     protected double _tol = 30;
     protected double _scaling = 200;
 
@@ -161,37 +163,44 @@ public class GoertzelFilter
 }
 
 //***********************************************
-// FIR
+// FIR including Hilbert signal confidence
 //***********************************************
 public class FIRStrategy : MorseFilterBase
 {
     private FIRFilter _filter;
+    private FIRFilter _wideFilter;          //pre filter for Hilbert
+    private Decimation _dec;
 
     private HilbertFIR _hilbert;
     private HilbertCoherentDetector _coherentDetector;
     private double _lastBlockConfidence = 0;
     public override double SigConfidence() => _lastBlockConfidence;
 
-    private double[] _delayedSig = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };        // For simple 2-output delay to accomodtae Hilbert delay line
+    private double[] _delayedSig = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };        // For simple 2-output delay to accomodtae Hilbert delay line
     private int _delayIndex = 0;
 
     public override string Name => "FIR Bandpass";
 
-    public FIRStrategy(int sampleRate, double freq, double bw, int SampleBlockSize = 128, int OverlapFactor = 1)
+    public FIRStrategy(int sampleRate, double freq, double bw, int SampleBlockSize = 128)
     {
         _sampleRate = sampleRate;
         _tone = freq;
         _bw = bw;
         _blockSize = SampleBlockSize;
-        _overlapFactor = OverlapFactor;
+        _decimationFactor = 4;
         OnSettingsChanged();
     }
 
     protected override void OnSettingsChanged()
     {
-        _filter = new FIRFilter(_sampleRate, _tone, _bw, 512);
+        //FIR runs at decimation sample rate (12k) but Hilbert runs at audio rate (48k)
+        _filter = new FIRFilter(_sampleRate / _decimationFactor, _tone, _bw, 512);
+        _dec = new Decimation();
+
+        //use separate wide prefilter for Hilbert
+        _wideFilter = new FIRFilter(_sampleRate, _tone, 100, 512);
         _hilbert = new HilbertFIR(511);         //note 511 min for sufficient freq resolution at 48k Fs
-        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol, _blockSize, _blockSize/_overlapFactor);
+        _coherentDetector = new HilbertCoherentDetector(_tone, _sampleRate, _tol, _blockSize, _blockSize);
     }
 
     public override double ProcessBlock(float[] samples)
@@ -199,23 +208,22 @@ public class FIRStrategy : MorseFilterBase
         double sumAbs = 0;
         double mag = 0;
         double sumConfidence = 0;         //from Hilbert processing
+        int i = 0;
 
         //For Hilbert processing - not used in this basic FIR
         double targetDelta = (2.0 * Math.PI * _tone) / _sampleRate;
         double radTol = (2.0 * Math.PI * _tol) / _sampleRate;
 
-        for (int i = 0; i < samples.Length; i++)
+        for (i = 0; i < samples.Length; i++)
         {
-            //FIR bandpass filtering
-            float filteredSample = _filter.Process(samples[i]);
-            sumAbs += Math.Abs(filteredSample);
+            //FIR bandpass pre-filtering
+            float filteredSample = _wideFilter.Process(samples[i]);
 
             var (I, Q) = _hilbert.GetIQ(filteredSample);
             var result = _coherentDetector.Update(I, Q);
 
             sumConfidence += result.Confidence;
         }
-        mag = sumAbs / samples.Length * 50000 / _scaling;
         double conf = sumConfidence / samples.Length;      //this is picked up by decoder
                                                                     //via SigConfidence() call
         _coherentDetector.AdjustForSampleOverlap();         //necessary for phase continuity with overlap
@@ -223,12 +231,24 @@ public class FIRStrategy : MorseFilterBase
         //delay line to match Hilbert filter delay 256 sample delay required for 511 tap Hilbert
         //assumes 128 sample blocks, so only 2 block delay needed
         //NOTE can not use overlap with hilbert and this simple delay line
-        _delayedSig[0] = _delayedSig[1];    //shift down
-        _delayedSig[1] = _delayedSig[2];
-        _delayedSig[2] = conf;               //put new result in newest slot
+        for (i = 0; i < _delayedSig.Length - 1; i++)
+        {
+            _delayedSig[i] = _delayedSig[i + 1];    //shift down
+        }
+        _delayedSig[i] = conf;
+        _lastBlockConfidence = _delayedSig[6];      //pick delay required, smaller index == higher delay
 
-        _lastBlockConfidence = _delayedSig[1];
+        //Onto decimation and fine FIR filter
+        float[] decSamples = _dec.Apply(samples, _decimationFactor);
 
+        for (i = 0; i < decSamples.Length; i++)
+        {
+            //FIR bandpass pre-filtering
+            float filteredSample = _filter.Process(decSamples[i]);
+            sumAbs += Math.Abs(filteredSample);
+        }
+
+        mag = sumAbs / decSamples.Length * 50000 / _scaling;
         return mag;          // now matches Hilbert confidence output
     }
 }
@@ -596,7 +616,7 @@ public class HilbertStrategy : MorseFilterBase
 
             return new CoherenceResult
             {
-                Magnitude = magnitude * Math.Pow(confidence, 3), // Cubic weighting
+                Magnitude = magnitude * Math.Pow(confidence, 4), // Cubic weighting
                 Confidence = confidence
             };
         }
