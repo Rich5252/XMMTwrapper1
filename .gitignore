@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/CWlogTemporalFilter 1.xlsx
+/CWlogTemporalFilter2.xlsx
+/CWlogTemporalFilter3.xlsx
+/CWlogTemporalFilter4.xlsx
+/CWlogTemporalFilterG.xlsx
+/CWlogTemporalFilterN.xlsx
+/CWlogTemporalFilter.csv

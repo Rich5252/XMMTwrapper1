@@ -244,7 +244,9 @@ public class CWDecoderEngine
                 {
                     long millis = sw.ElapsedMilliseconds;
                     // Record the decision-making data
-                    _csvLogger.WriteLine($"{millis},{_clock.GetTotalSamples()},{magFiltered:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4}, {lastChar}");
+                    double sq = GetSquelchLevel(out sq);
+                    double sp = _adaptor.GetSignalPower();
+                    _csvLogger.WriteLine($"{millis},{_clock.GetTotalSamples()},{magFiltered:F4},{sp:F4},{_adaptor.GetCurrentThreshold():F4},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4},{sq:F4} , {lastChar}");
                     //_csvLogger.WriteLine($"{_clock.GetTotalSamples()},{magFiltered:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
                 }
 
@@ -303,7 +305,7 @@ public class CWDecoderEngine
             try
             {
                 _csvLogger = new StreamWriter(filePath);
-                _csvLogger.WriteLine("Millis,#samples,Magnitude,Threshold,IsToning,State,Confidence, lastChar"); 
+                _csvLogger.WriteLine("Millis,#samples,Magnitude,SignalPower,Threshold,IsToning,State,Confidence,Squelch,lastChar"); 
             }
             catch 
             {
@@ -359,6 +361,7 @@ public class CWDecoderEngine
 //With temporal drop out filter
 public class AdaptiveThreshold
 {
+    private double _signalPower = 0.0;
     private double _noiseFloor = 0.0;
     private double _peakLevel = 0.01;
     private double range = 0.01;
@@ -428,10 +431,13 @@ public class AdaptiveThreshold
         bool meetsThreshold;
         double confidenceAdjust = 1;
         double signalPower = (mag * mag) / upperThreshold;
+        _signalPower = signalPower;
+
         if (!_isTone)
         {
             // If SILENT: Must cross the high bar to start a Mark
-            confidenceAdjust = (conf > 098 ? 1.4 : 1);                  //was 0.98, 1.4, 1
+            confidenceAdjust = (conf > 0.97 ? 2.8 : 1);                  //was 0.98, 1.4, 1
+            confidenceAdjust = (conf < 0.8 ? 0.5 : confidenceAdjust);       // added to solve "G" issue in 1dB PARIS
             if (confidenceAdjust > 1)
             {
                 mag = mag;
@@ -444,14 +450,15 @@ public class AdaptiveThreshold
         {
             // If TONING: Only need to stay above the low bar to continue the Mark
             // confidence adjust to avoid drop outs
-            confidenceAdjust = (conf > 0.8  ? 2 : 1);
+            confidenceAdjust = (conf > 0.8  ? 3 : 1);
             //double confidenceAdjust = 1.0 + (Math.Max(0, conf - 0.5) * 1.0);
-            //meetsThreshold = (mag * confidenceAdjust > lowerThreshold);
+            //meetsThreshold = (signalPower * confidenceAdjust) > lowerThreshold;
 
             meetsThreshold = signalPower > (lowerThreshold * 0.7);
         }
 
-        if (meetsThreshold && mag > SquelchLevel)    /// && conf > Config.MinConfidence)
+        confidenceAdjust = (conf > 0.97 ? 1.1 : 1);
+        if (meetsThreshold && (mag * confidenceAdjust) > SquelchLevel)    /// && conf > Config.MinConfidence)
         {
             _consecutiveHits++;
             _consecutiveMisses = 0;
@@ -776,6 +783,7 @@ public class AdaptiveThreshold
     public double GetCurrentThreshold() => _noiseFloor + (_peakLevel - _noiseFloor) * (_isTone ? Config.THRESHOLD_LOWER_RATIO : Config.THRESHOLD_UPPER_RATIO);
     public double GetPeak() => _peakLevel;
     public double GetNoise() => _noiseFloor;
+    public double GetSignalPower() => _signalPower;
 }
 
 public class Decimation
