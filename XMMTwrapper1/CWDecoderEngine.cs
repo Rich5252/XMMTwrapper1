@@ -207,6 +207,10 @@ public class CWDecoderEngine
         int processBlockSize = _BaseBlockSize;                     //if size == step then no overlap
         int processBlockStep = processBlockSize;                    //this version passes decimation decision and processing
                                                                     // to individual filters
+        //for logging
+        bool lastState = false;
+        long stateStartTime = 0;
+
         bool isTone = false;
         foreach (var buffer in _audioQueue.GetConsumingEnumerable())
         {
@@ -246,7 +250,18 @@ public class CWDecoderEngine
                     // Record the decision-making data
                     double sq = GetSquelchLevel(out sq);
                     double sp = _adaptor.GetSignalPower();
-                    _csvLogger.WriteLine($"{millis},{_clock.GetTotalSamples()},{magFiltered:F4},{sp:F4},{_adaptor.GetCurrentThreshold():F4},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4},{sq:F4} , {lastChar}");
+                    long ts = _clock.GetTotalSamples();
+                    double th = _adaptor.GetCurrentThreshold();
+                    string td = "";
+                    if (isTone != lastState)
+                    {
+                        lastState = isTone;
+                        td = $"{(ts - stateStartTime)/48:F0}";
+                        stateStartTime = ts;
+                    }
+                    double st = sp / th;
+                    double ms = magFiltered / sq;
+                    _csvLogger.WriteLine($"{millis},{ts},{magFiltered:F4},{sp:F4},{th:F4},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4},{sq:F4} , {lastChar},{td},{st:F4},{ms:F4}");
                     //_csvLogger.WriteLine($"{_clock.GetTotalSamples()},{magFiltered:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
                 }
 
@@ -305,7 +320,7 @@ public class CWDecoderEngine
             try
             {
                 _csvLogger = new StreamWriter(filePath);
-                _csvLogger.WriteLine("Millis,#samples,Magnitude,SignalPower,Threshold,IsToning,State,Confidence,Squelch,lastChar"); 
+                _csvLogger.WriteLine("Millis,#samples,Magnitude,SignalPower,Threshold,IsToning,State,Confidence,Squelch,lastChar,StateTime,sig/thrs,mag/squl"); 
             }
             catch 
             {
@@ -431,32 +446,24 @@ public class AdaptiveThreshold
         bool meetsThreshold;
         double confidenceAdjust = 1;
         double signalPower = (mag * mag) / upperThreshold;
-        _signalPower = signalPower;
+        _signalPower = signalPower;                         //save for diagnostic logging
 
         if (!_isTone)
         {
             // If SILENT: Must cross the high bar to start a Mark
-            confidenceAdjust = (conf > 0.97 ? 2.8 : 1);                  //was 0.98, 1.4, 1
-            confidenceAdjust = (conf < 0.8 ? 0.5 : confidenceAdjust);       // added to solve "G" issue in 1dB PARIS
-            if (confidenceAdjust > 1)
-            {
-                mag = mag;
-            }
-            //meetsThreshold = (mag * confidenceAdjust > upperThreshold);
+            confidenceAdjust = (conf > 0.96 ? 2.8 : 1);                     //was 0.98, 1.4, 1
 
-            meetsThreshold = (signalPower * confidenceAdjust) > upperThreshold;
+            //sometimes mag > signalPower when conf high so choose higher value to avoid missing dots
+            double magORsignalPower = (conf > 0.96 && mag > signalPower ? mag : signalPower);
+            meetsThreshold = (magORsignalPower * confidenceAdjust) > upperThreshold;
         }
         else
         {
             // If TONING: Only need to stay above the low bar to continue the Mark
-            // confidence adjust to avoid drop outs
-            confidenceAdjust = (conf > 0.8  ? 3 : 1);
-            //double confidenceAdjust = 1.0 + (Math.Max(0, conf - 0.5) * 1.0);
-            //meetsThreshold = (signalPower * confidenceAdjust) > lowerThreshold;
-
             meetsThreshold = signalPower > (lowerThreshold * 0.7);
         }
 
+        // avoid missing dots due to low squelch when conf is high
         confidenceAdjust = (conf > 0.97 ? 1.1 : 1);
         if (meetsThreshold && (mag * confidenceAdjust) > SquelchLevel)    /// && conf > Config.MinConfidence)
         {
@@ -471,69 +478,7 @@ public class AdaptiveThreshold
             if (_consecutiveMisses >= Config.MaxConsecutiveMisses) _isTone = false;
         }
 
-        /* //FIR ONLY version
-        // 3.3. CALCULATE DYNAMIC RANGE
-        range = _peakLevel - _noiseFloor;
-
-        // 4. THRESHOLDS & DEBOUNCE
-        // SCHMITT TRIGGER (HYSTERESIS)
-        // Baseline thresholds based on current noise and peak range
-        double upperThreshold = _noiseFloor + (range * Config.THRESHOLD_UPPER_RATIO); // The "Engage" level
-        double lowerThreshold = _noiseFloor + (range * Config.THRESHOLD_LOWER_RATIO); // The "Hold" level (lowered slightly for better QSB)
-
-        bool meetsThreshold;
-        if (!_isTone)
-        {
-            // If SILENT: Must cross the high bar to start a Mark
-            meetsThreshold = (mag > upperThreshold);
-        }
-        else
-        {
-            // If TONING: Only need to stay above the low bar to continue the Mark
-            meetsThreshold = (mag > lowerThreshold);
-        }
-
-        if (meetsThreshold && mag > SquelchLevel && conf > Config.MinConfidence)
-        {
-            _consecutiveHits++;
-            _consecutiveMisses = 0;
-            if (_consecutiveHits >= Config.MaxConsecutiveHits) _isTone = true;
-        }
-        else
-        {
-            _consecutiveMisses++;
-            _consecutiveHits = 0;
-            if (_consecutiveMisses >= Config.MaxConsecutiveMisses) _isTone = false;
-        }
-        */
-
-        //track S/N
-        /*        if (markMeanSquare == 0) markMeanSquare = Math.Pow(mag, 2);
-                if (spaceMeanSquare == 0) spaceMeanSquare = Math.Pow(mag, 2);
-                if (true)    //mag > SquelchLevel)
-                {
-                    if (_isTone)
-                    {
-                        if (markMeanSquareCount <= spaceMeanSquareCount)
-                        {
-                            markMeanSquare = markMeanSquare * 0.99 + Math.Pow(mag, 2) * 0.01;
-                            markMeanSquareCount++;
-                        }
-                    }
-                    else
-                    {
-                        if (markMeanSquareCount > spaceMeanSquare)
-                        {
-                            spaceMeanSquare = spaceMeanSquare * 0.99 + Math.Pow(mag, 2) * 0.01;
-                            spaceMeanSquareCount++;
-                        }
-                    }
-                    if (markMeanSquareCount == spaceMeanSquareCount)
-                    {
-                        markMeanSquareCount = spaceMeanSquareCount = 1;     //avoid overrun on counter
-                    }
-        */
-        
+        //Calculate S/N and squelch tracking
         if (_isTone)
         {
             markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
