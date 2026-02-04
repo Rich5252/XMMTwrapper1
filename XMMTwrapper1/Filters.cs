@@ -52,7 +52,7 @@ public abstract class MorseFilterBase : ICWFilter
     public virtual double Tolerance
     {
         get => _tol;
-        set { _tol = value; } // Usually doesn't require a filter rebuild
+        set { _tol = value; OnSettingsChanged(); }
     }
     public virtual double ScalingFactor
     {
@@ -209,10 +209,6 @@ public class FIRStrategy : MorseFilterBase
         double mag = 0;
         double sumConfidence = 0;         //from Hilbert processing
         int i = 0;
-
-        //For Hilbert processing - not used in this basic FIR
-        double targetDelta = (2.0 * Math.PI * _tone) / _sampleRate;
-        double radTol = (2.0 * Math.PI * _tol) / _sampleRate;
 
         for (i = 0; i < samples.Length; i++)
         {
@@ -582,14 +578,22 @@ public class HilbertStrategy : MorseFilterBase
     {
         private double _lastPhase = 0;
         private readonly double _targetDelta;
-        private readonly double _radTol;
+        private double _radTol;
+        private double _sampleRate;
         private readonly double _lastPhaseSampleOverlapAdjust;
 
+        
         public HilbertCoherentDetector(double targetFreq, double sampleRate, double toleranceHz, int smapleBlockSize = 128, int sampleStepSize = 128)
         {
+            _sampleRate = sampleRate;
             _targetDelta = (2.0 * Math.PI * targetFreq) / sampleRate;
             _radTol = (2.0 * Math.PI * toleranceHz) / sampleRate;
             _lastPhaseSampleOverlapAdjust = -(_targetDelta * (smapleBlockSize - sampleStepSize));    // For overlap handling
+        }
+
+        public void SetToleranceHz(double toleranceHz)
+        {
+            _radTol = (2.0 * Math.PI * toleranceHz) / _sampleRate;
         }
 
         // This is your "Inner Sample Code" extracted
