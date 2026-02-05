@@ -218,9 +218,10 @@ public class FIRStrategy : MorseFilterBase
             var (I, Q) = _hilbert.GetIQ(filteredSample);
             var result = _coherentDetector.Update(I, Q);
 
-            sumConfidence += result.Confidence;
+            sumConfidence += Math.Pow(result.Confidence, 2);
         }
-        double conf = sumConfidence / samples.Length;      //this is picked up by decoder
+        //RMS conf
+        double conf = Math.Pow(sumConfidence / samples.Length, 0.5);      //this is picked up by decoder
                                                                     //via SigConfidence() call
         _coherentDetector.AdjustForSampleOverlap();         //necessary for phase continuity with overlap
 
@@ -620,7 +621,7 @@ public class HilbertStrategy : MorseFilterBase
 
             return new CoherenceResult
             {
-                Magnitude = magnitude * Math.Pow(confidence, 4), // Cubic weighting
+                Magnitude = magnitude * Math.Pow(confidence, 3), // Cubic weighting
                 Confidence = confidence
             };
         }
