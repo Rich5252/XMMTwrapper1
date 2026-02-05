@@ -81,7 +81,8 @@ public class MorseClock
 
     private int stateCounter = 0;
     private long _noiseCarryoverMs = 0;
-    public void UpdateState(bool isTonePresent, int samplesInBlock)
+    private double lastToneConfAvg = 0;         //remember the confidence for end of last tone
+    public void UpdateState(bool isTonePresent, int samplesInBlock, double toneConfAvg)
     {
         lock (_lock)
         {
@@ -108,6 +109,7 @@ public class MorseClock
                         DecodeBuffer();
                     }
                 }
+                lastToneConfAvg = toneConfAvg;          //remember the value for processing on tone to !tone call
                 return;
             }
 
@@ -135,8 +137,20 @@ public class MorseClock
                 }
                 else
                 {
-                    // This is a "Blip." Hold it to see what the following space looks like.
-                    _pendingMarkDuration = adjusted;
+                    //use avg conf during blip and ignore if below minimum threshold
+                    // or hold and see what happens in next space
+                    if (lastToneConfAvg > 0.0) //always true
+                    {
+                        // This is a "Blip." Hold it to see what the following space looks like.
+                        _pendingMarkDuration = adjusted;
+                    }
+                    else
+                    {
+                        //this is noise according to confidence value for tone
+                        ProcessSpace(adjusted, isContinuation: true);
+                        _pendingMarkDuration = 0;
+                        Log.Perf($"NOISE_TRAP: Merged {adjusted}ms into existing silence. Based on low conf: {lastToneConfAvg:F4}");
+                    }
                 }
             }
             else if (!_lastToneState && isTonePresent) // Rising Edge (End of Space)

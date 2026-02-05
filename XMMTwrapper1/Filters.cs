@@ -621,7 +621,7 @@ public class HilbertStrategy : MorseFilterBase
 
             return new CoherenceResult
             {
-                Magnitude = magnitude * Math.Pow(confidence, 3), // Cubic weighting
+                Magnitude = magnitude * Math.Pow(confidence, 4), // Cubic weighting
                 Confidence = confidence
             };
         }

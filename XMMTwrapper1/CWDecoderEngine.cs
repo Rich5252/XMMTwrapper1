@@ -179,6 +179,7 @@ public class CWDecoderEngine
 
     double magFiltered = 0;
     double confFiltered = 0;
+    double toneConf = 0;
 
     //OLD - 50% overlap of incoming audio stream version
     //OLD - each 256 block is processed every 128 samples at 48kHz Fs (2.666ms per block)
@@ -233,7 +234,7 @@ public class CWDecoderEngine
                 double confidence = _activeFilter.SigConfidence();      //Hibert phase lock confidence (0.0 to 1.0)
                 if (!_activeFilter.isHilbert())
                 {
-                    (isTone, magFiltered, confFiltered) = _adaptor.IsSignalPresent(mag, confidence);
+                    (isTone, magFiltered, confFiltered, toneConf) = _adaptor.IsSignalPresent(mag, confidence);
                 }
                 else
                 {
@@ -261,7 +262,7 @@ public class CWDecoderEngine
                     }
                     double st = sp / th;
                     double ms = magFiltered / sq;
-                    _csvLogger.WriteLine($"{millis},{ts},{magFiltered:F4},{sp:F4},{th:F4},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4},{sq:F4} , {lastChar},{td},{st:F4},{ms:F4}");
+                    _csvLogger.WriteLine($"{millis},{ts},{magFiltered:F4},{sp:F4},{th:F4},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4},{sq:F4} , {lastChar},{td},{st:F4},{ms:F4},{toneConf:F4}");
                     //_csvLogger.WriteLine($"{_clock.GetTotalSamples()},{magFiltered:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
                 }
 
@@ -278,7 +279,7 @@ public class CWDecoderEngine
 
                 // 4. Update Clock with given samples of "time" for accurate timing
                 // This also allows overlap processing to work correctly
-                _clock.UpdateState(isTone, processBlockStep);
+                _clock.UpdateState(isTone, processBlockStep, toneConf);
             }
         }
     }
@@ -320,7 +321,7 @@ public class CWDecoderEngine
             try
             {
                 _csvLogger = new StreamWriter(filePath);
-                _csvLogger.WriteLine("Millis,#samples,Magnitude,SignalPower,Threshold,IsToning,State,Confidence,Squelch,lastChar,StateTime,sig/thrs,mag/squl"); 
+                _csvLogger.WriteLine("Millis,#samples,Magnitude,SignalPower,Threshold,IsToning,State,Confidence,Squelch,lastChar,StateTime,sig/thrs,mag/squl,AvgToneConf"); 
             }
             catch 
             {
@@ -381,6 +382,8 @@ public class AdaptiveThreshold
     private double _peakLevel = 0.01;
     private double range = 0.01;
     private bool _isTone = false;
+    private double _ToneConfidence = 0.0;           //avg conf during tone
+    private int _nToneConfidence = 0;               //n values in avg
     private double spaceMeanSquare = 0;     //for S/N display
     private double markMeanSquare = 0;
     private double markMeanSquelch = 0;      //for auto squelch tracking
@@ -408,7 +411,7 @@ public class AdaptiveThreshold
 
 
     //FIR + RMS + Goertzel all use this main logic
-    public (bool, double, double) IsSignalPresent(double rawMag, double confidence = 1)
+    public (bool, double, double, double) IsSignalPresent(double rawMag, double confidence = 1)
     {
         double mag = ApplyTemporalFilters(rawMag, 5, _magGaussHistory, _magMedHistory);       //5 point gaussian and median filtering
         double conf = ApplyTemporalFilters(confidence, 3, _confGaussHistory, _confMedHistory); //confidence filtering
@@ -451,7 +454,7 @@ public class AdaptiveThreshold
         if (!_isTone)
         {
             // If SILENT: Must cross the high bar to start a Mark
-            confidenceAdjust = (conf > 0.96 ? 2.8 : 1);                     //was 0.98, 1.4, 1
+            confidenceAdjust = (conf > 0.97 ? 2.8 : 1);                     //was 0.98, 1.4, 1
 
             //sometimes mag > signalPower when conf high so choose higher value to avoid missing dots
             double magORsignalPower = (conf > 0.96 && mag > signalPower ? mag : signalPower);
@@ -484,12 +487,18 @@ public class AdaptiveThreshold
             markMeanSquare = markMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
             markMeanSquelch = markMeanSquelch * Config.SquelchSignalAvgFactor + mag * (1 - Config.SquelchSignalAvgFactor);
             MarkSpaceRatio = 0;         //reset (ratio didnt work because depends on numbers of dits and dahs in message)
+
+            _nToneConfidence++;
+            _ToneConfidence  += Math.Pow(conf, 2);       // accumulate total for RMS
         }
         else
         {
             spaceMeanSquare = spaceMeanSquare * 0.999 + Math.Pow(mag, 2) * 0.001;
             spaceMeanSquelch = spaceMeanSquelch * Config.SquelchNoiseAvgFactor + mag * (1 - Config.SquelchNoiseAvgFactor);
             MarkSpaceRatio--;   //count no marks (no signal) to force reset
+
+            _nToneConfidence = 0;
+            _ToneConfidence = 0 ;
         }
 
         if (MarkSpaceRatio < -1500) { MarkSpaceRatio = 0; markMeanSquelch = spaceMeanSquelch; }    //reset if no tone for 4 sec
@@ -506,7 +515,9 @@ public class AdaptiveThreshold
             SNratio = 10 * Math.Log10(MarkEnergy / (spaceMeanSquare));      // / spaceMeanSquareCount));
         }
 
-        return (_isTone, mag, conf);
+        double confRMS = 1;
+        if (_nToneConfidence > 0) confRMS = Math.Pow(_ToneConfidence / _nToneConfidence, 0.5);
+        return (_isTone, mag, conf, confRMS);
     }
 
     //initial logic
