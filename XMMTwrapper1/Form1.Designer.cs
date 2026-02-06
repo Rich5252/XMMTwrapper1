@@ -352,7 +352,7 @@ namespace XMMTwrapper1
             tbTolerance.Name = "tbTolerance";
             tbTolerance.Size = new Size(42, 23);
             tbTolerance.TabIndex = 73;
-            tbTolerance.Value = new decimal(new int[] { 30, 0, 0, 0 });
+            tbTolerance.Value = new decimal(new int[] { 20, 0, 0, 0 });
             tbTolerance.ValueChanged += tbTolerance_ValueChanged;
             tbTolerance.KeyUp += tbTolerance_ValueChanged;
             // 
@@ -547,9 +547,9 @@ namespace XMMTwrapper1
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, lblPipeStatus });
-            statusStrip1.Location = new Point(0, 511);
+            statusStrip1.Location = new Point(0, 465);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(804, 22);
+            statusStrip1.Size = new Size(802, 22);
             statusStrip1.TabIndex = 22;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -572,7 +572,7 @@ namespace XMMTwrapper1
             menuStrip1.Items.AddRange(new ToolStripItem[] { OptionMenu, audioSelectToolStripMenuItem, exportLogToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(804, 24);
+            menuStrip1.Size = new Size(802, 24);
             menuStrip1.TabIndex = 23;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -1037,7 +1037,7 @@ namespace XMMTwrapper1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(804, 533);
+            ClientSize = new Size(802, 487);
             Controls.Add(label15);
             Controls.Add(tbPwr);
             Controls.Add(label14);

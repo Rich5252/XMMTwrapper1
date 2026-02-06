@@ -7,6 +7,7 @@ using NAudio.Wave;
 
 namespace XMMTwrapper1
 {
+    [System.ComponentModel.DesignerCategory("")]
     public partial class Form1
     {
         private NamedPipeClient _NamedPipeClient = new();       //coms with TXLink for tx commands and status (eg current rx freq)

@@ -47,6 +47,7 @@ public class MorseClock
     private long _lastTransitionSample = 0;
     private bool _lastToneState = false;
     private long _pendingMarkDuration = 0; // New class-level variable
+    private double _pendingMarkConfidence = 0.0;
     private StringBuilder _currentSymbolBuffer = new StringBuilder();
 
     private double _dotMs = 1200.0 / 25.0;
@@ -109,7 +110,7 @@ public class MorseClock
                         DecodeBuffer();
                     }
                 }
-                lastToneConfAvg = toneConfAvg;          //remember the value for processing on tone to !tone call
+                if (isTonePresent) lastToneConfAvg = toneConfAvg;          //remember the value for processing on tone to !tone call
                 return;
             }
 
@@ -134,46 +135,56 @@ public class MorseClock
                 {
                     ProcessMark(adjusted);
                     _pendingMarkDuration = 0;
+                    _pendingMarkConfidence = 0.0;
                 }
                 else
                 {
-                    //use avg conf during blip and ignore if below minimum threshold
-                    // or hold and see what happens in next space
-                    if (lastToneConfAvg > 0.0) //always true
+                    //here if its a short mark that is maybe noise
+                    //first check conf, if high enough park this blip and check again at end of next silence
+                    if (lastToneConfAvg > 0.7)                      //noise trap causing G at first P
                     {
                         // This is a "Blip." Hold it to see what the following space looks like.
                         _pendingMarkDuration = adjusted;
+                        _pendingMarkConfidence = lastToneConfAvg;
+                        Log.Perf($"NOISE_TRAP: Add Short PendingMark {adjusted}ms. Based on high conf: {lastToneConfAvg:F4}");
                     }
                     else
                     {
-                        //this is noise according to confidence value for tone
+                        //this is noise according to low confidence value for tone
+                        // hence ignore it and add it so previous silence
                         ProcessSpace(adjusted, isContinuation: true);
                         _pendingMarkDuration = 0;
-                        Log.Perf($"NOISE_TRAP: Merged {adjusted}ms into existing silence. Based on low conf: {lastToneConfAvg:F4}");
+                        _pendingMarkConfidence = 0.0;
+                        Log.Perf($"NOISE_TRAP: Merged {adjusted}ms into existing silence. Failed Pending test on low conf: {lastToneConfAvg:F4}");
                     }
                 }
             }
             else if (!_lastToneState && isTonePresent) // Rising Edge (End of Space)
             {
+                //check if there is a parked short mark to process
                 if (_pendingMarkDuration > 0)
                 {
-                    // The "Trap": If the space after a tiny blip is long (>80% of a dot), 
-                    // the blip was noise. We add the blip AND this space to the PREVIOUS space.
-                    if (adjusted > _dotMs * 0.8 || _pendingMarkDuration < Config.DOT_MINIMUM_MS)
+                    // The "Trap": Use both following space and mark confidence to evaluate if mark is noise, 
+                    // If mark was noise we add the mark AND this space to the PREVIOUS space and ignore it.
+                    // "adjusted" here is the space duration that followed pending mark
+                    double validMarkDuration = (_pendingMarkConfidence > 0.8 ? _dotMs * Config.MIN_DOT_WINDOW : Config.DOT_MINIMUM_MS * _pendingMarkConfidence);
+                    if (adjusted > _dotMs * 1.0 || _pendingMarkDuration < validMarkDuration || ((adjusted - 7 + 1) < (_pendingMarkDuration + 7)))
                     {
                         // We DON'T call ProcessSpace(adjusted). 
                         // We tell the system: "That noise spike didn't happen, just keep the space going."
                         // This is done by calling ProcessSpace with the cumulative total.
                         ProcessSpace(adjusted + _pendingMarkDuration, isContinuation: true);
-                        Log.Perf($"NOISE_TRAP: Merged {adjusted} + {_pendingMarkDuration}ms into existing silence.");
+                        Log.Perf($"NOISE_TRAP: Merged Short Pending {adjusted} + {_pendingMarkDuration}ms into existing silence.");
                     }
                     else
                     {
                         // The space was tight! The blip was a real (short) dot.
                         ProcessMark(_pendingMarkDuration);
                         ProcessSpace(adjusted);
+                        Log.Perf($"NOISE_TRAP: Process Short Pending Mark: Mark {_pendingMarkDuration}ms, Space {adjusted}ms");
                     }
                     _pendingMarkDuration = 0;
+                    _pendingMarkConfidence = 0.0;
                 }
                 else
                 {

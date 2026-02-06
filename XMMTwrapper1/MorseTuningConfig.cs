@@ -21,7 +21,7 @@ public static class Config
     // MARK CLASSIFICATION
     // Increased to 2.5 to prevent "Heavy Dots" from becoming "Dashes"
     public const double DASH_THRESHOLD_RATIO = 1.9;         //was 1.7, 1.9, 1.8
-    public const double DOT_MINIMUM_MS = 24;                // max 50wpm
+    public const double DOT_MINIMUM_MS = 25;                // max 50wpm
     public const double MIN_DOT_WINDOW = 0.4;               //compared to currect dotMs
     public const double MAX_DOT_WINDOW = 1.5;               //was 3
     public const double MIN_DASH_WINDOW = 2;

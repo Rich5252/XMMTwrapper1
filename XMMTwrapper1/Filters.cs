@@ -36,7 +36,7 @@ public abstract class MorseFilterBase : ICWFilter
     // Backing fields
     protected double _tone = 1000;
     protected double _bw = 40;
-    protected double _tol = 30;
+    protected double _tol = 20;
     protected double _scaling = 200;
 
     public virtual double TargetFrequency
@@ -621,7 +621,7 @@ public class HilbertStrategy : MorseFilterBase
 
             return new CoherenceResult
             {
-                Magnitude = magnitude * Math.Pow(confidence, 4), // Cubic weighting
+                Magnitude = magnitude * Math.Pow(confidence, 3), // Cubic weighting
                 Confidence = confidence
             };
         }

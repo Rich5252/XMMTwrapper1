@@ -70,7 +70,7 @@ public class CWDecoderEngine
     }     
 
     private double _InputScalingFactor = 200;
-    private double _HBAtol = 30;                        //HBA discrim tolerance (Hz)
+    private double _HBAtol = 20;                        //HBA discrim tolerance (Hz)
     public void SetInputScale(double _SF)
     {
         _InputScalingFactor = _SF;
@@ -454,10 +454,11 @@ public class AdaptiveThreshold
         if (!_isTone)
         {
             // If SILENT: Must cross the high bar to start a Mark
-            confidenceAdjust = (conf > 0.97 ? 2.8 : 1);                     //was 0.98, 1.4, 1
+            confidenceAdjust = (conf > 0.80 ? 2.2 : 1);                    //noise trap - low sig P last dot => W (stretches mark)
+            confidenceAdjust = (conf > 0.97 ? 2.8 : confidenceAdjust);                     //was 0.98, 1.4, 1
 
             //sometimes mag > signalPower when conf high so choose higher value to avoid missing dots
-            double magORsignalPower = (conf > 0.96 && mag > signalPower ? mag : signalPower);
+            double magORsignalPower = (conf > 0.80 && mag > signalPower ? mag : signalPower);
             meetsThreshold = (magORsignalPower * confidenceAdjust) > upperThreshold;
         }
         else
@@ -468,7 +469,7 @@ public class AdaptiveThreshold
 
         // avoid missing dots due to low squelch when conf is high
         confidenceAdjust = (conf > 0.97 ? 1.1 : 1);
-        if (meetsThreshold && (mag * confidenceAdjust) > SquelchLevel)    /// && conf > Config.MinConfidence)
+        if (meetsThreshold && (mag * confidenceAdjust) > SquelchLevel * 0.98)    ///noise trap P->W - && conf > Config.MinConfidence)
         {
             _consecutiveHits++;
             _consecutiveMisses = 0;
