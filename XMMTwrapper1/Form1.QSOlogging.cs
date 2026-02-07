@@ -15,8 +15,17 @@ namespace XMMTwrapper1
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
         }
 
-        private void btnLogQSO_Click(object sender, EventArgs e)
+        private void btnLogQSO_MouseDown(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Right)
+            {
+                //refresh list from file
+                _QSOlogger.LoadLogFile();
+                tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
+                return;
+            }
+
+            // otherwise log a QSO
             QsoEntry newEntry = new QsoEntry();
 
             newEntry.Callsign = tbCallsign.Text;

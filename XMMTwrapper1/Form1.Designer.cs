@@ -865,7 +865,7 @@ namespace XMMTwrapper1
             btnLogQSO.TabIndex = 46;
             btnLogQSO.Text = "Log QSO";
             btnLogQSO.UseVisualStyleBackColor = true;
-            btnLogQSO.Click += btnLogQSO_Click;
+            btnLogQSO.MouseDown += btnLogQSO_MouseDown;
             // 
             // tbNumberQSOs
             // 
