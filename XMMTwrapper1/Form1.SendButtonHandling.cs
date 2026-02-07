@@ -51,16 +51,12 @@ namespace XMMTwrapper1
                         "Edit Label:", "Macro Editor", msg.Label);
                 }
 
-                if (!string.IsNullOrEmpty(newLabel))
-                {
-                    msg.Label = newLabel;
-                }
+                if (!string.IsNullOrEmpty(newLabel)) msg.Label = newLabel;
                 
-                if (!string.IsNullOrEmpty(newTemplate))
-                {
-                    btn.Text = newLabel;
-                    msg.Template = newTemplate;
-
+                if (!string.IsNullOrEmpty(newTemplate))  msg.Template = newTemplate;
+                
+                if (!string.IsNullOrEmpty(newLabel) || !string.IsNullOrEmpty(newTemplate))
+                { 
                     // Save to INI using your current mode/set context
                     // Determine context based on UI selections to select correct ini data set
                     string currentContext = GetCurrentMacroContext();
