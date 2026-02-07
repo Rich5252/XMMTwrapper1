@@ -48,7 +48,7 @@ namespace XMMTwrapper1
                 {
                     // Update a SN ratio text box
                     tbSNratio.Text = SN.ToString("F1");
-                    if (cbAutoSquelch.Checked)
+                    if (cbAutoSquelch.Checked && btnCW.Checked)
                     {
                         //send new squelch level to decoder based on signal level
                         double SQlevel = _decoder.GetSquelchLevel(out SQlevel);

@@ -61,6 +61,7 @@ namespace XMMTwrapper1
                     // Determine context based on UI selections to select correct ini data set
                     string currentContext = GetCurrentMacroContext();
                     _macroProvider.SaveMacroToIni(currentContext, msg);
+                    UpdateButtonMacros();                                   //apply changes to buttons
                 }
                 cbEditButton.Checked = false;
             }
