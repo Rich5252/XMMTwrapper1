@@ -68,7 +68,7 @@ public class AdifLogger
         var sb = new StringBuilder();
         sb.Append(FormatAdifTag("CALL", entry.Callsign));
         sb.Append(FormatAdifTag("QSO_DATE", entry.Date));
-        sb.Append(FormatAdifTag("QSO_TIME", entry.Time));
+        sb.Append(FormatAdifTag("TIME_ON", entry.Time));
         sb.Append(FormatAdifTag("FREQ", freqStr));              //pre formatted by client eg "28.180"
         sb.Append(FormatAdifTag("MODE", entry.Mode));
         sb.Append(FormatAdifTag("RST_SENT", entry.RstSent));
