@@ -68,7 +68,7 @@ public class AdifLogger
         var sb = new StringBuilder();
         sb.Append(FormatAdifTag("CALL", entry.Callsign));
         sb.Append(FormatAdifTag("QSO_DATE", entry.Date));
-        sb.Append(FormatAdifTag("TIME_ON", entry.Time));
+        sb.Append(FormatAdifTag("TIME_ON", entry.Time));        // WinLog32 didnt like QSO_TIME
         sb.Append(FormatAdifTag("FREQ", freqStr));              //pre formatted by client eg "28.180"
         sb.Append(FormatAdifTag("MODE", entry.Mode));
         sb.Append(FormatAdifTag("RST_SENT", entry.RstSent));
@@ -108,7 +108,7 @@ public class AdifLogger
             {
                 Callsign = GetAdifElement(line, "<CALL:"),
                 Date = GetAdifElement(line, "<QSO_DATE:"),
-                Time = GetAdifElement(line, "<QSO_TIME:"),
+                Time = GetAdifElement(line, "<TIME_ON:"),
                 FrequencyMHz = GetAdifElement(line, "<FREQ:"),
                 Mode = GetAdifElement(line, "<MODE:"),
                 RstSent = GetAdifElement(line, "<RST_SENT:"),
