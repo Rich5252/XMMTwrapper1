@@ -54,6 +54,7 @@ namespace XMMTwrapper1
             }
 
             tbCallsign.Text = "";
+            tbSerialNumIn.Text = "";
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
             if (cbSerialNumAutoInc.Checked) { tbSerialNumOut.Increment(); }
         }
