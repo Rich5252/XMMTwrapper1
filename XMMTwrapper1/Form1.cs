@@ -103,6 +103,14 @@ namespace XMMTwrapper1
                 btnCW.Checked = true;
             else
                 btnRTTY.Checked = true;
+            
+            //restore contest settings
+            tbReportOut.Text = _ini.GetValue("General", "ReportOut", "599");
+            tbSerialNumOut.Text = _ini.GetValue("General", "SerialNumOut", "");
+            tbReportIn.Text = _ini.GetValue("General", "ReportIn", "599");
+            tbSerialNumIn.Text = _ini.GetValue("General", "SerialNumIn", "");
+            string autoInc = _ini.GetValue("General", "AutoIncr", "false");
+            cbSerialNumAutoInc.Checked = (autoInc == "True");
 
             InitQsoLogger();
         }
@@ -152,6 +160,13 @@ namespace XMMTwrapper1
             }
             _ini.SetValue("FixedSubs", "myPower", tbPwr.Text);
             _ini.SetValue("General", "Mode", btnCW.Checked ? "CW" : "RTTY");
+
+            //save contest settings
+            _ini.SetValue("General", "ReportOut", tbReportOut.Text);
+            _ini.SetValue("General", "SerialNumOut", tbSerialNumOut.Text);
+            _ini.SetValue("General", "ReportIn", tbReportIn.Text);
+            _ini.SetValue("General", "SerialNumIn", tbSerialNumIn.Text);
+            _ini.SetValue("General", "AutoIncr", $"{cbSerialNumAutoInc.Checked}");
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
