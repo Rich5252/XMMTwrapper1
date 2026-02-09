@@ -254,15 +254,20 @@ public class CWDecoderEngine
                     long ts = _clock.GetTotalSamples();
                     double th = _adaptor.GetCurrentThreshold();
                     string td = "";
+                    string sc = "";
                     if (isTone != lastState)
                     {
                         lastState = isTone;
                         td = $"{(ts - stateStartTime)/48:F0}";
                         stateStartTime = ts;
+                        sc = $"{_clock._signalCertainty:F3}";
                     }
                     double st = sp / th;
                     double ms = magFiltered / sq;
-                    _csvLogger.WriteLine($"{millis},{ts},{magFiltered:F4},{sp:F4},{th:F4},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4},{sq:F4} , {lastChar},{td},{st:F4},{ms:F4},{toneConf:F4}");
+                    double nf = _adaptor._noiseFloor;
+                    double pk = _adaptor._peakLevel;
+
+                    _csvLogger.WriteLine($"{millis},{ts},{nf:F3},{pk:F3},{magFiltered:F4},{sp:F4},{th:F4},{isTone},{(isTone ? 1 : 0)},{confFiltered:F4},{sq:F4},{sc},{lastChar},{td},{st:F4},{ms:F4},{toneConf:F4}");
                     //_csvLogger.WriteLine($"{_clock.GetTotalSamples()},{magFiltered:F6},{_adaptor.GetCurrentThreshold():F6},{isTone},{(isTone ? 1 : 0)}");
                 }
 
@@ -321,7 +326,7 @@ public class CWDecoderEngine
             try
             {
                 _csvLogger = new StreamWriter(filePath);
-                _csvLogger.WriteLine("Millis,#samples,Magnitude,SignalPower,Threshold,IsToning,State,Confidence,Squelch,lastChar,StateTime,sig/thrs,mag/squl,AvgToneConf"); 
+                _csvLogger.WriteLine("Millis,#samples,Noise,Peak,Magnitude,SignalPower,Threshold,IsToning,State,Confidence,Squelch,SigCertainty,lastChar,StateTime,sig/thrs,mag/squl,AvgToneConf"); 
             }
             catch 
             {
@@ -378,8 +383,8 @@ public class CWDecoderEngine
 public class AdaptiveThreshold
 {
     private double _signalPower = 0.0;
-    private double _noiseFloor = 0.0;
-    private double _peakLevel = 0.01;
+    public double _noiseFloor { get; set; } = 0.0;
+    public double _peakLevel { get; set; } = 0.01;
     private double range = 0.01;
     private bool _isTone = false;
     private double _ToneConfidence = 0.0;           //avg conf during tone
@@ -421,7 +426,7 @@ public class AdaptiveThreshold
         _noiseFloor = (_noiseFloor * 0.995) + (mag * 0.005);
 
         // 3.2. SQUELCH AS A GATE
-        bool isAboveSquelch = mag > SquelchLevel;
+        bool isAboveSquelch = mag > SquelchLevel * _noiseHysteresis;
 
         if (isAboveSquelch)
         {
@@ -469,7 +474,7 @@ public class AdaptiveThreshold
 
         // avoid missing dots due to low squelch when conf is high
         confidenceAdjust = (conf > 0.97 ? 1.1 : 1);
-        if (meetsThreshold && (mag * confidenceAdjust) > SquelchLevel * 0.98)    ///noise trap P->W - && conf > Config.MinConfidence)
+        if (meetsThreshold && (mag * confidenceAdjust) > SquelchLevel * 0.98 * _noiseHysteresis)    ///noise trap P->W - && conf > Config.MinConfidence)
         {
             _consecutiveHits++;
             _consecutiveMisses = 0;
@@ -502,6 +507,7 @@ public class AdaptiveThreshold
             _ToneConfidence = 0 ;
         }
 
+        UpdateDynamicSquelch(mag, SquelchLevel);        //sets squelch noise hysterisis factor for next loop
         if (MarkSpaceRatio < -1500) { MarkSpaceRatio = 0; markMeanSquelch = spaceMeanSquelch; }    //reset if no tone for 4 sec
         if (AutoSquelch)
             SquelchLevel = spaceMeanSquelch + (markMeanSquelch - spaceMeanSquelch) * Config.AutoSquelchLevelFactor;   //set squelch
@@ -519,6 +525,26 @@ public class AdaptiveThreshold
         double confRMS = 1;
         if (_nToneConfidence > 0) confRMS = Math.Pow(_ToneConfidence / _nToneConfidence, 0.5);
         return (_isTone, mag, conf, confRMS);
+    }
+
+    
+    //this can provide a temporary squelch uplift when noise is detected.
+    private double _noiseHysteresis = 1.0;
+
+    // Call this every block (2.66ms)
+    public void UpdateDynamicSquelch(double currentMag, double currentSquelch)
+    {
+        // If we are getting "micro-pulses" (too short to be dots)
+        if (currentMag > currentSquelch && !_isTone)
+        {
+            // This is "Trash energy". Push the effective squelch up.
+            _noiseHysteresis = Math.Min(2.0, _noiseHysteresis + 0.05);
+        }
+        else if (!_isTone)
+        {
+            // Smoothly return to the base squelch
+            _noiseHysteresis = Math.Max(1.0, _noiseHysteresis - 0.01);
+        }
     }
 
     //initial logic

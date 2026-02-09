@@ -54,6 +54,8 @@ public class MorseClock
     private double _currentWPM = 25;
     private bool _FixWpm = false;
 
+    public double _signalCertainty { get; set; } = 0; // 0 to 1.0 - is mark duration rythmic (compared to _dotMs)
+
     // --- TRACKING BUCKETS ---
     private List<double> _dotHistory = new();
     private List<double> _dashHistory = new();
@@ -197,116 +199,6 @@ public class MorseClock
         }
     }
 
-    /*
-    public void UpdateState(bool isTonePresent, int samplesInBlock)
-    {
-        lock (_lock)
-        {
-            _totalSamplesProcessed += samplesInBlock;
-
-            // 1. Idle/Same State Management
-            if (isTonePresent == _lastToneState)
-            {
-                if (!isTonePresent && _currentSymbolBuffer.Length > 0)
-                {
-                    double silenceMs = GetElapsedMs();
-                    // If we have a pending noise spike and hit idle, discard it
-                    if (_pendingMarkDuration > 0 && silenceMs > _dotMs * 0.5)
-                    {
-                        _pendingMarkDuration = 0;
-                    }
-                    if (silenceMs > _dotMs * Config.IDLE_DECODE_RATIO) DecodeBuffer();
-                }
-                return;
-            }
-
-            // 2. Measure transition
-            double elapsedMs = GetElapsedMs();
-
-            // 3. Adaptive Debounce
-            if (elapsedMs < _dotMs * Config.DEBOUNCE_RATIO) return;
-
-            //ignore very small durations to avoid noise
-            //if your dotMs * DEBOUNCE_RATIO gets too small.
-            if (elapsedMs < Math.Max(Config.DOT_MINIMUM_MS, _dotMs * Config.DEBOUNCE_RATIO)) return;
-
-            // 4. Compensation
-            //long adjusted = (long)elapsedMs + Config.FILTER_COMPENSATION_MS;
-
-            // 4. ASYMMETRICAL COMPENSATION
-            // Subtract from Marks, Add to Spaces to recover the "True" duration.
-            long adjusted;
-            if (_lastToneState) // We just finished a TONE (Falling Edge)
-            {
-                // -7ms is your identified "sweet spot"
-                adjusted = (long)elapsedMs - Config.FILTER_COMPENSATION_MS;         //Config.MARK_OFFSET_MS;
-            }
-            else // We just finished a SPACE (Rising Edge)
-            {
-                // Adding 7ms back to the space keeps the total Cadence (Dot+Gap) correct.
-                adjusted = (long)elapsedMs + Config.FILTER_COMPENSATION_MS;           //Config.MARK_OFFSET_MS;
-            }
-
-            // 5. LOOK-FORWARD LOGIC (The "E" Filter)
-            if (_lastToneState && !isTonePresent) // Falling Edge (End of Mark)
-            {
-                // If the mark is suspiciously short (e.g., < 50% of a dot), hold it
-                // If we have no history, don't try to "Look Forward" — we don't know enough to filter yet.
-                if (_dotHistory.Count < 5 || adjusted >= _dotMs * 0.5)
-                {
-                    //so if valid mark or no history yet, process immediately
-                    ProcessMark(adjusted);
-                    _pendingMarkDuration = 0;
-                }
-                else
-                {
-                    _pendingMarkDuration = adjusted;
-                }
-            }
-            else if (!_lastToneState && isTonePresent) // Rising Edge (End of Space)
-            {
-                if (_pendingMarkDuration > 0)
-                {
-                    // LOOK FORWARD: We just finished a space that followed a tiny mark.
-                    // If this space is also short, the "Mark" was likely a real (but fast) dot.
-                    // If this space is long, the "Mark" was almost certainly a noise spike.
-                    if (adjusted > _dotMs * 0.8)
-                    {
-                        // NOISE DETECTED: Discard the pending mark.
-                        // Instead of calling ProcessSpace for just this gap, 
-                        // we could optionally add the noise duration to the total space.
-                        //LogSignalHealth(adjusted, false);                     
-                        ProcessSpace(adjusted + _pendingMarkDuration);
-                    }
-                    else
-                    {
-                        // VALID DOT: It was short, but followed by a tight element space.
-                        //LogSignalHealth(_pendingMarkDuration, true);
-                        ProcessMark(_pendingMarkDuration);
-                        ProcessSpace(adjusted);
-                    }
-                    _pendingMarkDuration = 0;
-                }
-                else
-                {
-                    ProcessSpace(adjusted);
-                }
-            }
-
-            if (isTonePresent != _lastToneState)    //tone state changed
-            {
-                //log time in same state
-                double sampleCount = (_totalSamplesProcessed - _lastTransitionSample);
-                Log.Perf($"STATE_CHANGE: {_lastToneState} for {sampleCount} samples ({(sampleCount * 1000.0) / 48000.0} ms)");
-            }
-
-            _lastToneState = isTonePresent;
-            _lastTransitionSample = _totalSamplesProcessed;
-        }
-    }
-    */
-
-
     private void ProcessMark(long duration)
     {
         //LogSignalHealth(duration, true);
@@ -322,10 +214,12 @@ public class MorseClock
         // If it's in the 'no-man's land' between dot and dash, it's suspect.
         bool isValidDot = !isDash && (duration > _dotMs * Config.MIN_DOT_WINDOW && duration < _dotMs * Config.MAX_DOT_WINDOW);
         bool isValidDash = isDash && (duration > _dotMs * Config.MIN_DASH_WINDOW && duration < _dotMs * Config.MAX_DASH_WINDOW);
-
+        
+        //noise detect filter
+        bool isNotNoise = IsMarkRhythmicallyValid(duration) || lastToneConfAvg > 0.6;
         if (isDash)
         {
-            if (isValidDash)
+            if (isValidDash && isNotNoise)
             {
                 _dashHistory.Add(duration);
                 if (_dashHistory.Count > Config.HISTORY_BUCKET_SIZE) _dashHistory.RemoveAt(0);
@@ -334,7 +228,7 @@ public class MorseClock
         else
         {
             // Only let "clean" dots update our speed tracking
-            if (isValidDot)
+            if (isValidDot && isNotNoise)
             {
                 _dotHistory.Add(duration);
                 if (_dotHistory.Count > Config.HISTORY_BUCKET_SIZE) _dotHistory.RemoveAt(0);
@@ -344,8 +238,15 @@ public class MorseClock
         // 3. DECODE BUFFER
         // We still append the symbol to the buffer so the user sees the "hit", 
         // but the speed tracker is now protected from the jitter.
-        _currentSymbolBuffer.Append(isDash ? "-" : ".");
-        OnSequenceChanged?.Invoke(_currentSymbolBuffer.ToString());
+        if (isNotNoise)
+        {
+            _currentSymbolBuffer.Append(isDash ? "-" : ".");
+            OnSequenceChanged?.Invoke(_currentSymbolBuffer.ToString());
+        }
+        else
+        {
+            _currentSymbolBuffer.Clear();
+        }
 
         // Only update speed if the element was statistically "sane"
         if (isValidDot || isValidDash) UpdateSpeedTracking();
@@ -387,6 +288,23 @@ public class MorseClock
             OnCharacterDecoded?.Invoke(' ');
             isLastCharSpace = true;
         }
+    }
+
+    public bool IsMarkRhythmicallyValid(long duration)
+    {
+        double dotError = Math.Abs(duration - _dotMs) / (double)_dotMs;
+        double dashError = Math.Abs(duration - (_dotMs * 3)) / (double)(_dotMs * 3);
+
+        // If it's within 25% of a dot or a dash, it's "Plausible"
+        bool plausible = (dotError < 0.25) || (dashError < 0.25);
+
+        // Update a rolling "Certainty" score
+        if (plausible)
+            _signalCertainty = Math.Min(1.0, _signalCertainty + 0.3); // Build trust
+        else
+            _signalCertainty = Math.Max(0.0, _signalCertainty - 0.4); // Lose trust fast
+
+        return plausible;
     }
 
     private void LogSignalHealth(long duration, bool isMark)
@@ -517,8 +435,11 @@ public class MorseClock
         string sequence = _currentSymbolBuffer.ToString();
         if (string.IsNullOrEmpty(sequence)) return false;       //nothing to decode
 
-        char result = MorseTable.Lookup(sequence);
-        if (result != '\0') OnCharacterDecoded?.Invoke(result);
+        if (_signalCertainty >= 0)
+        {
+            char result = MorseTable.Lookup(sequence);
+            if (result != '\0') OnCharacterDecoded?.Invoke(result);
+        }
 
         _currentSymbolBuffer.Clear();
         OnSequenceChanged?.Invoke("");
