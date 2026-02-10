@@ -32,12 +32,9 @@
 //
 //****************************************************************************************
 
-using Microsoft.VisualStudio.OLE.Interop;
 using NAudio.Wave;                          //audio support library
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Drawing.Text;
-using System.Threading.Channels;
 
 public class CWDecoderEngine
 {

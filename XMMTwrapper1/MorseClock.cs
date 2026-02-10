@@ -35,8 +35,6 @@
 
 // ***************************************************************************************************************
 
-using Microsoft.VisualStudio.Shell.Interop;
-using System.Diagnostics;
 using System.Text;
 
 

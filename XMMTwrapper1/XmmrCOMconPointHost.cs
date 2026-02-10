@@ -1,8 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
-using System.Windows.Forms;
 
 //COM connection point host that links to OCX
 //Events from OCX are handled in XmmrEventsSink.cs

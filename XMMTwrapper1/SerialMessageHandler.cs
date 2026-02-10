@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Ports;              //*** use NuGet to install this
+﻿using System.IO.Ports;              //*** use NuGet to install this
 using System.Text;
 
 public class SerialMessageHandler : IDisposable

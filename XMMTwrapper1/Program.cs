@@ -1,8 +1,5 @@
 namespace XMMTwrapper1
 {
-    using System.Diagnostics;
-    using System.Runtime.ExceptionServices;
-    using System.Runtime.InteropServices;
     using System.Threading;
 
     internal static class Program

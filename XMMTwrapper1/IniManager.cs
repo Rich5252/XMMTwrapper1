@@ -1,7 +1,5 @@
 ﻿using IniParser;
 using IniParser.Model;
-using System;
-using System.IO;
 using System.Text;
 
 public class IniManager

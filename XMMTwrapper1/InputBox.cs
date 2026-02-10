@@ -1,8 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-
-public static class InputBox
+﻿public static class InputBox
 {
     public static string Show(string prompt, string title, string defaultValue = "")
     {

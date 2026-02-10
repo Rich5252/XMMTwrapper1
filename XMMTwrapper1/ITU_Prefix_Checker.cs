@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿
 public static class ITU_Prefix_Checker
 {
     // A HashSet of 1, 2 and 3 character prefixes for rapid lookup

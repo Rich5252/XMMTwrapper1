@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-
+﻿
 public static class TextBoxWordSelect
 {
     // Delimiters: space, tab, CR, LF. Add punctuation here if you want.

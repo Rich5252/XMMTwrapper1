@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using XMMTwrapper1.OcxInteropConstants;
 
 namespace XMMTwrapper1.OcxInteropConstants

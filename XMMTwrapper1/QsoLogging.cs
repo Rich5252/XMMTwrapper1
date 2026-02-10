@@ -1,7 +1,6 @@
 ﻿
 using System.Diagnostics;
 using System.Text;
-using XMMTwrapper1;
 
 public class QsoEntry
 {
