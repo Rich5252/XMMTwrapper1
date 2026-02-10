@@ -391,43 +391,7 @@ public class MorseClock
         return stableSamples.Average();
     }
 
-    /*
-    private void UpdateSpeedTracking()
-    {
-        if (_dotHistory.Count < 3 || _spaceHistory.Count < 3) return;
-
-        // 1. Calculate the raw median from the current buckets
-        double rawDotMedian = MorseMath.CalculateMedian(_dotHistory);
-
-        // 2. APPLY AN ADAPTIVE GATE
-        // Only allow the internal _dotMs to move by a small percentage per update.
-        // This prevents a burst of noise (15ms dots) from "yanking" the WPM to 60.
-        double maxChange = _dotMs * 0.05; // Limit change to 5% per update
-        double delta = rawDotMedian - _dotMs;
-
-        if (Math.Abs(delta) > maxChange)
-        {
-            _dotMs += Math.Sign(delta) * maxChange;
-        }
-        else
-        {
-            _dotMs = rawDotMedian;
-        }
-
-        double newWpm = 1200.0 / _dotMs;
-        if (newWpm > 40 || newWpm < 15)
-        {
-            newWpm = 25.0;
-            SeedDotDashHistory(newWpm);
-        }
-        if ((int)_currentWPM != (int)newWpm)
-        {
-            _currentWPM = newWpm;
-            OnWpmChanged?.Invoke((int)_currentWPM);
-        }
-    }
-    */
-
+    
     private bool DecodeBuffer()
     {
         string sequence = _currentSymbolBuffer.ToString();
@@ -471,20 +435,6 @@ public class MorseClock
             }
         }
     }
-
-    /*
-    private void SeedDotDashHistory(double Wpm)
-    {
-        //set or reset dot/dash history
-        for (int i = 0; i < Config.HISTORY_BUCKET_SIZE; i++)
-        {
-            double dotMs = 1200 / Wpm;
-            _dotHistory.Add(dotMs);
-            _dashHistory.Add(dotMs * 3);
-            _spaceHistory.Add(dotMs * 3);       ************** BUG should be * 1 dit/dah space
-        }
-    }
-    */
 }
 
 
