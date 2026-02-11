@@ -75,7 +75,7 @@ namespace XMMTwrapper1
                 // ONLY clear if the app was already in front AND the box was already active
                 if (appWasAlreadyActive && this.ActiveControl == tbCallsign)
                 {
-                    tbCallsign.Clear();
+                    ClearDownUiAfterLog();
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace XMMTwrapper1
                 btnCW.Checked = true;
             else
                 btnRTTY.Checked = true;
-            
+
             //restore contest settings
             tbReportOut.Text = _ini.GetValue("General", "ReportOut", "599");
             tbSerialNumOut.Text = _ini.GetValue("General", "SerialNumOut", "");
@@ -208,6 +208,7 @@ namespace XMMTwrapper1
         private void tbTextReceived_MouseDown(object sender, MouseEventArgs e)
         {
             if (sender is TextBoxBase tb) TextBoxWordSelect.SelectWordAtClick(tb, e);
+            ClearDownUiAfterLog();
             tbCallsign.Text = tbTextReceived.SelectedText;
         }
 
@@ -284,6 +285,7 @@ namespace XMMTwrapper1
         private void tbCallSignList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             //transfer callsign to active callsign to call or log
+            ClearDownUiAfterLog();
             tbCallsign.Text = tbCallSignList.SelectedText;
         }
 

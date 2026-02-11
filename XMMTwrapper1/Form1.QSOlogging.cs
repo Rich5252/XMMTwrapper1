@@ -4,12 +4,17 @@
 
 namespace XMMTwrapper1
 {
+    
     public partial class Form1
     {
         private AdifLogger _QSOlogger = new AdifLogger("CW-RTTY.ADI");      //file in app folder
+        private QrzService _qrzService = new QrzService();
 
         private void InitQsoLogger()
         {
+            _qrzService.SetCredentials();
+            Log.Perf($"QRZ login: {_qrzService.EnsureLoggedInAsync()}");
+
             tbPwr.Text = _ini.GetValue("FixedSubs", "myPower", "100");
             _QSOlogger.Initialize();        //creates file (if needed) with header & then loads it
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
@@ -53,10 +58,19 @@ namespace XMMTwrapper1
                 return;
             }
 
-            tbCallsign.Text = "";
-            tbSerialNumIn.Text = "";
+            ClearDownUiAfterLog();
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
             if (cbSerialNumAutoInc.Checked) { tbSerialNumOut.Increment(); }
+        }
+
+        private void ClearDownUiAfterLog()
+        {
+            tbCallsign.Text = "";
+            tbSerialNumIn.Text = "";
+            tbLocator.Text = "";
+            tbQTH.Text = "";
+            tbOpName.Text = "";
+            tbComment.Text = "";
         }
 
         //this is also called when tbFreq changes
@@ -84,6 +98,33 @@ namespace XMMTwrapper1
                     }
                 }
             }
+        }
+
+        private async void btnLookup_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                //reset login
+                _qrzService.SetCredentials(true);
+                return;
+            }
+
+            if (await _qrzService.GetCallsignDataAsync(tbCallsign.Text) is { } data)
+            {
+                // Inside this block, 'data' is guaranteed not to be null
+                tbOpName.Text = data.Name;
+                tbLocator.Text = data.Grid;
+                tbQTH.Text = data.City;
+
+                string USinfo = "";
+                if (!string.IsNullOrEmpty(data.UScounty)) USinfo = data.UScounty.Trim() + " CTY";
+                if (!string.IsNullOrEmpty(data.USstate)) USinfo = USinfo + " " + data.USstate.Trim();
+                if (!string.IsNullOrEmpty(USinfo)) tbComment.Text = USinfo;
+            }
+            else
+            {
+                tbComment.Text = "Not found in QRZ";
+            }  
         }
     }
 }

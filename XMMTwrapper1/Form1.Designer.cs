@@ -119,6 +119,7 @@ namespace XMMTwrapper1
             tbPwr = new TextBox();
             label15 = new Label();
             lblDUPE = new Label();
+            btnLookup = new Button();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1033,11 +1034,22 @@ namespace XMMTwrapper1
             lblDUPE.Text = "DUPE";
             lblDUPE.Visible = false;
             // 
+            // btnLookup
+            // 
+            btnLookup.Location = new Point(723, 296);
+            btnLookup.Name = "btnLookup";
+            btnLookup.Size = new Size(65, 23);
+            btnLookup.TabIndex = 75;
+            btnLookup.Text = "Lookup";
+            btnLookup.UseVisualStyleBackColor = true;
+            btnLookup.MouseDown += btnLookup_MouseDown;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(802, 487);
+            Controls.Add(btnLookup);
             Controls.Add(label15);
             Controls.Add(tbPwr);
             Controls.Add(label14);
@@ -1209,5 +1221,6 @@ namespace XMMTwrapper1
         private TextBox tbConfidence;
         private CheckBox cbFixWpm;
         private CheckBox cbAutoSquelch;
+        private Button btnLookup;
     }
 }
