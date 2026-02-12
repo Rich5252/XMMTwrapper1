@@ -106,7 +106,7 @@ public class GoertzelStrategy : MorseFilterBase
     {
         // Goertzel returns power; we scale it to match the expected UI range.
         // The 77 is your original empirical scaling constant.
-        return _filter.CalculateMagnitude(samples) * 77 / _scaling;
+        return _filter.CalculateMagnitude(samples) * 3953 / _scaling;
     }
 }
 
@@ -414,7 +414,7 @@ public class RMSStrategy : MorseFilterBase
     public override double ProcessBlock(float[] samples)
     {
         // 18.7 is your existing empirical normalization constant
-        return _filter.CalculateMagnitude(samples) / 18.7 / _scaling;
+        return _filter.CalculateMagnitude(samples) * 1.449 / _scaling;
     }
 }
 
@@ -525,7 +525,7 @@ public class HilbertStrategy : MorseFilterBase
         // _lastPhase = phaseForNextBlock; 
 
         // Return weighted magnitude
-        return (sumMag / cleanSamples.Length) * 50000 / _scaling;
+        return (sumMag / cleanSamples.Length) * 30687 / _scaling;
     }
 
     public class HilbertFIR

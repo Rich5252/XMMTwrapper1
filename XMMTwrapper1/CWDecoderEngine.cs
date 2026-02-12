@@ -235,7 +235,7 @@ public class CWDecoderEngine
                 }
                 else
                 {
-                    isTone = _adaptor.IsHBASignalPresent(mag, confidence);
+                    (isTone, magFiltered, confFiltered, toneConf) = _adaptor.IsSignalPresent(mag, confidence);
                 }
                 
                 SNratio = _adaptor.SNratio;                             //pick up the current SN measurement for UI
@@ -469,7 +469,7 @@ public class AdaptiveThreshold
             meetsThreshold = signalPower > (lowerThreshold * 0.7);
         }
 
-        // avoid missing dots due to low squelch when conf is high
+        // avoid missing dots due to signal below squelch when conf is high
         confidenceAdjust = (conf > 0.97 ? 1.1 : 1);
         if (meetsThreshold && (mag * confidenceAdjust) > SquelchLevel * 0.98 * _noiseHysteresis)    ///noise trap P->W - && conf > Config.MinConfidence)
         {
