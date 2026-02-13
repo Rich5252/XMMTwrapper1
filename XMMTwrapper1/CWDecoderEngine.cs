@@ -513,11 +513,13 @@ public class AdaptiveThreshold
         // S/N not (S+N)/N
         double MarkEnergy = (markMeanSquare - spaceMeanSquare); // / 2;      // 2 is window correction factor for tone
 
-        SNratio = 100;       
+        // SNratio = 100;       
         if (MarkEnergy > 0.00000001 && spaceMeanSquare > 0.00000001)
         {
-            SNratio = 10 * Math.Log10(MarkEnergy / (spaceMeanSquare));      // / spaceMeanSquareCount));
+            //SNratio = 10 * Math.Log10(MarkEnergy / (spaceMeanSquare));      // / spaceMeanSquareCount));
+            SNratio = SNratio * 0.999 + (20 * Math.Log10(_peakLevel / _noiseFloor)) * 0.001;
         }
+        
 
         double confRMS = 1;
         if (_nToneConfidence > 0) confRMS = Math.Pow(_ToneConfidence / _nToneConfidence, 0.5);
