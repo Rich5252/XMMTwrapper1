@@ -207,9 +207,52 @@ namespace XMMTwrapper1
 
         private void tbTextReceived_MouseDown(object sender, MouseEventArgs e)
         {
-            if (sender is TextBoxBase tb) TextBoxWordSelect.SelectWordAtClick(tb, e);
-            ClearDownUiAfterLog();
-            tbCallsign.Text = tbTextReceived.SelectedText;
+            // Use the bitwise AND (&) to check for specific keys
+            bool isCtrlDown = (Control.ModifierKeys & Keys.Control) == Keys.Control;
+            bool isShiftDown = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
+            bool isAltDown = (Control.ModifierKeys & Keys.Alt) == Keys.Alt;
+
+            if (!(sender is TextBoxBase tb)) return;
+
+            //select word at click position in received text box and copy to correct log entry
+            TextBoxWordSelect.SelectWordAtClick(tb, e);
+            string selectedWord = tb.SelectedText.Trim();
+            if (string.IsNullOrEmpty(selectedWord)) return;
+
+            if (isCtrlDown && !isShiftDown)
+            {
+                // If Ctrl is down, copy locator
+                tbLocator.Text = selectedWord;
+            }
+            else if (isShiftDown && !isCtrlDown)        // If Shift is down, copy report in
+            {
+                if (tbReportIn.Text == "")
+                {
+                    tbReportIn.Text = selectedWord.Length >= 3 ? selectedWord.Substring(0, 3) : selectedWord;
+                    tbSerialNumIn.Text = selectedWord.Length > 3 ? selectedWord.Substring(3) : "";
+                }
+                else
+                {
+                    // If Shift is down and report in already has value, copy to serial number in
+                    tbSerialNumIn.Text = selectedWord;
+                }
+            }
+            else if (isCtrlDown && isShiftDown)
+            {
+                // If both Ctrl and Shift are down, copy to Name
+                tbOpName.Text = selectedWord;
+            }
+            else if (isAltDown)
+            {
+                // If Alt is down, copy to QTH
+                tbQTH.Text = selectedWord;
+            }
+            else
+            {
+                // No modifier keys, copy to callsign
+                ClearDownUiAfterLog();
+                tbCallsign.Text = selectedWord;
+            }
         }
 
         private void PipeConnectTimer_Tick(object sender, EventArgs e)
