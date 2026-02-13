@@ -19,17 +19,20 @@ public class QsoEntry
 
 public class AdifLogger
 {
-    private readonly string _fileName;
-    private readonly string _filePath;
+    public string LogFileName = "";
+    private string _filePath;
     private readonly string _fileFolder;
+    private IniManager _ini;
     public List<QsoEntry> _loggedEntries = new();
 
-    public AdifLogger(string fileName = "CW-RTTY.ADI")
+    public AdifLogger(IniManager ini)
     {
+        _ini = ini;
         // Equivalent to App.Path in VB6
         _fileFolder = AppDomain.CurrentDomain.BaseDirectory;
-        _fileName = fileName;
-        _filePath = Path.Combine(_fileFolder, fileName);
+        LogFileName = _ini.GetValue("Logging", "logFileName", "CW-RTTY.ADI");
+        
+        _filePath = Path.Combine(_fileFolder, LogFileName);
     }
 
     public void Initialize()
@@ -38,9 +41,33 @@ public class AdifLogger
         LoadLogFile();
     }
 
-    private void CheckAndCreateLogFile()
+    public bool CreateNewLogFile(string newFileName)
     {
-        if (!File.Exists(_filePath))
+        string file = newFileName;
+        if (!file.ToUpper().EndsWith(".ADI")) file = file + ".ADI";
+
+        string newFilePath = Path.Combine(_fileFolder, file);
+
+        bool bOverWrite = true;
+        if (File.Exists(newFilePath))
+        {
+            string overwrite = InputBox.Show($"File '{file}' already exists. Do you want to overwrite it?", "File Exists", "No");
+            bOverWrite = ((overwrite.ToUpper() == "YES") ? true : false);
+        }
+
+        LogFileName = file;
+        _ini.SetValue("Logging", "logFileName", LogFileName);
+        _filePath = newFilePath;
+        CheckAndCreateLogFile(bOverWrite /* NewFile */);        //uses _filePath, creates new empty file with header
+        LoadLogFile();                                            // Clear in-memory list and load new file
+
+        MessageBox.Show($"Requested log opened: {LogFileName}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        return true;
+    }   
+
+    private void CheckAndCreateLogFile(bool bNewEmptyLog = false)
+    {
+        if (!File.Exists(_filePath) || bNewEmptyLog)
         {
             var header = new StringBuilder();
             header.AppendLine("CW - RTTY Controller for TXLink");

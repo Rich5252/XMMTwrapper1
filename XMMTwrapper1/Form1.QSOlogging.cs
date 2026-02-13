@@ -7,7 +7,7 @@ namespace XMMTwrapper1
     
     public partial class Form1
     {
-        private AdifLogger _QSOlogger = new AdifLogger("CW-RTTY.ADI");      //file in app folder
+        private AdifLogger _QSOlogger = new AdifLogger(_ini);      //file in app folder
         private QrzService _qrzService = new QrzService();
 
         private void InitQsoLogger()
@@ -18,6 +18,7 @@ namespace XMMTwrapper1
             tbPwr.Text = _ini.GetValue("FixedSubs", "myPower", "100");
             _QSOlogger.Initialize();        //creates file (if needed) with header & then loads it
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
+            lblLogFileName.Text = _QSOlogger.LogFileName;
         }
 
         private void btnLogQSO_MouseDown(object sender, MouseEventArgs e)
@@ -27,6 +28,7 @@ namespace XMMTwrapper1
                 //refresh list from file
                 _QSOlogger.LoadLogFile();
                 tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
+                lblLogFileName.Text = _QSOlogger.LogFileName;
                 return;
             }
 
@@ -60,6 +62,7 @@ namespace XMMTwrapper1
 
             ClearDownUiAfterLog();
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
+            lblLogFileName.Text = _QSOlogger.LogFileName;
             if (cbSerialNumAutoInc.Checked) { tbSerialNumOut.Increment(); }
         }
 

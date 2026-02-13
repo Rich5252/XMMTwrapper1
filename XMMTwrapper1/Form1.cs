@@ -351,5 +351,17 @@ namespace XMMTwrapper1
         {
             _QSOlogger.OpenLogDirectory();
         }
+
+        private void createNewLogBookToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string fileName = InputBox.Show("Enter new logbook name (without extension)", "New Logbook", "MyContestLog");
+
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                _QSOlogger.CreateNewLogFile(fileName);  //can create new or open existing log with option to overwrite or append
+                tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
+                lblLogFileName.Text = _QSOlogger.LogFileName;
+            }
+        }
     }
 }

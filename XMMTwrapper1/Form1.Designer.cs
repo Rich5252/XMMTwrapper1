@@ -74,6 +74,7 @@ namespace XMMTwrapper1
             setupEngineToolStripMenuItem = new ToolStripMenuItem();
             audioSelectToolStripMenuItem = new ToolStripMenuItem();
             exportLogToolStripMenuItem = new ToolStripMenuItem();
+            createNewLogBookToolStripMenuItem = new ToolStripMenuItem();
             exportCabrilloToolStripMenuItem = new ToolStripMenuItem();
             openLogDirectoryToolStripMenuItem = new ToolStripMenuItem();
             tbTextReceived = new TextBox();
@@ -120,6 +121,7 @@ namespace XMMTwrapper1
             label15 = new Label();
             lblDUPE = new Label();
             btnLookup = new Button();
+            lblLogFileName = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -547,7 +549,7 @@ namespace XMMTwrapper1
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, lblPipeStatus });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, lblPipeStatus, lblLogFileName });
             statusStrip1.Location = new Point(0, 465);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(802, 22);
@@ -599,22 +601,29 @@ namespace XMMTwrapper1
             // 
             // exportLogToolStripMenuItem
             // 
-            exportLogToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportCabrilloToolStripMenuItem, openLogDirectoryToolStripMenuItem });
+            exportLogToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { createNewLogBookToolStripMenuItem, exportCabrilloToolStripMenuItem, openLogDirectoryToolStripMenuItem });
             exportLogToolStripMenuItem.Name = "exportLogToolStripMenuItem";
             exportLogToolStripMenuItem.Size = new Size(69, 20);
             exportLogToolStripMenuItem.Text = "Log Book";
             // 
+            // createNewLogBookToolStripMenuItem
+            // 
+            createNewLogBookToolStripMenuItem.Name = "createNewLogBookToolStripMenuItem";
+            createNewLogBookToolStripMenuItem.Size = new Size(183, 22);
+            createNewLogBookToolStripMenuItem.Text = "Open New Log Book";
+            createNewLogBookToolStripMenuItem.Click += createNewLogBookToolStripMenuItem_Click;
+            // 
             // exportCabrilloToolStripMenuItem
             // 
             exportCabrilloToolStripMenuItem.Name = "exportCabrilloToolStripMenuItem";
-            exportCabrilloToolStripMenuItem.Size = new Size(173, 22);
+            exportCabrilloToolStripMenuItem.Size = new Size(183, 22);
             exportCabrilloToolStripMenuItem.Text = "Export Cabrillo";
             exportCabrilloToolStripMenuItem.Click += exportCabrilloToolStripMenuItem_Click;
             // 
             // openLogDirectoryToolStripMenuItem
             // 
             openLogDirectoryToolStripMenuItem.Name = "openLogDirectoryToolStripMenuItem";
-            openLogDirectoryToolStripMenuItem.Size = new Size(173, 22);
+            openLogDirectoryToolStripMenuItem.Size = new Size(183, 22);
             openLogDirectoryToolStripMenuItem.Text = "Open log directory";
             openLogDirectoryToolStripMenuItem.Click += openLogDirectoryToolStripMenuItem_Click;
             // 
@@ -1044,6 +1053,15 @@ namespace XMMTwrapper1
             btnLookup.UseVisualStyleBackColor = true;
             btnLookup.MouseDown += btnLookup_MouseDown;
             // 
+            // lblLogFileName
+            // 
+            lblLogFileName.AutoSize = false;
+            lblLogFileName.ImageAlign = ContentAlignment.MiddleRight;
+            lblLogFileName.Name = "lblLogFileName";
+            lblLogFileName.Size = new Size(250, 17);
+            lblLogFileName.Text = "Log File Name";
+            lblLogFileName.TextAlign = ContentAlignment.MiddleRight;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1222,5 +1240,7 @@ namespace XMMTwrapper1
         private CheckBox cbFixWpm;
         private CheckBox cbAutoSquelch;
         private Button btnLookup;
+        private ToolStripMenuItem createNewLogBookToolStripMenuItem;
+        private ToolStripStatusLabel lblLogFileName;
     }
 }
