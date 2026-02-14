@@ -69,6 +69,7 @@ namespace XMMTwrapper1
             statusStrip1 = new StatusStrip();
             lblMMTTYstatus = new ToolStripStatusLabel();
             lblPipeStatus = new ToolStripStatusLabel();
+            lblLogFileName = new ToolStripStatusLabel();
             menuStrip1 = new MenuStrip();
             OptionMenu = new ToolStripMenuItem();
             setupEngineToolStripMenuItem = new ToolStripMenuItem();
@@ -121,7 +122,8 @@ namespace XMMTwrapper1
             label15 = new Label();
             lblDUPE = new Label();
             btnLookup = new Button();
-            lblLogFileName = new ToolStripStatusLabel();
+            btnSend7 = new Button();
+            btnStopTX = new Button();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -550,7 +552,7 @@ namespace XMMTwrapper1
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, lblPipeStatus, lblLogFileName });
-            statusStrip1.Location = new Point(0, 465);
+            statusStrip1.Location = new Point(0, 514);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(802, 22);
             statusStrip1.TabIndex = 22;
@@ -569,6 +571,15 @@ namespace XMMTwrapper1
             lblPipeStatus.Name = "lblPipeStatus";
             lblPipeStatus.Size = new Size(173, 17);
             lblPipeStatus.Text = "TxLink Pipe ... Trying to connect";
+            // 
+            // lblLogFileName
+            // 
+            lblLogFileName.AutoSize = false;
+            lblLogFileName.ImageAlign = ContentAlignment.MiddleRight;
+            lblLogFileName.Name = "lblLogFileName";
+            lblLogFileName.Size = new Size(250, 17);
+            lblLogFileName.Text = "Log File Name";
+            lblLogFileName.TextAlign = ContentAlignment.MiddleRight;
             // 
             // menuStrip1
             // 
@@ -808,7 +819,7 @@ namespace XMMTwrapper1
             // 
             // btnSend2
             // 
-            btnSend2.Location = new Point(83, 435);
+            btnSend2.Location = new Point(82, 435);
             btnSend2.Name = "btnSend2";
             btnSend2.Size = new Size(55, 23);
             btnSend2.TabIndex = 40;
@@ -818,7 +829,7 @@ namespace XMMTwrapper1
             // 
             // btnSend4
             // 
-            btnSend4.Location = new Point(211, 435);
+            btnSend4.Location = new Point(208, 435);
             btnSend4.Name = "btnSend4";
             btnSend4.Size = new Size(55, 23);
             btnSend4.TabIndex = 41;
@@ -828,7 +839,7 @@ namespace XMMTwrapper1
             // 
             // btnSend3
             // 
-            btnSend3.Location = new Point(147, 435);
+            btnSend3.Location = new Point(145, 435);
             btnSend3.Name = "btnSend3";
             btnSend3.Size = new Size(55, 23);
             btnSend3.TabIndex = 42;
@@ -838,7 +849,7 @@ namespace XMMTwrapper1
             // 
             // btnSend5
             // 
-            btnSend5.Location = new Point(275, 435);
+            btnSend5.Location = new Point(271, 435);
             btnSend5.Name = "btnSend5";
             btnSend5.Size = new Size(55, 23);
             btnSend5.TabIndex = 43;
@@ -848,7 +859,7 @@ namespace XMMTwrapper1
             // 
             // btnSend6
             // 
-            btnSend6.Location = new Point(339, 435);
+            btnSend6.Location = new Point(334, 435);
             btnSend6.Name = "btnSend6";
             btnSend6.Size = new Size(55, 23);
             btnSend6.TabIndex = 44;
@@ -860,11 +871,11 @@ namespace XMMTwrapper1
             // 
             cbEditButton.AutoSize = true;
             cbEditButton.CheckAlign = ContentAlignment.MiddleRight;
-            cbEditButton.Location = new Point(433, 439);
+            cbEditButton.Location = new Point(472, 439);
             cbEditButton.Name = "cbEditButton";
-            cbEditButton.Size = new Size(85, 19);
+            cbEditButton.Size = new Size(46, 19);
             cbEditButton.TabIndex = 45;
-            cbEditButton.Text = "Edit Button";
+            cbEditButton.Text = "Edit";
             cbEditButton.UseVisualStyleBackColor = true;
             // 
             // btnLogQSO
@@ -1053,20 +1064,33 @@ namespace XMMTwrapper1
             btnLookup.UseVisualStyleBackColor = true;
             btnLookup.MouseDown += btnLookup_MouseDown;
             // 
-            // lblLogFileName
+            // btnSend7
             // 
-            lblLogFileName.AutoSize = false;
-            lblLogFileName.ImageAlign = ContentAlignment.MiddleRight;
-            lblLogFileName.Name = "lblLogFileName";
-            lblLogFileName.Size = new Size(250, 17);
-            lblLogFileName.Text = "Log File Name";
-            lblLogFileName.TextAlign = ContentAlignment.MiddleRight;
+            btnSend7.Location = new Point(397, 435);
+            btnSend7.Name = "btnSend7";
+            btnSend7.Size = new Size(55, 23);
+            btnSend7.TabIndex = 76;
+            btnSend7.Text = "CQ";
+            btnSend7.UseVisualStyleBackColor = true;
+            btnSend7.Click += MacroButton_Click;
+            // 
+            // btnStopTX
+            // 
+            btnStopTX.Location = new Point(19, 480);
+            btnStopTX.Name = "btnStopTX";
+            btnStopTX.Size = new Size(55, 23);
+            btnStopTX.TabIndex = 77;
+            btnStopTX.Text = "STOP";
+            btnStopTX.UseVisualStyleBackColor = true;
+            btnStopTX.Click += btnStopTX_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(802, 487);
+            ClientSize = new Size(802, 536);
+            Controls.Add(btnStopTX);
+            Controls.Add(btnSend7);
             Controls.Add(btnLookup);
             Controls.Add(label15);
             Controls.Add(tbPwr);
@@ -1242,5 +1266,7 @@ namespace XMMTwrapper1
         private Button btnLookup;
         private ToolStripMenuItem createNewLogBookToolStripMenuItem;
         private ToolStripStatusLabel lblLogFileName;
+        private Button btnSend7;
+        private Button btnStopTX;
     }
 }

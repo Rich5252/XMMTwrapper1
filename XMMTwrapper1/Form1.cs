@@ -40,6 +40,7 @@ namespace XMMTwrapper1
             _sendButtonList.Add(btnSend4);
             _sendButtonList.Add(btnSend5);
             _sendButtonList.Add(btnSend6);
+            _sendButtonList.Add(btnSend7);
 
             // Now you can call your Load method
             UpdateButtonMacros();
@@ -363,5 +364,7 @@ namespace XMMTwrapper1
                 lblLogFileName.Text = _QSOlogger.LogFileName;
             }
         }
+
+
     }
 }

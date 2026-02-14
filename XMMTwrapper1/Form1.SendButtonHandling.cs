@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.VisualStudio.OLE.Interop;
 using System.Text;
 
 namespace XMMTwrapper1
@@ -171,6 +172,25 @@ namespace XMMTwrapper1
                     btnSend6.PerformClick();
                     e.Handled = true;
                     break;
+
+                case Keys.F7:
+                    btnSend7.PerformClick();
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        private void btnStopTX_Click(object sender, EventArgs e)
+        {
+            if (btnCW.Checked)
+            {
+                
+                //_serial.SendMessage("{X0}");
+            }
+            else
+            {
+                //"RTTY:{M1}{Z" + btnStr + "}{X1}"
+                _NamedPipeClient.SendCommand("RTTY:{X0}");
             }
         }
     }
