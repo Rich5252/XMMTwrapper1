@@ -72,8 +72,8 @@ public class AdifLogger
             var header = new StringBuilder();
             header.AppendLine("CW - RTTY Controller for TXLink");
             header.AppendLine("ID_G4AHN");
-            header.AppendLine("<PROGRAMID:13>CW-RTTY-G4AHN");
-            header.AppendLine("<PROGRAMVERSION:3>1.0");
+            header.AppendLine("<PROGRAMID:8>WINLOG32");         //needed to support wl32_remarks field
+            header.AppendLine("<PROGRAMVERSION:3>7.3");
             header.AppendLine("CW-RTTY DECODER + LOGGER BY G4AHN");
             header.AppendLine("CALL      G4AHN");
             header.AppendLine("<EOH>\r\n");
