@@ -41,6 +41,13 @@ namespace XMMTwrapper1
             _sendButtonList.Add(btnSend5);
             _sendButtonList.Add(btnSend6);
             _sendButtonList.Add(btnSend7);
+            _sendButtonList.Add(btnSend8);
+            _sendButtonList.Add(btnSend9);
+            _sendButtonList.Add(btnSend10);
+            _sendButtonList.Add(btnSend11);
+            _sendButtonList.Add(btnSend12);
+            _sendButtonList.Add(btnSend13);
+            _sendButtonList.Add(btnSend14);
 
             // Now you can call your Load method
             UpdateButtonMacros();

@@ -124,6 +124,13 @@ namespace XMMTwrapper1
             btnLookup = new Button();
             btnSend7 = new Button();
             btnStopTX = new Button();
+            btnSend8 = new Button();
+            btnSend9 = new Button();
+            btnSend10 = new Button();
+            btnSend11 = new Button();
+            btnSend12 = new Button();
+            btnSend13 = new Button();
+            btnSend14 = new Button();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -552,7 +559,7 @@ namespace XMMTwrapper1
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, lblPipeStatus, lblLogFileName });
-            statusStrip1.Location = new Point(0, 514);
+            statusStrip1.Location = new Point(0, 538);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(802, 22);
             statusStrip1.TabIndex = 22;
@@ -1076,7 +1083,7 @@ namespace XMMTwrapper1
             // 
             // btnStopTX
             // 
-            btnStopTX.Location = new Point(19, 480);
+            btnStopTX.Location = new Point(19, 490);
             btnStopTX.Name = "btnStopTX";
             btnStopTX.Size = new Size(55, 23);
             btnStopTX.TabIndex = 77;
@@ -1084,11 +1091,88 @@ namespace XMMTwrapper1
             btnStopTX.UseVisualStyleBackColor = true;
             btnStopTX.Click += btnStopTX_Click;
             // 
+            // btnSend8
+            // 
+            btnSend8.Location = new Point(19, 461);
+            btnSend8.Name = "btnSend8";
+            btnSend8.Size = new Size(55, 23);
+            btnSend8.TabIndex = 78;
+            btnSend8.Text = "tbd";
+            btnSend8.UseVisualStyleBackColor = true;
+            btnSend8.Click += MacroButton_Click;
+            // 
+            // btnSend9
+            // 
+            btnSend9.Location = new Point(82, 461);
+            btnSend9.Name = "btnSend9";
+            btnSend9.Size = new Size(55, 23);
+            btnSend9.TabIndex = 79;
+            btnSend9.Text = "tbd";
+            btnSend9.UseVisualStyleBackColor = true;
+            btnSend9.Click += MacroButton_Click;
+            // 
+            // btnSend10
+            // 
+            btnSend10.Location = new Point(145, 461);
+            btnSend10.Name = "btnSend10";
+            btnSend10.Size = new Size(55, 23);
+            btnSend10.TabIndex = 80;
+            btnSend10.Text = "tbd";
+            btnSend10.UseVisualStyleBackColor = true;
+            btnSend10.Click += MacroButton_Click;
+            // 
+            // btnSend11
+            // 
+            btnSend11.Location = new Point(208, 461);
+            btnSend11.Name = "btnSend11";
+            btnSend11.Size = new Size(55, 23);
+            btnSend11.TabIndex = 81;
+            btnSend11.Text = "tbd";
+            btnSend11.UseVisualStyleBackColor = true;
+            btnSend11.Click += MacroButton_Click;
+            // 
+            // btnSend12
+            // 
+            btnSend12.Location = new Point(271, 461);
+            btnSend12.Name = "btnSend12";
+            btnSend12.Size = new Size(55, 23);
+            btnSend12.TabIndex = 82;
+            btnSend12.Text = "tbd";
+            btnSend12.UseVisualStyleBackColor = true;
+            btnSend12.Click += MacroButton_Click;
+            // 
+            // btnSend13
+            // 
+            btnSend13.Location = new Point(334, 461);
+            btnSend13.Name = "btnSend13";
+            btnSend13.Size = new Size(55, 23);
+            btnSend13.TabIndex = 83;
+            btnSend13.Text = "tbd";
+            btnSend13.UseVisualStyleBackColor = true;
+            btnSend13.Click += MacroButton_Click;
+            // 
+            // btnSend14
+            // 
+            btnSend14.Location = new Point(397, 461);
+            btnSend14.Name = "btnSend14";
+            btnSend14.Size = new Size(55, 23);
+            btnSend14.TabIndex = 84;
+            btnSend14.Text = "tbd";
+            btnSend14.UseVisualStyleBackColor = true;
+            btnSend14.Click += MacroButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(802, 536);
+            ClientSize = new Size(802, 560);
+            Controls.Add(btnSend14);
+            Controls.Add(btnSend13);
+            Controls.Add(btnSend12);
+            Controls.Add(btnSend11);
+            Controls.Add(btnSend10);
+            Controls.Add(btnSend9);
+            Controls.Add(btnSend8);
             Controls.Add(btnStopTX);
             Controls.Add(btnSend7);
             Controls.Add(btnLookup);
@@ -1268,5 +1352,12 @@ namespace XMMTwrapper1
         private ToolStripStatusLabel lblLogFileName;
         private Button btnSend7;
         private Button btnStopTX;
+        private Button btnSend8;
+        private Button btnSend9;
+        private Button btnSend10;
+        private Button btnSend11;
+        private Button btnSend12;
+        private Button btnSend13;
+        private Button btnSend14;
     }
 }
