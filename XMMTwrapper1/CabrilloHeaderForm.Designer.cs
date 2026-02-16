@@ -63,6 +63,12 @@
             label15 = new Label();
             label16 = new Label();
             tbLocation = new TextBox();
+            label17 = new Label();
+            tbCatOverlay = new TextBox();
+            tbCatAssisted = new TextBox();
+            label18 = new Label();
+            tbEmail = new TextBox();
+            label19 = new Label();
             SuspendLayout();
             // 
             // label1
@@ -85,7 +91,7 @@
             // 
             // label3
             // 
-            label3.Location = new Point(267, 64);
+            label3.Location = new Point(267, 92);
             label3.Name = "label3";
             label3.Size = new Size(100, 23);
             label3.TabIndex = 2;
@@ -94,7 +100,7 @@
             // 
             // label4
             // 
-            label4.Location = new Point(267, 93);
+            label4.Location = new Point(267, 121);
             label4.Name = "label4";
             label4.Size = new Size(100, 23);
             label4.TabIndex = 3;
@@ -103,7 +109,7 @@
             // 
             // label5
             // 
-            label5.Location = new Point(267, 210);
+            label5.Location = new Point(267, 266);
             label5.Name = "label5";
             label5.Size = new Size(100, 23);
             label5.TabIndex = 4;
@@ -112,9 +118,9 @@
             // 
             // label6
             // 
-            label6.Location = new Point(267, 239);
+            label6.Location = new Point(12, 267);
             label6.Name = "label6";
-            label6.Size = new Size(100, 23);
+            label6.Size = new Size(57, 23);
             label6.TabIndex = 5;
             label6.Text = "Soapbox";
             label6.TextAlign = ContentAlignment.MiddleRight;
@@ -125,6 +131,7 @@
             tbContest.Name = "tbContest";
             tbContest.Size = new Size(185, 23);
             tbContest.TabIndex = 6;
+            tbContest.Text = "CQ-WPX-RTTY";
             // 
             // tbCatOp
             // 
@@ -132,35 +139,39 @@
             tbCatOp.Name = "tbCatOp";
             tbCatOp.Size = new Size(185, 23);
             tbCatOp.TabIndex = 7;
+            tbCatOp.Text = "SINGLE-OP";
             // 
             // tbCatTx
             // 
-            tbCatTx.Location = new Point(373, 65);
+            tbCatTx.Location = new Point(373, 93);
             tbCatTx.Name = "tbCatTx";
             tbCatTx.Size = new Size(185, 23);
             tbCatTx.TabIndex = 8;
+            tbCatTx.Text = "ONE";
             // 
             // tbCatPwr
             // 
-            tbCatPwr.Location = new Point(373, 94);
+            tbCatPwr.Location = new Point(373, 122);
             tbCatPwr.Name = "tbCatPwr";
             tbCatPwr.Size = new Size(185, 23);
             tbCatPwr.TabIndex = 9;
+            tbCatPwr.Text = "LOW";
             // 
             // tbScore
             // 
-            tbScore.Location = new Point(373, 211);
+            tbScore.Location = new Point(373, 267);
             tbScore.Name = "tbScore";
             tbScore.Size = new Size(185, 23);
             tbScore.TabIndex = 10;
             // 
             // tbSoap
             // 
-            tbSoap.Location = new Point(373, 240);
+            tbSoap.Location = new Point(77, 267);
             tbSoap.Multiline = true;
             tbSoap.Name = "tbSoap";
-            tbSoap.Size = new Size(185, 86);
+            tbSoap.Size = new Size(155, 86);
             tbSoap.TabIndex = 11;
+            tbSoap.TextChanged += tbSoap_TextChanged;
             // 
             // btnExport
             // 
@@ -188,6 +199,7 @@
             tbCallsign.Name = "tbCallsign";
             tbCallsign.Size = new Size(158, 23);
             tbCallsign.TabIndex = 15;
+            tbCallsign.Text = "G4AHN";
             // 
             // label7
             // 
@@ -281,28 +293,31 @@
             // 
             // tbCatBand
             // 
-            tbCatBand.Location = new Point(373, 123);
+            tbCatBand.Location = new Point(373, 151);
             tbCatBand.Name = "tbCatBand";
             tbCatBand.Size = new Size(185, 23);
             tbCatBand.TabIndex = 26;
+            tbCatBand.Text = "ALL";
             // 
             // tbCatMode
             // 
-            tbCatMode.Location = new Point(373, 152);
+            tbCatMode.Location = new Point(373, 180);
             tbCatMode.Name = "tbCatMode";
             tbCatMode.Size = new Size(185, 23);
             tbCatMode.TabIndex = 27;
+            tbCatMode.Text = "RTTY";
             // 
             // tbCatStation
             // 
-            tbCatStation.Location = new Point(373, 181);
+            tbCatStation.Location = new Point(373, 209);
             tbCatStation.Name = "tbCatStation";
             tbCatStation.Size = new Size(185, 23);
             tbCatStation.TabIndex = 28;
+            tbCatStation.Text = "FIXED";
             // 
             // label13
             // 
-            label13.Location = new Point(267, 122);
+            label13.Location = new Point(267, 150);
             label13.Name = "label13";
             label13.Size = new Size(100, 23);
             label13.TabIndex = 29;
@@ -311,7 +326,7 @@
             // 
             // label14
             // 
-            label14.Location = new Point(267, 151);
+            label14.Location = new Point(267, 179);
             label14.Name = "label14";
             label14.Size = new Size(100, 23);
             label14.TabIndex = 30;
@@ -320,7 +335,7 @@
             // 
             // label15
             // 
-            label15.Location = new Point(267, 180);
+            label15.Location = new Point(267, 208);
             label15.Name = "label15";
             label15.Size = new Size(100, 23);
             label15.TabIndex = 31;
@@ -342,12 +357,69 @@
             tbLocation.Name = "tbLocation";
             tbLocation.Size = new Size(158, 23);
             tbLocation.TabIndex = 33;
+            tbLocation.Text = "DX";
+            // 
+            // label17
+            // 
+            label17.Location = new Point(267, 237);
+            label17.Name = "label17";
+            label17.Size = new Size(100, 23);
+            label17.TabIndex = 35;
+            label17.Text = "Category Overlay";
+            label17.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tbCatOverlay
+            // 
+            tbCatOverlay.Location = new Point(373, 238);
+            tbCatOverlay.Name = "tbCatOverlay";
+            tbCatOverlay.Size = new Size(185, 23);
+            tbCatOverlay.TabIndex = 34;
+            tbCatOverlay.Text = "TB-WIRES";
+            // 
+            // tbCatAssisted
+            // 
+            tbCatAssisted.Location = new Point(373, 65);
+            tbCatAssisted.Name = "tbCatAssisted";
+            tbCatAssisted.Size = new Size(185, 23);
+            tbCatAssisted.TabIndex = 37;
+            tbCatAssisted.Text = "NON-ASSISTED";
+            // 
+            // label18
+            // 
+            label18.Location = new Point(267, 64);
+            label18.Name = "label18";
+            label18.Size = new Size(100, 23);
+            label18.TabIndex = 36;
+            label18.Text = "Cat Assisted";
+            label18.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tbEmail
+            // 
+            tbEmail.Location = new Point(77, 210);
+            tbEmail.Name = "tbEmail";
+            tbEmail.Size = new Size(158, 23);
+            tbEmail.TabIndex = 39;
+            // 
+            // label19
+            // 
+            label19.Location = new Point(1, 209);
+            label19.Name = "label19";
+            label19.Size = new Size(70, 23);
+            label19.TabIndex = 38;
+            label19.Text = "email";
+            label19.TextAlign = ContentAlignment.MiddleRight;
             // 
             // CabrilloHeaderForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(570, 376);
+            Controls.Add(tbEmail);
+            Controls.Add(label19);
+            Controls.Add(tbCatAssisted);
+            Controls.Add(label18);
+            Controls.Add(label17);
+            Controls.Add(tbCatOverlay);
             Controls.Add(tbLocation);
             Controls.Add(label16);
             Controls.Add(label15);
@@ -426,5 +498,11 @@
         private Label label15;
         private Label label16;
         private TextBox tbLocation;
+        private Label label17;
+        private TextBox tbCatOverlay;
+        private TextBox tbCatAssisted;
+        private Label label18;
+        private TextBox tbEmail;
+        private Label label19;
     }
 }

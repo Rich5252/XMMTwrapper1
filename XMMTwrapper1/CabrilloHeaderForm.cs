@@ -43,11 +43,16 @@ namespace XMMTwrapper1
             tbOpCalls.Text = ini.GetValue("Station", "Operators", "G4AHN");
             tbClub.Text = ini.GetValue("Station", "Club", "");
             tbCatOp.Text = ini.GetValue("Station", "CategoryOp", "SINGLE-OP");
+            tbCatAssisted.Text = ini.GetValue("Station", "CategoryAssist", "NON-ASSISTED");
+            tbCatOverlay.Text = ini.GetValue("Station", "CategoryOvl", "TB-WIRES");
             tbCatTx.Text = ini.GetValue("Station", "CategoryTx", "ONE");
-            tbCatPwr.Text = ini.GetValue("Station", "CategoryPower", "HIGH");
+            tbCatPwr.Text = ini.GetValue("Station", "CategoryPower", "LOW");
+            tbCatBand.Text = ini.GetValue("Station", "CategoryBand", "ALL");
+            tbCatMode.Text = ini.GetValue("Station", "CategoryMode", "RTTY");
             tbLocator.Text = ini.GetValue("Station", "GridLocator", "IO91OE");
             tbFullName.Text = ini.GetValue("Station", "FullName", "Richard Lax");
             tbAddress.Text = ini.GetValue("Station", "Address", "1 Gardeners Hill Rd|Farnham|GU10 4RL|England");
+            tbEmail.Text = ini.GetValue("Station", "Email", "richard.lax7@gmail.com");
             tbCatStation.Text = ini.GetValue("Station", "CategoryStation", "FIXED");
             tbLocation.Text = ini.GetValue("Station", "Location", "DX");
         }
@@ -60,11 +65,16 @@ namespace XMMTwrapper1
                 Contest = tbContest.Text,
                 Callsign = tbCallsign.Text,
                 FullName = tbFullName.Text,
+                Email = tbEmail.Text,
                 Address = tbAddress.Text,
                 Location = tbLocation.Text,
                 Locator = tbLocator.Text,
                 CategoryStation = tbCatStation.Text,
                 CategoryOp = tbCatOp.Text,
+                CategoryAssist = tbCatAssisted.Text,
+                CategoryBand = tbCatBand.Text,
+                CategoryMode = tbCatMode.Text,
+                CategoryOverlay = tbCatOverlay.Text,
                 CategoryTx = tbCatTx.Text,
                 CategoryPower = tbCatPwr.Text,
                 Operators = tbOpCalls.Text,
@@ -93,13 +103,16 @@ namespace XMMTwrapper1
             sb.AppendLine($"CALLSIGN: {header.Callsign}");
             sb.AppendLine($"OPERATORS: {header.Operators}");
             sb.AppendLine($"CATEGORY-OPERATOR: {header.CategoryOp}");
+            sb.AppendLine($"CATEGORY-ASSISTED: {header.CategoryAssist}");
+            sb.AppendLine($"CATEGORY-BAND: {header.CategoryBand}");
             sb.AppendLine($"CATEGORY-TRANSMITTER: {header.CategoryTx}");
             sb.AppendLine($"CATEGORY-STATION: {header.CategoryStation}");
+            sb.AppendLine($"CATEGORY-OVERLAY: {header.CategoryOverlay}");
             sb.AppendLine($"CATEGORY-MODE: {header.CategoryMode}");
             sb.AppendLine($"CATEGORY-POWER: {header.CategoryPower}");
             sb.AppendLine($"LOCATION: {header.Location}");
-            sb.AppendLine($"CLUB: {header.Club}");
-            sb.AppendLine($"LOCATOR: {header.Locator}");
+            if (header.Club != "") sb.AppendLine($"CLUB: {header.Club}");
+            sb.AppendLine($"GRID-LOCATOR: {header.Locator}");
             sb.AppendLine($"NAME: {header.FullName}");
 
             // Split by pipe and add a line for each segment
@@ -108,7 +121,9 @@ namespace XMMTwrapper1
                 sb.AppendLine($"ADDRESS: {line.Trim()}");
             }
 
-            sb.AppendLine($"CLAMED-SCORE: {header.ClaimedScore}");
+            sb.AppendLine($"EMAIL: {header.Email}");
+
+            if (header.ClaimedScore != "") sb.AppendLine($"CLAMED-SCORE: {header.ClaimedScore}");
 
             if (!string.IsNullOrWhiteSpace(header.Soapbox))
             {
@@ -123,7 +138,7 @@ namespace XMMTwrapper1
             }
 
             sb.AppendLine("CREATED-BY: MyG4AHNLogger v1.0");
-            sb.AppendLine("<EOH>");
+            //sb.AppendLine("<EOH>");
             sb.AppendLine("");
             sb.AppendLine("");
             // 2. QSO Data - Column alignment is critical here
@@ -144,10 +159,12 @@ namespace XMMTwrapper1
 
                 // Build the line with separate columns
                 // The widths below are standard for most HF contests
+                string formattedDate = DateTime.ParseExact(qso.Date, "yyyyMMdd", null).ToString("yyyy-MM-dd");
+
                 string line = string.Format("QSO: {0} {1} {2} {3} {4} {5} {6} {7} {8} {9}",
                     qso.FrequencyMHz.Replace(".", "").PadLeft(5), // Freq
                     mode,                                         // Mode (e.g., RTTY)
-                    qso.Date,                                     // Date
+                    formattedDate,                                // Date
                     qso.Time,                                     // Time
                     header.Callsign.PadRight(13),                // Sent Call
                     myRst.PadRight(3),                           // Sent RST
@@ -165,6 +182,11 @@ namespace XMMTwrapper1
             // 3. Write to file
             File.WriteAllText(fileName, sb.ToString());
         }
+
+        private void tbSoap_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 
     public class CabrilloHeader
@@ -173,11 +195,15 @@ namespace XMMTwrapper1
         public string Callsign { get; set; }
         public string Club { get; set; }
         public string CategoryOp { get; set; }
+        public string CategoryAssist { get; set; }
+        public string CategoryOverlay { get; set; }
+        public string CategoryBand { get; set; }
         public string CategoryTx { get; set; }
         public string CategoryPower { get; set; }
         public string CategoryStation { get; set; }
         public string CategoryMode { get; set; }
         public string FullName { get; set; }
+        public string Email { get; set; }
         public string Location { get; set; }
         public string Locator { get; set; }
         public string Address { get; set; }
