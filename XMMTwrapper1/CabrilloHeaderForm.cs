@@ -34,27 +34,51 @@ namespace XMMTwrapper1
         // Object to hold the results
         public CabrilloHeader HeaderData { get; private set; }
 
+        public IniManager _ini;
+
         public CabrilloHeaderForm(IniManager ini)
         {
             InitializeComponent();
-            // Pre-fill from INI using your IniManager
-            tbCallsign.Text = ini.GetValue("Station", "Callsign", "G4AHN");
 
-            tbOpCalls.Text = ini.GetValue("Station", "Operators", "G4AHN");
-            tbClub.Text = ini.GetValue("Station", "Club", "");
-            tbCatOp.Text = ini.GetValue("Station", "CategoryOp", "SINGLE-OP");
-            tbCatAssisted.Text = ini.GetValue("Station", "CategoryAssist", "NON-ASSISTED");
-            tbCatOverlay.Text = ini.GetValue("Station", "CategoryOvl", "TB-WIRES");
-            tbCatTx.Text = ini.GetValue("Station", "CategoryTx", "ONE");
-            tbCatPwr.Text = ini.GetValue("Station", "CategoryPower", "LOW");
-            tbCatBand.Text = ini.GetValue("Station", "CategoryBand", "ALL");
-            tbCatMode.Text = ini.GetValue("Station", "CategoryMode", "RTTY");
-            tbLocator.Text = ini.GetValue("Station", "GridLocator", "IO91OE");
-            tbFullName.Text = ini.GetValue("Station", "FullName", "Richard Lax");
-            tbAddress.Text = ini.GetValue("Station", "Address", "1 Gardeners Hill Rd|Farnham|GU10 4RL|England");
-            tbEmail.Text = ini.GetValue("Station", "Email", "richard.lax7@gmail.com");
-            tbCatStation.Text = ini.GetValue("Station", "CategoryStation", "FIXED");
-            tbLocation.Text = ini.GetValue("Station", "Location", "DX");
+            _ini = ini;
+            // Pre-fill from INI using your IniManager
+            tbCallsign.Text = _ini.GetValue("Station", "Callsign", "G4AHN");
+
+            tbOpCalls.Text = _ini.GetValue("Station", "Operators", "G4AHN");
+            tbClub.Text = _ini.GetValue("Station", "Club", "");
+            tbCatOp.Text = _ini.GetValue("Station", "CategoryOp", "SINGLE-OP");
+            tbCatAssisted.Text = _ini.GetValue("Station", "CategoryAssist", "NON-ASSISTED");
+            tbCatOverlay.Text = _ini.GetValue("Station", "CategoryOvl", "TB-WIRES");
+            tbCatTx.Text = _ini.GetValue("Station", "CategoryTx", "ONE");
+            tbCatPwr.Text = _ini.GetValue("Station", "CategoryPower", "LOW");
+            tbCatBand.Text = _ini.GetValue("Station", "CategoryBand", "ALL");
+            tbCatMode.Text = _ini.GetValue("Station", "CategoryMode", "RTTY");
+            tbLocator.Text = _ini.GetValue("Station", "GridLocator", "IO91OE");
+            tbFullName.Text = _ini.GetValue("Station", "FullName", "Richard Lax");
+            tbAddress.Text = _ini.GetValue("Station", "Address", "1 Gardeners Hill Rd|Farnham|GU10 4RL|England");
+            tbEmail.Text = _ini.GetValue("Station", "Email", "Rich.G4AHN@gmail.com");
+            tbCatStation.Text = _ini.GetValue("Station", "CategoryStation", "FIXED");
+            tbLocation.Text = _ini.GetValue("Station", "Location", "DX");
+        }
+
+        private void SaveDefaults()
+        {
+            _ini.SetValue("Station", "Callsign", tbCallsign.Text);
+            _ini.SetValue("Station", "Operators", tbOpCalls.Text);
+            _ini.SetValue("Station", "Club", tbClub.Text);
+            _ini.SetValue("Station", "CategoryOp", tbCatOp.Text);
+            _ini.SetValue("Station", "CategoryAssist", tbCatAssisted.Text);
+            _ini.SetValue("Station", "CategoryOvl", tbCatOverlay.Text);
+            _ini.SetValue("Station", "CategoryTx", tbCatTx.Text);
+            _ini.SetValue("Station", "CategoryPower", tbCatPwr.Text);
+            _ini.SetValue("Station", "CategoryBand", tbCatBand.Text);
+            _ini.SetValue("Station", "CategoryMode", tbCatMode.Text);
+            _ini.SetValue("Station", "GridLocator", tbLocator.Text);
+            _ini.SetValue("Station", "FullName", tbFullName.Text);
+            _ini.SetValue("Station", "Address", tbAddress.Text.Replace(Environment.NewLine, "|"));
+            _ini.SetValue("Station", "Email", tbEmail.Text);
+            _ini.SetValue("Station", "CategoryStation", tbCatStation.Text);
+            _ini.SetValue("Station", "Location", tbLocation.Text);
         }
 
         private void btnExport_Click(object sender, EventArgs e)
@@ -181,6 +205,8 @@ namespace XMMTwrapper1
 
             // 3. Write to file
             File.WriteAllText(fileName, sb.ToString());
+
+            SaveDefaults();
         }
 
         private void tbSoap_TextChanged(object sender, EventArgs e)
