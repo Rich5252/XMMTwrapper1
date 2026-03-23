@@ -342,13 +342,16 @@ namespace XMMTwrapper1
 
         private void btnSerialNumInc_Click(object sender, EventArgs e)
         {
+            ClearSerialNumOutTim();
             tbSerialNumOut.Increment();
         }
 
         private void btnSerialNumDec_Click(object sender, EventArgs e)
         {
+            ClearSerialNumOutTim();
             tbSerialNumOut.Decrement();
         }
+
 
         private void exportCabrilloToolStripMenuItem_Click(object sender, EventArgs e)
         {

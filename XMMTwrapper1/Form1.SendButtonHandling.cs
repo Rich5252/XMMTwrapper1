@@ -19,7 +19,7 @@ namespace XMMTwrapper1
             var tags = new List<string>
             {
                 "%myCall", "%DXcall", "%myName", "%myQTH",
-                "%myLOC", "%RSTout", "%NumOut", "%RSTin",
+                "%myLOC", "%RSTout", "%NumOut", "%TimOut", "%RSTin",
                 "%NumIn",  "%DXloc",  "%DXname", "%DXqth"
             };
 
@@ -69,6 +69,14 @@ namespace XMMTwrapper1
             else
             {
                 // 2. SEND MODE
+                //Special case of BARTG RTTY contest that includes HHMM after serial num
+                // if no time generated yet add it to serial num. eg 001-1533
+                // note serial number update resets this each time
+                if (msg.Template.Contains("%TimOut") && !tbSerialNumOut.Text.Contains("-"))
+                {
+                    string timeStr = DateTime.Now.ToString("HHmm");
+                    tbSerialNumOut.Text = $"{tbSerialNumOut.Text}-{timeStr}";
+                }
                 // Update variables from textboxes right before parsing
                 UpdateButtonMacroInserts();
                
@@ -116,8 +124,11 @@ namespace XMMTwrapper1
 
             _macroProvider.AddTagSubstitutions("%RSTout", tbReportOut.Text);
             _macroProvider.AddTagSubstitutions("%NumOut", tbSerialNumOut.Text);
+            _macroProvider.AddTagSubstitutions("%TimOut", "");
             _macroProvider.AddTagSubstitutions("%RSTin", tbReportIn.Text);
             _macroProvider.AddTagSubstitutions("%NumIn", tbSerialNumIn.Text);
+
+
 
             _macroProvider.AddTagSubstitutions("%DXloc", tbLocator.Text);
             _macroProvider.AddTagSubstitutions("%DXname", tbOpName.Text);

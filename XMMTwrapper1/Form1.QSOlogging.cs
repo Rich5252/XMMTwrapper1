@@ -74,6 +74,20 @@ namespace XMMTwrapper1
             tbQTH.Text = "";
             tbOpName.Text = "";
             tbComment.Text = "";
+            ClearSerialNumOutTim();
+        }
+
+
+        private void ClearSerialNumOutTim()
+        {
+            //special case BARTG contest using HHMM after serial, eg 001-1533
+            //remove time when changing serial ready for next QSO
+            if (tbSerialNumOut.Text.Contains("-"))
+            {
+                //remove -HHMM
+                int index = tbSerialNumOut.Text.IndexOf("-");
+                tbSerialNumOut.Text = tbSerialNumOut.Text.Substring(0, index);
+            }
         }
 
         //this is also called when tbFreq changes

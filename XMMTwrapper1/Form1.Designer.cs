@@ -663,7 +663,7 @@ namespace XMMTwrapper1
             tbCallsign.CharacterCasing = CharacterCasing.Upper;
             tbCallsign.Location = new Point(620, 210);
             tbCallsign.Name = "tbCallsign";
-            tbCallsign.Size = new Size(96, 23);
+            tbCallsign.Size = new Size(108, 23);
             tbCallsign.TabIndex = 25;
             tbCallsign.TextChanged += tbCallsign_TextChanged;
             // 
@@ -750,7 +750,7 @@ namespace XMMTwrapper1
             tbSerialNumOut.CharacterCasing = CharacterCasing.Upper;
             tbSerialNumOut.Location = new Point(671, 239);
             tbSerialNumOut.Name = "tbSerialNumOut";
-            tbSerialNumOut.Size = new Size(45, 23);
+            tbSerialNumOut.Size = new Size(57, 23);
             tbSerialNumOut.TabIndex = 31;
             // 
             // tbSerialNumIn
@@ -758,7 +758,7 @@ namespace XMMTwrapper1
             tbSerialNumIn.CharacterCasing = CharacterCasing.Upper;
             tbSerialNumIn.Location = new Point(671, 268);
             tbSerialNumIn.Name = "tbSerialNumIn";
-            tbSerialNumIn.Size = new Size(45, 23);
+            tbSerialNumIn.Size = new Size(57, 23);
             tbSerialNumIn.TabIndex = 33;
             // 
             // tbReportIn
@@ -773,14 +773,14 @@ namespace XMMTwrapper1
             // 
             tbQTH.Location = new Point(620, 355);
             tbQTH.Name = "tbQTH";
-            tbQTH.Size = new Size(96, 23);
+            tbQTH.Size = new Size(108, 23);
             tbQTH.TabIndex = 34;
             // 
             // tbOpName
             // 
             tbOpName.Location = new Point(620, 326);
             tbOpName.Name = "tbOpName";
-            tbOpName.Size = new Size(96, 23);
+            tbOpName.Size = new Size(108, 23);
             tbOpName.TabIndex = 35;
             // 
             // tbLocator
@@ -788,13 +788,13 @@ namespace XMMTwrapper1
             tbLocator.CharacterCasing = CharacterCasing.Upper;
             tbLocator.Location = new Point(620, 297);
             tbLocator.Name = "tbLocator";
-            tbLocator.Size = new Size(96, 23);
+            tbLocator.Size = new Size(108, 23);
             tbLocator.TabIndex = 36;
             // 
             // btnSerialNumInc
             // 
             btnSerialNumInc.Font = new Font("Segoe UI", 8.25F);
-            btnSerialNumInc.Location = new Point(720, 231);
+            btnSerialNumInc.Location = new Point(732, 231);
             btnSerialNumInc.Margin = new Padding(1);
             btnSerialNumInc.Name = "btnSerialNumInc";
             btnSerialNumInc.Size = new Size(35, 20);
@@ -807,7 +807,7 @@ namespace XMMTwrapper1
             // btnSerialNumDec
             // 
             btnSerialNumDec.Font = new Font("Segoe UI", 8.25F);
-            btnSerialNumDec.Location = new Point(720, 252);
+            btnSerialNumDec.Location = new Point(732, 252);
             btnSerialNumDec.Name = "btnSerialNumDec";
             btnSerialNumDec.Size = new Size(35, 20);
             btnSerialNumDec.TabIndex = 38;
@@ -818,7 +818,7 @@ namespace XMMTwrapper1
             // cbSerialNumAutoInc
             // 
             cbSerialNumAutoInc.AutoSize = true;
-            cbSerialNumAutoInc.Location = new Point(761, 243);
+            cbSerialNumAutoInc.Location = new Point(773, 243);
             cbSerialNumAutoInc.Name = "cbSerialNumAutoInc";
             cbSerialNumAutoInc.Size = new Size(15, 14);
             cbSerialNumAutoInc.TabIndex = 39;
@@ -1054,7 +1054,7 @@ namespace XMMTwrapper1
             lblDUPE.AutoSize = true;
             lblDUPE.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblDUPE.ForeColor = Color.Red;
-            lblDUPE.Location = new Point(720, 205);
+            lblDUPE.Location = new Point(723, 203);
             lblDUPE.Name = "lblDUPE";
             lblDUPE.Size = new Size(67, 30);
             lblDUPE.TabIndex = 74;
@@ -1063,9 +1063,9 @@ namespace XMMTwrapper1
             // 
             // btnLookup
             // 
-            btnLookup.Location = new Point(723, 296);
+            btnLookup.Location = new Point(732, 296);
             btnLookup.Name = "btnLookup";
-            btnLookup.Size = new Size(65, 23);
+            btnLookup.Size = new Size(56, 23);
             btnLookup.TabIndex = 75;
             btnLookup.Text = "Lookup";
             btnLookup.UseVisualStyleBackColor = true;
