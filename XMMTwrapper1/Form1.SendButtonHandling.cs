@@ -20,7 +20,7 @@ namespace XMMTwrapper1
             {
                 "%myCall", "%DXcall", "%myName", "%myQTH",
                 "%myLOC", "%RSTout", "%NumOut", "%TimOut", "%RSTin",
-                "%NumIn",  "%DXloc",  "%DXname", "%DXqth"
+                "%NumIn",  "%DXloc",  "%DXname", "%DXqth", "%rn"
             };
 
             StringBuilder sb = new StringBuilder();
@@ -133,6 +133,8 @@ namespace XMMTwrapper1
             _macroProvider.AddTagSubstitutions("%DXloc", tbLocator.Text);
             _macroProvider.AddTagSubstitutions("%DXname", tbOpName.Text);
             _macroProvider.AddTagSubstitutions("%DXqth", tbQTH.Text);
+
+            _macroProvider.AddTagSubstitutions("%rn", "\r\n");
         }
 
 
