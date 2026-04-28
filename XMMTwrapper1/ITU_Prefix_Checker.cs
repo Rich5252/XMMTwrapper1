@@ -201,7 +201,7 @@ public static class ITU_Prefix_Checker
         if (bS3)
         {
             //if a 3 char prefix then 4th must be letter
-            if (!char.IsLetter(word[3])) return false;
+            if (word.Length > 3 && !char.IsLetter(word[3])) return false;
             prefix = S3;
         }
         else
