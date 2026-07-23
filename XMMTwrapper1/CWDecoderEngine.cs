@@ -39,7 +39,7 @@ using System.Diagnostics;
 public class CWDecoderEngine
 {
     private bool _isRunning = false;
-    private readonly BlockingCollection<byte[]> _audioQueue = new BlockingCollection<byte[]>();
+    private BlockingCollection<byte[]> _audioQueue = new BlockingCollection<byte[]>();
     private List<float> _residualBuffer = new List<float>();
     private WaveInEvent _waveIn;
     private AdaptiveThreshold _adaptor = new AdaptiveThreshold();
@@ -117,6 +117,10 @@ public class CWDecoderEngine
     {
         if (_isRunning) return;
 
+        // Fresh queue every time — old one may be in "adding completed" state
+        _audioQueue = new BlockingCollection<byte[]>();
+        _residualBuffer.Clear();
+
         _waveIn = new WaveInEvent
         {
             DeviceNumber = deviceIndex,
@@ -125,12 +129,10 @@ public class CWDecoderEngine
         };
 
         _SampleRate = _waveIn.WaveFormat.SampleRate;
-        _clock.SetSampleRate(_SampleRate);                  //all filters get data at audio sample rate
+        _clock.SetSampleRate(_SampleRate);
 
-        //_activeFilter = new GoertzelStrategy(TargetFrequency, _SampleRate, 256 /* buffersize */);    //default filter
-        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw /* BW */, _BaseBlockSize);    //default filter
+        _activeFilter = new FIRStrategy(_SampleRate, TargetFrequency, FIRbw, _BaseBlockSize);
         _activeFilter.ScalingFactor = _InputScalingFactor;
-
 
         _waveIn.DataAvailable += (s, e) => {
             if (!_audioQueue.IsAddingCompleted)
@@ -146,20 +148,26 @@ public class CWDecoderEngine
 
         _waveIn.StartRecording();
         _isRunning = true;
+
+        // Restart the consumer loop on its own thread/task
+        Task.Run(ProcessAudioLoop);
     }
 
     public void Stop()
     {
         if (!_isRunning) return;
 
-        // 1. Stop the soundcard
-        _waveIn?.StopRecording();
+        _isRunning = false;
 
-        // 2. Tell the BlockingCollection no more data is coming
-        // This allows the ProcessAudioLoop 'foreach' to exit naturally
+        var stoppedTcs = new TaskCompletionSource<bool>();
+        _waveIn.RecordingStopped += (s, e) => stoppedTcs.TrySetResult(true);
+        _waveIn.StopRecording();
+        stoppedTcs.Task.Wait(500);   // give the driver time to actually release the device
+
         _audioQueue.CompleteAdding();
 
-        _isRunning = false;
+        _waveIn.Dispose();
+        _waveIn = null;
     }
 
     public void Dispose()
