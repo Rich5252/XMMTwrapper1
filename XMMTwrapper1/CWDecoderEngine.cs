@@ -110,6 +110,8 @@ public class CWDecoderEngine
         _clock.OnCharacterDecoded = (c) => { lastChar = c; OnCharacterDecoded?.Invoke(c); };
         _clock.OnSequenceChanged = (s) => OnSequenceChanged?.Invoke(s);
         _clock.OnWpmChanged = (i) => OnWpmChanged?.Invoke(i);
+
+        _clock.EnableTimingBroadcast(); // defaults: 239.255.42.99:6789, matching UdpTimingListener's defaults
     }
 
     // start/re-start engine from UI on seleced audio device

@@ -45,8 +45,19 @@ public class MorseClock
     private long _lastTransitionSample = 0;
     private bool _lastToneState = false;
     private long _pendingMarkDuration = 0; // New class-level variable
+    private long _pendingMarkEndSample = 0; // Sample count at the moment the pending mark actually ended
     private double _pendingMarkConfidence = 0.0;
     private StringBuilder _currentSymbolBuffer = new StringBuilder();
+
+    // Optional: sends filtered, confirmed DOWN/UP timing to an external analyzer
+    // over UDP multicast. Null unless EnableTimingBroadcast() is called - keeps
+    // this a no-op for anyone using MorseClock without the analyzer running.
+    private UdpTimingSender _timingSender;
+
+    public void EnableTimingBroadcast(string multicastAddress = "239.255.42.99", int port = 6789)
+    {
+        _timingSender = new UdpTimingSender(multicastAddress, port);
+    }
 
     private double _dotMs = 1200.0 / 25.0;
     private double _currentWPM = 25;
@@ -66,7 +77,7 @@ public class MorseClock
     private readonly object _lock = new object();
 
     public void SetSampleRate(int rate) => _sampleRate = rate;
-    
+
     public long GetTotalSamples() => _totalSamplesProcessed;
 
     public bool FixWpm(bool fix) => _FixWpm = fix;
@@ -133,7 +144,7 @@ public class MorseClock
                 // If it's > 50% of a dot, it's almost certainly a real 'E' or part of a character.
                 if (_dotHistory.Count < 5 || adjusted >= Config.DOT_MINIMUM_MS)     //_dotMs * 0.5)
                 {
-                    ProcessMark(adjusted);
+                    ProcessMark(adjusted, _totalSamplesProcessed); // ends right now - real edge time
                     _pendingMarkDuration = 0;
                     _pendingMarkConfidence = 0.0;
                 }
@@ -145,6 +156,7 @@ public class MorseClock
                     {
                         // This is a "Blip." Hold it to see what the following space looks like.
                         _pendingMarkDuration = adjusted;
+                        _pendingMarkEndSample = _totalSamplesProcessed; // remember when it REALLY ended
                         _pendingMarkConfidence = lastToneConfAvg;
                         Log.Perf($"NOISE_TRAP: Add Short PendingMark {adjusted}ms. Based on high conf: {lastToneConfAvg:F4}");
                     }
@@ -179,7 +191,7 @@ public class MorseClock
                     else
                     {
                         // The space was tight! The blip was a real (short) dot.
-                        ProcessMark(_pendingMarkDuration);
+                        ProcessMark(_pendingMarkDuration, _pendingMarkEndSample); // original edge time, not now
                         ProcessSpace(adjusted);
                         Log.Perf($"NOISE_TRAP: Process Short Pending Mark: Mark {_pendingMarkDuration}ms, Space {adjusted}ms");
                     }
@@ -197,7 +209,7 @@ public class MorseClock
         }
     }
 
-    private void ProcessMark(long duration)
+    private void ProcessMark(long duration, long endSampleCount)
     {
         //LogSignalHealth(duration, true);
 
@@ -212,7 +224,7 @@ public class MorseClock
         // If it's in the 'no-man's land' between dot and dash, it's suspect.
         bool isValidDot = !isDash && (duration > _dotMs * Config.MIN_DOT_WINDOW && duration < _dotMs * Config.MAX_DOT_WINDOW);
         bool isValidDash = isDash && (duration > _dotMs * Config.MIN_DASH_WINDOW && duration < _dotMs * Config.MAX_DASH_WINDOW);
-        
+
         //noise detect filter
         bool isNotNoise = IsMarkRhythmicallyValid(duration) || lastToneConfAvg > 0.6;
         if (isDash)
@@ -240,6 +252,14 @@ public class MorseClock
         {
             _currentSymbolBuffer.Append(isDash ? "-" : ".");
             OnSequenceChanged?.Invoke(_currentSymbolBuffer.ToString());
+
+            if (_timingSender != null)
+            {
+                double upMicros = (endSampleCount / _sampleRate) * 1_000_000.0;
+                double downMicros = upMicros - (duration * 1000.0); // duration is ms
+                _timingSender.SendKeyEvent("DOWN", (long)downMicros);
+                _timingSender.SendKeyEvent("UP", (long)upMicros);
+            }
         }
         else
         {
@@ -391,7 +411,7 @@ public class MorseClock
         return stableSamples.Average();
     }
 
-    
+
     private bool DecodeBuffer()
     {
         string sequence = _currentSymbolBuffer.ToString();
