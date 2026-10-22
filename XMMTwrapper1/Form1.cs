@@ -1,4 +1,5 @@
 
+using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
 
 namespace XMMTwrapper1
@@ -30,6 +31,8 @@ namespace XMMTwrapper1
         {
             Log.Mark("Form1 before init");
             InitializeComponent();
+
+            InitializeJttyUi();
 
             InitializeCWDecoder();
 
@@ -109,8 +112,11 @@ namespace XMMTwrapper1
             string mode = _ini.GetValue("General", "Mode", "CW");
             if (mode == "CW")
                 btnCW.Checked = true;
-            else
+            else if (mode == "RTTY")
                 btnRTTY.Checked = true;
+            else
+                btnJTTY.Checked = true;     //default if not set or invalid value
+
 
             //restore contest settings
             tbReportOut.Text = _ini.GetValue("General", "ReportOut", "599");
@@ -150,6 +156,8 @@ namespace XMMTwrapper1
             //start MMTTY app in background
             StartMmttyEngine();
 
+            StartJttyLink();            //link to WS JTTY server for RTTY decode and TX
+
             SelectMode();           //init mode UI
             UpdateButtonMacros();   //init Send button macros & labels
 
@@ -167,7 +175,7 @@ namespace XMMTwrapper1
                 _ini.SetValue("General", "Height", $"{this.Height}");
             }
             _ini.SetValue("FixedSubs", "myPower", tbPwr.Text);
-            _ini.SetValue("General", "Mode", btnCW.Checked ? "CW" : "RTTY");
+            _ini.SetValue("General", "Mode", btnCW.Checked ? "CW" : btnRTTY.Checked ? "RTTY" : "JTTY");
 
             //save contest settings
             _ini.SetValue("General", "ReportOut", tbReportOut.Text);
@@ -179,6 +187,7 @@ namespace XMMTwrapper1
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            StopJttyLink();
             _hook?.Dispose();
             base.OnFormClosed(e);
         }
@@ -309,6 +318,7 @@ namespace XMMTwrapper1
             {
                 tbTextReceived.Text = "";
                 _decoder.Start();
+                gbJTTYcontrols.Left = -500;
                 gbRTTYbuttons.Left = -500;
                 gbCWcontrols.Left = 12;
                 gbCWcontrols.Visible = true;
@@ -324,9 +334,19 @@ namespace XMMTwrapper1
             if (btnRTTY.Checked == true)
             {
                 tbTextReceived.Text = "";
+                gbJTTYcontrols.Left = -500;
                 gbCWcontrols.Left = -500;
                 gbRTTYbuttons.Left = 12;
                 gbRTTYbuttons.Visible = true;
+            }
+
+            if (btnJTTY.Checked == true)
+            {
+                tbTextReceived.Text = "";
+                gbCWcontrols.Left = -500;
+                gbRTTYbuttons.Left = -500;
+                gbJTTYcontrols.Left = 12;
+                gbJTTYcontrols.Visible = true;
             }
             UpdateButtonMacros();
         }

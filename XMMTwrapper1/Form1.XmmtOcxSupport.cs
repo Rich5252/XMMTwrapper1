@@ -392,7 +392,7 @@ namespace XMMTwrapper1
 
         private void axXMMR1_OnCharRcvd(object sender, _DXMMREvents_OnCharRcvdEvent e)
         {
-            if (btnCW.Checked) return;      //Only display RTTY here
+            if (!btnRTTY.Checked) return;      //Only display RTTY here
 
             string s = ((char)e.bChar).ToString();
             DisplayNextChar(s);

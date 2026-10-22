@@ -69,6 +69,9 @@ namespace XMMTwrapper1
             statusStrip1 = new StatusStrip();
             lblMMTTYstatus = new ToolStripStatusLabel();
             lblPipeStatus = new ToolStripStatusLabel();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
+            lblWSjttyStatus = new ToolStripStatusLabel();
+            toolStripStatusLabel2 = new ToolStripStatusLabel();
             lblLogFileName = new ToolStripStatusLabel();
             menuStrip1 = new MenuStrip();
             OptionMenu = new ToolStripMenuItem();
@@ -85,6 +88,7 @@ namespace XMMTwrapper1
             btnTemplate = new AxXMMBtn();
             btnSend1 = new Button();
             gbRttyCW = new GroupBox();
+            btnJTTY = new RadioButton();
             btnRTTY = new RadioButton();
             btnCW = new RadioButton();
             tbComment = new TextBox();
@@ -131,6 +135,10 @@ namespace XMMTwrapper1
             btnSend12 = new Button();
             btnSend13 = new Button();
             btnSend14 = new Button();
+            tbFreeText = new TextBox();
+            label16 = new Label();
+            gbJTTYcontrols = new GroupBox();
+            toolStripStatusLabel3 = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -155,22 +163,22 @@ namespace XMMTwrapper1
             axxmmxy1.Location = new Point(620, 37);
             axxmmxy1.Name = "axxmmxy1";
             axxmmxy1.OcxState = (AxHost.State)resources.GetObject("axxmmxy1.OcxState");
-            axxmmxy1.Size = new Size(168, 161);
+            axxmmxy1.Size = new Size(168, 177);
             axxmmxy1.TabIndex = 14;
             // 
             // axxmmWater1
             // 
             axxmmWater1.Enabled = true;
-            axxmmWater1.Location = new Point(261, 119);
+            axxmmWater1.Location = new Point(261, 125);
             axxmmWater1.Name = "axxmmWater1";
             axxmmWater1.OcxState = (AxHost.State)resources.GetObject("axxmmWater1.OcxState");
-            axxmmWater1.Size = new Size(353, 79);
+            axxmmWater1.Size = new Size(353, 89);
             axxmmWater1.TabIndex = 13;
             // 
             // axXMMR1
             // 
             axXMMR1.Enabled = true;
-            axXMMR1.Location = new Point(210, 259);
+            axXMMR1.Location = new Point(210, 272);
             axXMMR1.Name = "axXMMR1";
             axXMMR1.OcxState = (AxHost.State)resources.GetObject("axXMMR1.OcxState");
             axXMMR1.Size = new Size(100, 50);
@@ -185,7 +193,7 @@ namespace XMMTwrapper1
             axXMMSpec1.Location = new Point(261, 37);
             axXMMSpec1.Name = "axXMMSpec1";
             axXMMSpec1.OcxState = (AxHost.State)resources.GetObject("axXMMSpec1.OcxState");
-            axXMMSpec1.Size = new Size(353, 76);
+            axXMMSpec1.Size = new Size(353, 82);
             axXMMSpec1.TabIndex = 10;
             axXMMSpec1.OnLMouseDown += axXMMSpec1_OnLMouseDown_1;
             axXMMSpec1.OnLMouseMove += axXMMSpec1_OnLMouseMove;
@@ -197,7 +205,7 @@ namespace XMMTwrapper1
             axXMMLevel1.Location = new Point(229, 37);
             axXMMLevel1.Name = "axXMMLevel1";
             axXMMLevel1.OcxState = (AxHost.State)resources.GetObject("axXMMLevel1.OcxState");
-            axXMMLevel1.Size = new Size(26, 161);
+            axXMMLevel1.Size = new Size(26, 177);
             axXMMLevel1.TabIndex = 9;
             axXMMLevel1.OnLMouseDown += axXMMLevel1_OnLMouseDown;
             axXMMLevel1.OnLMouseUp += axXMMLevel1_OnLMouseUp;
@@ -209,7 +217,7 @@ namespace XMMTwrapper1
             gbRTTYbuttons.Font = new Font("Verdana", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             gbRTTYbuttons.Location = new Point(-500, 27);
             gbRTTYbuttons.Name = "gbRTTYbuttons";
-            gbRTTYbuttons.Size = new Size(215, 171);
+            gbRTTYbuttons.Size = new Size(215, 187);
             gbRTTYbuttons.TabIndex = 20;
             gbRTTYbuttons.TabStop = false;
             // 
@@ -319,9 +327,9 @@ namespace XMMTwrapper1
             gbCWcontrols.Controls.Add(sbAudioLevel);
             gbCWcontrols.Controls.Add(tbWPM);
             gbCWcontrols.Controls.Add(pnlKeyIndicator);
-            gbCWcontrols.Location = new Point(12, 27);
+            gbCWcontrols.Location = new Point(-500, 27);
             gbCWcontrols.Name = "gbCWcontrols";
-            gbCWcontrols.Size = new Size(215, 171);
+            gbCWcontrols.Size = new Size(215, 187);
             gbCWcontrols.TabIndex = 64;
             gbCWcontrols.TabStop = false;
             gbCWcontrols.Visible = false;
@@ -558,8 +566,8 @@ namespace XMMTwrapper1
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, lblPipeStatus, lblLogFileName });
-            statusStrip1.Location = new Point(0, 538);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, toolStripStatusLabel3, lblPipeStatus, toolStripStatusLabel1, lblWSjttyStatus, toolStripStatusLabel2, lblLogFileName });
+            statusStrip1.Location = new Point(0, 537);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(802, 22);
             statusStrip1.TabIndex = 22;
@@ -567,9 +575,8 @@ namespace XMMTwrapper1
             // 
             // lblMMTTYstatus
             // 
-            lblMMTTYstatus.AutoSize = false;
             lblMMTTYstatus.Name = "lblMMTTYstatus";
-            lblMMTTYstatus.Size = new Size(300, 17);
+            lblMMTTYstatus.Size = new Size(82, 17);
             lblMMTTYstatus.Text = "MMTTY status";
             lblMMTTYstatus.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -579,12 +586,29 @@ namespace XMMTwrapper1
             lblPipeStatus.Size = new Size(173, 17);
             lblPipeStatus.Text = "TxLink Pipe ... Trying to connect";
             // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(16, 17);
+            toolStripStatusLabel1.Text = " | ";
+            // 
+            // lblWSjttyStatus
+            // 
+            lblWSjttyStatus.Name = "lblWSjttyStatus";
+            lblWSjttyStatus.Size = new Size(104, 17);
+            lblWSjttyStatus.Text = "WS not connected";
+            // 
+            // toolStripStatusLabel2
+            // 
+            toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            toolStripStatusLabel2.Size = new Size(16, 17);
+            toolStripStatusLabel2.Text = " | ";
+            // 
             // lblLogFileName
             // 
-            lblLogFileName.AutoSize = false;
             lblLogFileName.ImageAlign = ContentAlignment.MiddleRight;
             lblLogFileName.Name = "lblLogFileName";
-            lblLogFileName.Size = new Size(250, 17);
+            lblLogFileName.Size = new Size(83, 17);
             lblLogFileName.Text = "Log File Name";
             lblLogFileName.TextAlign = ContentAlignment.MiddleRight;
             // 
@@ -650,7 +674,7 @@ namespace XMMTwrapper1
             tbTextReceived.AcceptsReturn = true;
             tbTextReceived.AcceptsTab = true;
             tbTextReceived.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            tbTextReceived.Location = new Point(12, 239);
+            tbTextReceived.Location = new Point(12, 252);
             tbTextReceived.Multiline = true;
             tbTextReceived.Name = "tbTextReceived";
             tbTextReceived.ScrollBars = ScrollBars.Vertical;
@@ -661,7 +685,7 @@ namespace XMMTwrapper1
             // tbCallsign
             // 
             tbCallsign.CharacterCasing = CharacterCasing.Upper;
-            tbCallsign.Location = new Point(620, 210);
+            tbCallsign.Location = new Point(620, 223);
             tbCallsign.Name = "tbCallsign";
             tbCallsign.Size = new Size(108, 23);
             tbCallsign.TabIndex = 25;
@@ -676,7 +700,7 @@ namespace XMMTwrapper1
             // tbReportOut
             // 
             tbReportOut.CharacterCasing = CharacterCasing.Upper;
-            tbReportOut.Location = new Point(620, 239);
+            tbReportOut.Location = new Point(620, 252);
             tbReportOut.Name = "tbReportOut";
             tbReportOut.Size = new Size(42, 23);
             tbReportOut.TabIndex = 26;
@@ -685,7 +709,7 @@ namespace XMMTwrapper1
             // btnTemplate
             // 
             btnTemplate.Enabled = true;
-            btnTemplate.Location = new Point(185, 259);
+            btnTemplate.Location = new Point(185, 272);
             btnTemplate.Name = "btnTemplate";
             btnTemplate.OcxState = (AxHost.State)resources.GetObject("btnTemplate.OcxState");
             btnTemplate.Size = new Size(100, 50);
@@ -694,7 +718,7 @@ namespace XMMTwrapper1
             // 
             // btnSend1
             // 
-            btnSend1.Location = new Point(19, 435);
+            btnSend1.Location = new Point(19, 448);
             btnSend1.Name = "btnSend1";
             btnSend1.Size = new Size(55, 23);
             btnSend1.TabIndex = 29;
@@ -704,13 +728,26 @@ namespace XMMTwrapper1
             // 
             // gbRttyCW
             // 
+            gbRttyCW.Controls.Add(btnJTTY);
             gbRttyCW.Controls.Add(btnRTTY);
             gbRttyCW.Controls.Add(btnCW);
             gbRttyCW.Location = new Point(12, 148);
             gbRttyCW.Name = "gbRttyCW";
-            gbRttyCW.Size = new Size(58, 49);
+            gbRttyCW.Size = new Size(58, 66);
             gbRttyCW.TabIndex = 29;
             gbRttyCW.TabStop = false;
+            // 
+            // btnJTTY
+            // 
+            btnJTTY.AutoSize = true;
+            btnJTTY.Location = new Point(5, 47);
+            btnJTTY.Name = "btnJTTY";
+            btnJTTY.Size = new Size(48, 19);
+            btnJTTY.TabIndex = 2;
+            btnJTTY.TabStop = true;
+            btnJTTY.Text = "JTTY";
+            btnJTTY.UseVisualStyleBackColor = true;
+            btnJTTY.CheckedChanged += btnJTTY_CheckedChanged;
             // 
             // btnRTTY
             // 
@@ -740,7 +777,7 @@ namespace XMMTwrapper1
             // 
             // tbComment
             // 
-            tbComment.Location = new Point(620, 384);
+            tbComment.Location = new Point(620, 397);
             tbComment.Name = "tbComment";
             tbComment.Size = new Size(168, 23);
             tbComment.TabIndex = 30;
@@ -748,7 +785,7 @@ namespace XMMTwrapper1
             // tbSerialNumOut
             // 
             tbSerialNumOut.CharacterCasing = CharacterCasing.Upper;
-            tbSerialNumOut.Location = new Point(671, 239);
+            tbSerialNumOut.Location = new Point(671, 252);
             tbSerialNumOut.Name = "tbSerialNumOut";
             tbSerialNumOut.Size = new Size(57, 23);
             tbSerialNumOut.TabIndex = 31;
@@ -756,7 +793,7 @@ namespace XMMTwrapper1
             // tbSerialNumIn
             // 
             tbSerialNumIn.CharacterCasing = CharacterCasing.Upper;
-            tbSerialNumIn.Location = new Point(671, 268);
+            tbSerialNumIn.Location = new Point(671, 281);
             tbSerialNumIn.Name = "tbSerialNumIn";
             tbSerialNumIn.Size = new Size(57, 23);
             tbSerialNumIn.TabIndex = 33;
@@ -764,21 +801,21 @@ namespace XMMTwrapper1
             // tbReportIn
             // 
             tbReportIn.CharacterCasing = CharacterCasing.Upper;
-            tbReportIn.Location = new Point(620, 268);
+            tbReportIn.Location = new Point(620, 281);
             tbReportIn.Name = "tbReportIn";
             tbReportIn.Size = new Size(42, 23);
             tbReportIn.TabIndex = 32;
             // 
             // tbQTH
             // 
-            tbQTH.Location = new Point(620, 355);
+            tbQTH.Location = new Point(620, 368);
             tbQTH.Name = "tbQTH";
             tbQTH.Size = new Size(108, 23);
             tbQTH.TabIndex = 34;
             // 
             // tbOpName
             // 
-            tbOpName.Location = new Point(620, 326);
+            tbOpName.Location = new Point(620, 339);
             tbOpName.Name = "tbOpName";
             tbOpName.Size = new Size(108, 23);
             tbOpName.TabIndex = 35;
@@ -786,7 +823,7 @@ namespace XMMTwrapper1
             // tbLocator
             // 
             tbLocator.CharacterCasing = CharacterCasing.Upper;
-            tbLocator.Location = new Point(620, 297);
+            tbLocator.Location = new Point(620, 310);
             tbLocator.Name = "tbLocator";
             tbLocator.Size = new Size(108, 23);
             tbLocator.TabIndex = 36;
@@ -794,7 +831,7 @@ namespace XMMTwrapper1
             // btnSerialNumInc
             // 
             btnSerialNumInc.Font = new Font("Segoe UI", 8.25F);
-            btnSerialNumInc.Location = new Point(732, 231);
+            btnSerialNumInc.Location = new Point(732, 244);
             btnSerialNumInc.Margin = new Padding(1);
             btnSerialNumInc.Name = "btnSerialNumInc";
             btnSerialNumInc.Size = new Size(35, 20);
@@ -807,7 +844,7 @@ namespace XMMTwrapper1
             // btnSerialNumDec
             // 
             btnSerialNumDec.Font = new Font("Segoe UI", 8.25F);
-            btnSerialNumDec.Location = new Point(732, 252);
+            btnSerialNumDec.Location = new Point(732, 265);
             btnSerialNumDec.Name = "btnSerialNumDec";
             btnSerialNumDec.Size = new Size(35, 20);
             btnSerialNumDec.TabIndex = 38;
@@ -818,7 +855,7 @@ namespace XMMTwrapper1
             // cbSerialNumAutoInc
             // 
             cbSerialNumAutoInc.AutoSize = true;
-            cbSerialNumAutoInc.Location = new Point(773, 243);
+            cbSerialNumAutoInc.Location = new Point(773, 256);
             cbSerialNumAutoInc.Name = "cbSerialNumAutoInc";
             cbSerialNumAutoInc.Size = new Size(15, 14);
             cbSerialNumAutoInc.TabIndex = 39;
@@ -826,7 +863,7 @@ namespace XMMTwrapper1
             // 
             // btnSend2
             // 
-            btnSend2.Location = new Point(82, 435);
+            btnSend2.Location = new Point(82, 448);
             btnSend2.Name = "btnSend2";
             btnSend2.Size = new Size(55, 23);
             btnSend2.TabIndex = 40;
@@ -836,7 +873,7 @@ namespace XMMTwrapper1
             // 
             // btnSend4
             // 
-            btnSend4.Location = new Point(208, 435);
+            btnSend4.Location = new Point(208, 448);
             btnSend4.Name = "btnSend4";
             btnSend4.Size = new Size(55, 23);
             btnSend4.TabIndex = 41;
@@ -846,7 +883,7 @@ namespace XMMTwrapper1
             // 
             // btnSend3
             // 
-            btnSend3.Location = new Point(145, 435);
+            btnSend3.Location = new Point(145, 448);
             btnSend3.Name = "btnSend3";
             btnSend3.Size = new Size(55, 23);
             btnSend3.TabIndex = 42;
@@ -856,7 +893,7 @@ namespace XMMTwrapper1
             // 
             // btnSend5
             // 
-            btnSend5.Location = new Point(271, 435);
+            btnSend5.Location = new Point(271, 448);
             btnSend5.Name = "btnSend5";
             btnSend5.Size = new Size(55, 23);
             btnSend5.TabIndex = 43;
@@ -866,7 +903,7 @@ namespace XMMTwrapper1
             // 
             // btnSend6
             // 
-            btnSend6.Location = new Point(334, 435);
+            btnSend6.Location = new Point(334, 448);
             btnSend6.Name = "btnSend6";
             btnSend6.Size = new Size(55, 23);
             btnSend6.TabIndex = 44;
@@ -878,7 +915,7 @@ namespace XMMTwrapper1
             // 
             cbEditButton.AutoSize = true;
             cbEditButton.CheckAlign = ContentAlignment.MiddleRight;
-            cbEditButton.Location = new Point(472, 439);
+            cbEditButton.Location = new Point(472, 452);
             cbEditButton.Name = "cbEditButton";
             cbEditButton.Size = new Size(46, 19);
             cbEditButton.TabIndex = 45;
@@ -887,7 +924,7 @@ namespace XMMTwrapper1
             // 
             // btnLogQSO
             // 
-            btnLogQSO.Location = new Point(620, 415);
+            btnLogQSO.Location = new Point(620, 428);
             btnLogQSO.Name = "btnLogQSO";
             btnLogQSO.Size = new Size(75, 23);
             btnLogQSO.TabIndex = 46;
@@ -897,7 +934,7 @@ namespace XMMTwrapper1
             // 
             // tbNumberQSOs
             // 
-            tbNumberQSOs.Location = new Point(722, 416);
+            tbNumberQSOs.Location = new Point(722, 429);
             tbNumberQSOs.Name = "tbNumberQSOs";
             tbNumberQSOs.Size = new Size(66, 23);
             tbNumberQSOs.TabIndex = 47;
@@ -905,7 +942,7 @@ namespace XMMTwrapper1
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(702, 419);
+            label1.Location = new Point(702, 432);
             label1.Name = "label1";
             label1.Size = new Size(14, 15);
             label1.TabIndex = 48;
@@ -914,7 +951,7 @@ namespace XMMTwrapper1
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(569, 213);
+            label2.Location = new Point(569, 226);
             label2.Name = "label2";
             label2.Size = new Size(45, 15);
             label2.TabIndex = 49;
@@ -924,7 +961,7 @@ namespace XMMTwrapper1
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(562, 243);
+            label3.Location = new Point(562, 256);
             label3.Name = "label3";
             label3.Size = new Size(52, 15);
             label3.TabIndex = 50;
@@ -934,7 +971,7 @@ namespace XMMTwrapper1
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(537, 272);
+            label4.Location = new Point(537, 285);
             label4.Name = "label4";
             label4.Size = new Size(77, 15);
             label4.TabIndex = 51;
@@ -944,7 +981,7 @@ namespace XMMTwrapper1
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(529, 300);
+            label5.Location = new Point(529, 313);
             label5.Name = "label5";
             label5.Size = new Size(85, 15);
             label5.TabIndex = 52;
@@ -954,7 +991,7 @@ namespace XMMTwrapper1
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(519, 329);
+            label6.Location = new Point(519, 342);
             label6.Name = "label6";
             label6.Size = new Size(95, 15);
             label6.TabIndex = 53;
@@ -964,7 +1001,7 @@ namespace XMMTwrapper1
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(558, 358);
+            label7.Location = new Point(558, 371);
             label7.Name = "label7";
             label7.Size = new Size(56, 15);
             label7.TabIndex = 54;
@@ -974,7 +1011,7 @@ namespace XMMTwrapper1
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(553, 387);
+            label8.Location = new Point(553, 400);
             label8.Name = "label8";
             label8.Size = new Size(61, 15);
             label8.TabIndex = 55;
@@ -983,7 +1020,7 @@ namespace XMMTwrapper1
             // 
             // btnClearText
             // 
-            btnClearText.Location = new Point(382, 213);
+            btnClearText.Location = new Point(382, 226);
             btnClearText.Name = "btnClearText";
             btnClearText.Size = new Size(23, 23);
             btnClearText.TabIndex = 66;
@@ -995,7 +1032,7 @@ namespace XMMTwrapper1
             // 
             label9.AutoSize = true;
             label9.Font = new Font("Verdana", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label9.Location = new Point(16, 216);
+            label9.Location = new Point(16, 229);
             label9.Name = "label9";
             label9.Size = new Size(37, 14);
             label9.TabIndex = 68;
@@ -1006,7 +1043,7 @@ namespace XMMTwrapper1
             // 
             tbRxFrequency.Font = new Font("Verdana", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             tbRxFrequency.ForeColor = Color.Green;
-            tbRxFrequency.Location = new Point(59, 210);
+            tbRxFrequency.Location = new Point(59, 223);
             tbRxFrequency.Name = "tbRxFrequency";
             tbRxFrequency.Size = new Size(119, 26);
             tbRxFrequency.TabIndex = 69;
@@ -1015,7 +1052,7 @@ namespace XMMTwrapper1
             // 
             // tbCallSignList
             // 
-            tbCallSignList.Location = new Point(418, 240);
+            tbCallSignList.Location = new Point(418, 253);
             tbCallSignList.Multiline = true;
             tbCallSignList.Name = "tbCallSignList";
             tbCallSignList.ScrollBars = ScrollBars.Vertical;
@@ -1026,7 +1063,7 @@ namespace XMMTwrapper1
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(433, 218);
+            label14.Location = new Point(433, 231);
             label14.Name = "label14";
             label14.Size = new Size(54, 15);
             label14.TabIndex = 71;
@@ -1034,7 +1071,7 @@ namespace XMMTwrapper1
             // 
             // tbPwr
             // 
-            tbPwr.Location = new Point(761, 355);
+            tbPwr.Location = new Point(761, 368);
             tbPwr.Name = "tbPwr";
             tbPwr.Size = new Size(27, 23);
             tbPwr.TabIndex = 72;
@@ -1043,7 +1080,7 @@ namespace XMMTwrapper1
             // label15
             // 
             label15.AutoSize = true;
-            label15.Location = new Point(730, 358);
+            label15.Location = new Point(730, 371);
             label15.Name = "label15";
             label15.Size = new Size(27, 15);
             label15.TabIndex = 73;
@@ -1054,7 +1091,7 @@ namespace XMMTwrapper1
             lblDUPE.AutoSize = true;
             lblDUPE.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblDUPE.ForeColor = Color.Red;
-            lblDUPE.Location = new Point(723, 203);
+            lblDUPE.Location = new Point(723, 216);
             lblDUPE.Name = "lblDUPE";
             lblDUPE.Size = new Size(67, 30);
             lblDUPE.TabIndex = 74;
@@ -1063,7 +1100,7 @@ namespace XMMTwrapper1
             // 
             // btnLookup
             // 
-            btnLookup.Location = new Point(732, 296);
+            btnLookup.Location = new Point(732, 309);
             btnLookup.Name = "btnLookup";
             btnLookup.Size = new Size(56, 23);
             btnLookup.TabIndex = 75;
@@ -1073,7 +1110,7 @@ namespace XMMTwrapper1
             // 
             // btnSend7
             // 
-            btnSend7.Location = new Point(397, 435);
+            btnSend7.Location = new Point(397, 448);
             btnSend7.Name = "btnSend7";
             btnSend7.Size = new Size(55, 23);
             btnSend7.TabIndex = 76;
@@ -1083,7 +1120,7 @@ namespace XMMTwrapper1
             // 
             // btnStopTX
             // 
-            btnStopTX.Location = new Point(19, 490);
+            btnStopTX.Location = new Point(19, 503);
             btnStopTX.Name = "btnStopTX";
             btnStopTX.Size = new Size(55, 23);
             btnStopTX.TabIndex = 77;
@@ -1093,7 +1130,7 @@ namespace XMMTwrapper1
             // 
             // btnSend8
             // 
-            btnSend8.Location = new Point(19, 461);
+            btnSend8.Location = new Point(19, 474);
             btnSend8.Name = "btnSend8";
             btnSend8.Size = new Size(55, 23);
             btnSend8.TabIndex = 78;
@@ -1103,7 +1140,7 @@ namespace XMMTwrapper1
             // 
             // btnSend9
             // 
-            btnSend9.Location = new Point(82, 461);
+            btnSend9.Location = new Point(82, 474);
             btnSend9.Name = "btnSend9";
             btnSend9.Size = new Size(55, 23);
             btnSend9.TabIndex = 79;
@@ -1113,7 +1150,7 @@ namespace XMMTwrapper1
             // 
             // btnSend10
             // 
-            btnSend10.Location = new Point(145, 461);
+            btnSend10.Location = new Point(145, 474);
             btnSend10.Name = "btnSend10";
             btnSend10.Size = new Size(55, 23);
             btnSend10.TabIndex = 80;
@@ -1123,7 +1160,7 @@ namespace XMMTwrapper1
             // 
             // btnSend11
             // 
-            btnSend11.Location = new Point(208, 461);
+            btnSend11.Location = new Point(208, 474);
             btnSend11.Name = "btnSend11";
             btnSend11.Size = new Size(55, 23);
             btnSend11.TabIndex = 81;
@@ -1133,7 +1170,7 @@ namespace XMMTwrapper1
             // 
             // btnSend12
             // 
-            btnSend12.Location = new Point(271, 461);
+            btnSend12.Location = new Point(271, 474);
             btnSend12.Name = "btnSend12";
             btnSend12.Size = new Size(55, 23);
             btnSend12.TabIndex = 82;
@@ -1143,7 +1180,7 @@ namespace XMMTwrapper1
             // 
             // btnSend13
             // 
-            btnSend13.Location = new Point(334, 461);
+            btnSend13.Location = new Point(334, 474);
             btnSend13.Name = "btnSend13";
             btnSend13.Size = new Size(55, 23);
             btnSend13.TabIndex = 83;
@@ -1153,7 +1190,7 @@ namespace XMMTwrapper1
             // 
             // btnSend14
             // 
-            btnSend14.Location = new Point(397, 461);
+            btnSend14.Location = new Point(397, 474);
             btnSend14.Name = "btnSend14";
             btnSend14.Size = new Size(55, 23);
             btnSend14.TabIndex = 84;
@@ -1161,11 +1198,44 @@ namespace XMMTwrapper1
             btnSend14.UseVisualStyleBackColor = true;
             btnSend14.Click += MacroButton_Click;
             // 
+            // tbFreeText
+            // 
+            tbFreeText.Location = new Point(149, 504);
+            tbFreeText.Name = "tbFreeText";
+            tbFreeText.Size = new Size(369, 23);
+            tbFreeText.TabIndex = 85;
+            // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Location = new Point(93, 507);
+            label16.Name = "label16";
+            label16.Size = new Size(50, 15);
+            label16.TabIndex = 86;
+            label16.Text = "FreeText";
+            // 
+            // gbJTTYcontrols
+            // 
+            gbJTTYcontrols.Location = new Point(12, 27);
+            gbJTTYcontrols.Name = "gbJTTYcontrols";
+            gbJTTYcontrols.Size = new Size(211, 187);
+            gbJTTYcontrols.TabIndex = 87;
+            gbJTTYcontrols.TabStop = false;
+            gbJTTYcontrols.Text = "JTTY";
+            // 
+            // toolStripStatusLabel3
+            // 
+            toolStripStatusLabel3.Name = "toolStripStatusLabel3";
+            toolStripStatusLabel3.Size = new Size(16, 17);
+            toolStripStatusLabel3.Text = " | ";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(802, 560);
+            ClientSize = new Size(802, 559);
+            Controls.Add(label16);
+            Controls.Add(tbFreeText);
             Controls.Add(btnSend14);
             Controls.Add(btnSend13);
             Controls.Add(btnSend12);
@@ -1225,6 +1295,7 @@ namespace XMMTwrapper1
             Controls.Add(gbRTTYbuttons);
             Controls.Add(gbCWcontrols);
             Controls.Add(lblDUPE);
+            Controls.Add(gbJTTYcontrols);
             Icon = (Icon)resources.GetObject("$this.Icon");
             KeyPreview = true;
             MainMenuStrip = menuStrip1;
@@ -1359,5 +1430,13 @@ namespace XMMTwrapper1
         private Button btnSend12;
         private Button btnSend13;
         private Button btnSend14;
+        private RadioButton btnJTTY;
+        private TextBox tbFreeText;
+        private Label label16;
+        private GroupBox gbJTTYcontrols;
+        private ToolStripStatusLabel lblWSjttyStatus;
+        private ToolStripStatusLabel toolStripStatusLabel1;
+        private ToolStripStatusLabel toolStripStatusLabel2;
+        private ToolStripStatusLabel toolStripStatusLabel3;
     }
 }

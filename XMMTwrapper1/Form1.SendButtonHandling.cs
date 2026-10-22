@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.VisualStudio.OLE.Interop;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace XMMTwrapper1
 {
@@ -85,11 +86,17 @@ namespace XMMTwrapper1
                     string outMsg = _macroProvider.ParseCW(msg.Template);
                     _serial.SendMessage(outMsg);
                 }
-                else
+                else if (btnRTTY.Checked)
                 {
                     //"RTTY:{M1}{Z" + btnStr + "}{X1}"
                     string outMsg = _macroProvider.ParseRTTY(msg.Template);
                     _NamedPipeClient.SendCommand(outMsg);
+                }
+                else if (btnJTTY.Checked)
+                {
+                    string outMsg = _macroProvider.ParseJTTY(msg.Template);
+                    if (outMsg == "") return;
+                    _jttyLink.SendTag("TXTEXT", outMsg);   // transmit text via WS
                 }
             }
         }
@@ -147,7 +154,11 @@ namespace XMMTwrapper1
             {
                 return $"{"CW"}_{strCurrentSendButtonMode}";
             }
-            else
+            else if (btnJTTY.Checked) 
+            {
+                return $"{"JTTY"}_{strCurrentSendButtonMode}";
+            }
+            else        // RTTY is default if neither CW or JTTY is selected
             {
                 return $"{"RTTY"}_{strCurrentSendButtonMode}";
             }
@@ -200,10 +211,15 @@ namespace XMMTwrapper1
                 
                 //_serial.SendMessage("{X0}");
             }
-            else
+  
+            else if (btnRTTY.Checked)
             {
                 //"RTTY:{M1}{Z" + btnStr + "}{X1}"
                 _NamedPipeClient.SendCommand("RTTY:{X0}");
+            }
+            else if (btnJTTY.Checked)
+            {
+                _jttyLink.SendTag("ABORT");          // stop via WS
             }
         }
     }

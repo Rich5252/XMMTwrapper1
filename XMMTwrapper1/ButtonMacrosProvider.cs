@@ -94,4 +94,15 @@ public class MacroProvider
         result = result.Replace("%r%", "\r\n");
         return $"{result}";
     }
+
+    public string ParseJTTY(string template)
+    {
+        string result = template;
+        foreach (var var in _substitutions)
+        {
+            result = result.Replace(var.Key, var.Value);
+        }
+        return result;  // return the text to send via JTTY link, no extra formatting
+        //return $"JTTY:{{M1}}{{Z{result}}}{{X1}}";
+    }
 }

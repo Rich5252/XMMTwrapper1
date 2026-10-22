@@ -69,7 +69,7 @@ namespace XMMTwrapper1
 
             _decoder.OnCharacterDecoded = (c) =>
             {
-                if (btnRTTY.Checked) return;
+                if (!btnCW.Checked) return;
 
                 this.BeginInvoke(new Action(() =>
                 {
