@@ -82,10 +82,10 @@ namespace XMMTwrapper1
             createNewLogBookToolStripMenuItem = new ToolStripMenuItem();
             exportCabrilloToolStripMenuItem = new ToolStripMenuItem();
             openLogDirectoryToolStripMenuItem = new ToolStripMenuItem();
-            tbTextReceived = new TextBox();
+            tbTextReceived = new RichTextBox();
             tbCallsign = new TextBox();
             PipeConnectTimer = new System.Windows.Forms.Timer(components);
-            tbReportOut = new RichTextBox();
+            tbReportOut = new TextBox();
             btnTemplate = new AxXMMBtn();
             btnSend1 = new Button();
             gbRttyCW = new GroupBox();
@@ -678,13 +678,13 @@ namespace XMMTwrapper1
             // 
             // tbTextReceived
             // 
-            tbTextReceived.AcceptsReturn = true;
+            //tbTextReceived.AcceptsReturn = true;
             tbTextReceived.AcceptsTab = true;
             tbTextReceived.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tbTextReceived.Location = new Point(12, 252);
             tbTextReceived.Multiline = true;
             tbTextReceived.Name = "tbTextReceived";
-            tbTextReceived.ScrollBars = ScrollBars.Vertical;
+            tbTextReceived.ScrollBars = RichTextBoxScrollBars.Vertical;
             tbTextReceived.Size = new Size(393, 190);
             tbTextReceived.TabIndex = 24;
             tbTextReceived.MouseDown += tbTextReceived_MouseDown;
@@ -706,7 +706,7 @@ namespace XMMTwrapper1
             // 
             // tbReportOut
             // 
-            //tbReportOut.CharacterCasing = CharacterCasing.Upper;
+            tbReportOut.CharacterCasing = CharacterCasing.Upper;
             tbReportOut.Location = new Point(620, 252);
             tbReportOut.Name = "tbReportOut";
             tbReportOut.Size = new Size(42, 23);
@@ -1361,11 +1361,11 @@ namespace XMMTwrapper1
         private RadioButton DiscrimBtn2;
         private RadioButton DiscrimBtn3;
         private GroupBox gbRttyFilters;
-        private TextBox tbTextReceived;
+        private RichTextBox tbTextReceived;
         private TextBox tbCallsign;
         private System.Windows.Forms.Timer PipeConnectTimer;
         private ToolStripStatusLabel lblPipeStatus;
-        private RichTextBox tbReportOut;
+        private TextBox tbReportOut;
         private AxXMMBtn btnTemplate;
         private Button btnSend1;
         private GroupBox gbRttyCW;

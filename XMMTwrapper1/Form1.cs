@@ -1,5 +1,3 @@
-
-using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
 
 namespace XMMTwrapper1

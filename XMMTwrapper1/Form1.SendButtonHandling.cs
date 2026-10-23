@@ -1,7 +1,5 @@
-﻿
-using Microsoft.VisualStudio.OLE.Interop;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
+﻿using System.Text;
+
 
 namespace XMMTwrapper1
 {
@@ -106,7 +104,7 @@ namespace XMMTwrapper1
             {
                 string outMsg = _macroProvider.ParseJTTY(MacroTemplate);
                 if (outMsg == "") return;
-                _jttyLink.SendTag("TXTEXT", outMsg);   // transmit text via WS
+                _jttyLink.SendTag("TXTEXT", outMsg.ToUpper());   // transmit text via WS
             }
         }
 

@@ -3,9 +3,10 @@
 // Receive: WS decodes JTTY and sends the text to us over its MMTTY-style TCP link
 //          (JttyLink). Start WS with  --mode jtty -p <port>  using the port in settings.ini
 //          [JTTY] Port. WS takes its audio from SDRuno, as MMTTY does.
-// Transmit: same route as RTTY - macros go down the TXLink named pipe as
-//          JTTY:{Z<text>}{X1}   and Stop sends   JTTY:{X0}
-//          TXLink encodes the text and drives the Nano. Nothing is sent to WS.
+// Transmit: WS receives our text over the same TCP link and keys the transmitter via its
+//          TXLink interface.
+// Startup:  WS must be started with  -p <port> --n1mm-rxtext-info as it only looks for tcp
+//          connection at startup. Hence this app normally starts WS.
 // TX state: TXLink reports {TXS} when it keys up and {TXE} when its queue has run empty.
 //          While transmitting (plus a short holdoff) decoded text from WS is suppressed,
 //          because the SDRuno receiver hears our own signal.
@@ -59,8 +60,8 @@ namespace XMMTwrapper1
             try
             {
                 _jttyLink.Start(port);      //start looking before WS starts, so we don't miss its connect
-                LaunchWsIfNeeded(port);
                 lblWSjttyStatus.Text = $"Waiting for WS on port {port}";
+                LaunchWsIfNeeded(port);         
             }
             catch (Exception ex)
             {
