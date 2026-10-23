@@ -140,8 +140,8 @@ namespace XMMTwrapper1
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
             cbAutoClearFreeText = new CheckBox();
-            this.panelButtons = new Panel();
-            this.panelLogging = new Panel();
+            panelButtons = new Panel();
+            panelLogging = new Panel();
             panelTextReceived = new Panel();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
@@ -159,8 +159,8 @@ namespace XMMTwrapper1
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnTemplate).BeginInit();
             gbRttyCW.SuspendLayout();
-            this.panelButtons.SuspendLayout();
-            this.panelLogging.SuspendLayout();
+            panelButtons.SuspendLayout();
+            panelLogging.SuspendLayout();
             panelTextReceived.SuspendLayout();
             SuspendLayout();
             // 
@@ -688,10 +688,10 @@ namespace XMMTwrapper1
             tbTextReceived.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tbTextReceived.Location = new Point(3, 39);
             tbTextReceived.Name = "tbTextReceived";
-            tbTextReceived.ScrollBars = RichTextBoxScrollBars.Vertical;
             tbTextReceived.Size = new Size(393, 200);
             tbTextReceived.TabIndex = 24;
             tbTextReceived.Text = "";
+            tbTextReceived.WordWrap = false;
             tbTextReceived.MouseDown += tbTextReceived_MouseDown;
             // 
             // tbCallsign
@@ -1249,64 +1249,64 @@ namespace XMMTwrapper1
             // 
             // panelButtons
             // 
-            this.panelButtons.Controls.Add(btnSend4);
-            this.panelButtons.Controls.Add(cbAutoClearFreeText);
-            this.panelButtons.Controls.Add(btnSend1);
-            this.panelButtons.Controls.Add(label16);
-            this.panelButtons.Controls.Add(btnSend2);
-            this.panelButtons.Controls.Add(tbFreeText);
-            this.panelButtons.Controls.Add(btnSend3);
-            this.panelButtons.Controls.Add(btnSend14);
-            this.panelButtons.Controls.Add(btnSend5);
-            this.panelButtons.Controls.Add(btnSend13);
-            this.panelButtons.Controls.Add(btnSend6);
-            this.panelButtons.Controls.Add(btnSend12);
-            this.panelButtons.Controls.Add(cbEditButton);
-            this.panelButtons.Controls.Add(btnSend11);
-            this.panelButtons.Controls.Add(btnSend7);
-            this.panelButtons.Controls.Add(btnSend10);
-            this.panelButtons.Controls.Add(btnStopTX);
-            this.panelButtons.Controls.Add(btnSend9);
-            this.panelButtons.Controls.Add(btnSend8);
-            this.panelButtons.Location = new Point(12, 476);
-            this.panelButtons.Name = "panelButtons";
-            this.panelButtons.Size = new Size(519, 88);
-            this.panelButtons.TabIndex = 89;
+            panelButtons.Controls.Add(btnSend4);
+            panelButtons.Controls.Add(cbAutoClearFreeText);
+            panelButtons.Controls.Add(btnSend1);
+            panelButtons.Controls.Add(label16);
+            panelButtons.Controls.Add(btnSend2);
+            panelButtons.Controls.Add(tbFreeText);
+            panelButtons.Controls.Add(btnSend3);
+            panelButtons.Controls.Add(btnSend14);
+            panelButtons.Controls.Add(btnSend5);
+            panelButtons.Controls.Add(btnSend13);
+            panelButtons.Controls.Add(btnSend6);
+            panelButtons.Controls.Add(btnSend12);
+            panelButtons.Controls.Add(cbEditButton);
+            panelButtons.Controls.Add(btnSend11);
+            panelButtons.Controls.Add(btnSend7);
+            panelButtons.Controls.Add(btnSend10);
+            panelButtons.Controls.Add(btnStopTX);
+            panelButtons.Controls.Add(btnSend9);
+            panelButtons.Controls.Add(btnSend8);
+            panelButtons.Location = new Point(12, 476);
+            panelButtons.Name = "panelButtons";
+            panelButtons.Size = new Size(519, 88);
+            panelButtons.TabIndex = 89;
             // 
             // panelLogging
             // 
-            this.panelLogging.Controls.Add(tbOpName);
-            this.panelLogging.Controls.Add(lblDUPE);
-            this.panelLogging.Controls.Add(btnLookup);
-            this.panelLogging.Controls.Add(tbCallsign);
-            this.panelLogging.Controls.Add(label15);
-            this.panelLogging.Controls.Add(tbReportOut);
-            this.panelLogging.Controls.Add(tbPwr);
-            this.panelLogging.Controls.Add(tbComment);
-            this.panelLogging.Controls.Add(label14);
-            this.panelLogging.Controls.Add(tbSerialNumOut);
-            this.panelLogging.Controls.Add(tbCallSignList);
-            this.panelLogging.Controls.Add(tbReportIn);
-            this.panelLogging.Controls.Add(tbSerialNumIn);
-            this.panelLogging.Controls.Add(tbQTH);
-            this.panelLogging.Controls.Add(tbLocator);
-            this.panelLogging.Controls.Add(btnSerialNumInc);
-            this.panelLogging.Controls.Add(label8);
-            this.panelLogging.Controls.Add(btnSerialNumDec);
-            this.panelLogging.Controls.Add(label7);
-            this.panelLogging.Controls.Add(cbSerialNumAutoInc);
-            this.panelLogging.Controls.Add(label6);
-            this.panelLogging.Controls.Add(btnLogQSO);
-            this.panelLogging.Controls.Add(label5);
-            this.panelLogging.Controls.Add(tbNumberQSOs);
-            this.panelLogging.Controls.Add(label4);
-            this.panelLogging.Controls.Add(label1);
-            this.panelLogging.Controls.Add(label3);
-            this.panelLogging.Controls.Add(label2);
-            this.panelLogging.Location = new Point(414, 221);
-            this.panelLogging.Name = "panelLogging";
-            this.panelLogging.Size = new Size(374, 249);
-            this.panelLogging.TabIndex = 90;
+            panelLogging.Controls.Add(tbOpName);
+            panelLogging.Controls.Add(lblDUPE);
+            panelLogging.Controls.Add(btnLookup);
+            panelLogging.Controls.Add(tbCallsign);
+            panelLogging.Controls.Add(label15);
+            panelLogging.Controls.Add(tbReportOut);
+            panelLogging.Controls.Add(tbPwr);
+            panelLogging.Controls.Add(tbComment);
+            panelLogging.Controls.Add(label14);
+            panelLogging.Controls.Add(tbSerialNumOut);
+            panelLogging.Controls.Add(tbCallSignList);
+            panelLogging.Controls.Add(tbReportIn);
+            panelLogging.Controls.Add(tbSerialNumIn);
+            panelLogging.Controls.Add(tbQTH);
+            panelLogging.Controls.Add(tbLocator);
+            panelLogging.Controls.Add(btnSerialNumInc);
+            panelLogging.Controls.Add(label8);
+            panelLogging.Controls.Add(btnSerialNumDec);
+            panelLogging.Controls.Add(label7);
+            panelLogging.Controls.Add(cbSerialNumAutoInc);
+            panelLogging.Controls.Add(label6);
+            panelLogging.Controls.Add(btnLogQSO);
+            panelLogging.Controls.Add(label5);
+            panelLogging.Controls.Add(tbNumberQSOs);
+            panelLogging.Controls.Add(label4);
+            panelLogging.Controls.Add(label1);
+            panelLogging.Controls.Add(label3);
+            panelLogging.Controls.Add(label2);
+            panelLogging.Location = new Point(414, 221);
+            panelLogging.Name = "panelLogging";
+            panelLogging.Size = new Size(374, 249);
+            panelLogging.TabIndex = 90;
             // 
             // panelTextReceived
             // 
@@ -1327,8 +1327,8 @@ namespace XMMTwrapper1
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(804, 587);
             Controls.Add(panelTextReceived);
-            Controls.Add(this.panelLogging);
-            Controls.Add(this.panelButtons);
+            Controls.Add(panelLogging);
+            Controls.Add(panelButtons);
             Controls.Add(gbRttyCW);
             Controls.Add(statusStrip1);
             Controls.Add(menuStrip1);
@@ -1368,10 +1368,10 @@ namespace XMMTwrapper1
             ((System.ComponentModel.ISupportInitialize)btnTemplate).EndInit();
             gbRttyCW.ResumeLayout(false);
             gbRttyCW.PerformLayout();
-            this.panelButtons.ResumeLayout(false);
-            this.panelButtons.PerformLayout();
-            this.panelLogging.ResumeLayout(false);
-            this.panelLogging.PerformLayout();
+            panelButtons.ResumeLayout(false);
+            panelButtons.PerformLayout();
+            panelLogging.ResumeLayout(false);
+            panelLogging.PerformLayout();
             panelTextReceived.ResumeLayout(false);
             panelTextReceived.PerformLayout();
             ResumeLayout(false);
