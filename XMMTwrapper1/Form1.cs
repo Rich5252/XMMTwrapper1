@@ -101,6 +101,7 @@ namespace XMMTwrapper1
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            CaptureResizeLayout();      //note design layout margins before saved window size is applied
             BuildMmttyButtons();
             _serial.Connect("COM3", 115200);            //Keyer
 
@@ -163,10 +164,6 @@ namespace XMMTwrapper1
 
             //diagnostic to explore ocx interface
             //DumpSpecDrawSignature();
-        }
-
-        private void Form1_Resize(object sender, EventArgs e)
-        {
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
