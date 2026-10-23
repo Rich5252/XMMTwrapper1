@@ -220,7 +220,7 @@ namespace XMMTwrapper1
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = wsPath,
-                    Arguments = $"-p {port}",
+                    Arguments = $"-p {port} --n1mm-rxtext-info",
                     WorkingDirectory = Path.GetDirectoryName(wsPath)!,
                     UseShellExecute = true,
                 });
