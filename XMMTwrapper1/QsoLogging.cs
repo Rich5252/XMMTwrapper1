@@ -10,6 +10,7 @@ public class QsoEntry
     public string Date { get; set; }                //these are created internally from TimeStamp
     public string Time { get; set; }
     public string Mode { get; set; } = "CW";
+    public string SubMode { get; set; } = "";
     public string RstSent { get; set; } = "";
     public string RstRcvd { get; set; } = "";
     public string Comment { get; set; } = "";
@@ -97,6 +98,7 @@ public class AdifLogger
         sb.Append(FormatAdifTag("TIME_ON", entry.Time));        // WinLog32 didnt like QSO_TIME
         sb.Append(FormatAdifTag("FREQ", freqStr));              //pre formatted by client eg "28.180"
         sb.Append(FormatAdifTag("MODE", entry.Mode));
+        sb.Append(FormatAdifTag("SUBMODE", entry.SubMode));
         sb.Append(FormatAdifTag("RST_SENT", entry.RstSent));
         sb.Append(FormatAdifTag("RST_RCVD", entry.RstRcvd));
         sb.Append(FormatAdifTag("TX_PWR", entry.Power));
@@ -137,6 +139,7 @@ public class AdifLogger
                 Time = GetAdifElement(line, "<TIME_ON:"),
                 FrequencyMHz = GetAdifElement(line, "<FREQ:"),
                 Mode = GetAdifElement(line, "<MODE:"),
+                SubMode = GetAdifElement(line, "<SUBMODE:"),
                 RstSent = GetAdifElement(line, "<RST_SENT:"),
                 RstRcvd = GetAdifElement(line, "<RST_RCVD:")
             };

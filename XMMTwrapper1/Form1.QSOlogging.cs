@@ -40,8 +40,10 @@ namespace XMMTwrapper1
             if (freq.Length > 4) freq = freq.Substring(0, freq.Length-4);       //28.189.000 in UI, needs 28.180 in log
             newEntry.FrequencyMHz = freq;                                       //in log kHz res format eg 28.180
             newEntry.Timestamp = DateTime.UtcNow;
-            newEntry.Mode = btnCW.Checked ? "CW" : "RTTY";
+            newEntry.Mode = btnCW.Checked ? "CW" : btnRTTY.Checked ? "RTTY" : "MFSK";
+            if (btnJTTY.Checked) newEntry.SubMode = "JTTY";
 
+            //<mode:4>MFSK <submode:3>FT4
             //combine report & serial num
             string str = tbReportOut.Text;
             if (tbSerialNumOut.Text != "") str = str + " " + tbSerialNumOut.Text;
