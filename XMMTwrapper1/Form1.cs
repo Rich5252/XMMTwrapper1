@@ -27,6 +27,8 @@ namespace XMMTwrapper1
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
+        private bool tbReportOutAuto = false;                //flag to indicate report out was auto filled from received text
+        
         public Form1()
         {
             Log.Mark("Form1 before init");
@@ -235,6 +237,7 @@ namespace XMMTwrapper1
             TextBoxWordSelect.SelectWordAtClick(tb, e);
             string selectedWord = tb.SelectedText.Trim();
             if (string.IsNullOrEmpty(selectedWord)) return;
+            string LogRST = TextBoxWordSelect.GetReportOnSelectedLine(tb, selectReport: true);
 
             if (isCtrlDown && !isShiftDown)
             {
@@ -267,8 +270,13 @@ namespace XMMTwrapper1
             else
             {
                 // No modifier keys, copy to callsign
-                ClearDownUiAfterLog();
+                ClearDownUiAfterLog();              //clears tbReportOut if it was auto filled from received text
                 tbCallsign.Text = selectedWord;
+                tbReportOutAuto =  tbReportOut.Text == "" ?  true : false;        //set flag to indicate report out was auto filled from received text
+                if (btnJTTY.Checked && LogRST != null && tbReportOutAuto)
+                {
+                    tbReportOut.Text = LogRST.Length >= 3 ? LogRST.Substring(0, 3) : LogRST;                 
+                }
             }
         }
 
