@@ -10,8 +10,10 @@
 
 namespace XMMTwrapper1
 {
+    [System.ComponentModel.DesignerCategory("Code")]
     public partial class Form1
     {
+
         private bool _layoutCaptured = false;
 
         // form edge -> panel
