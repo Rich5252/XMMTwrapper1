@@ -85,7 +85,7 @@ namespace XMMTwrapper1
             tbTextReceived = new TextBox();
             tbCallsign = new TextBox();
             PipeConnectTimer = new System.Windows.Forms.Timer(components);
-            tbReportOut = new TextBox();
+            tbReportOut = new RichTextBox();
             btnTemplate = new AxXMMBtn();
             btnSend1 = new Button();
             gbRttyCW = new GroupBox();
@@ -706,7 +706,7 @@ namespace XMMTwrapper1
             // 
             // tbReportOut
             // 
-            tbReportOut.CharacterCasing = CharacterCasing.Upper;
+            //tbReportOut.CharacterCasing = CharacterCasing.Upper;
             tbReportOut.Location = new Point(620, 252);
             tbReportOut.Name = "tbReportOut";
             tbReportOut.Size = new Size(42, 23);
@@ -1365,7 +1365,7 @@ namespace XMMTwrapper1
         private TextBox tbCallsign;
         private System.Windows.Forms.Timer PipeConnectTimer;
         private ToolStripStatusLabel lblPipeStatus;
-        private TextBox tbReportOut;
+        private RichTextBox tbReportOut;
         private AxXMMBtn btnTemplate;
         private Button btnSend1;
         private GroupBox gbRttyCW;
