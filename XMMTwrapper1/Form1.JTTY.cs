@@ -58,7 +58,8 @@ namespace XMMTwrapper1
 
             try
             {
-                _jttyLink.Start(port);
+                _jttyLink.Start(port);      //start looking before WS starts, so we don't miss its connect
+                LaunchWsIfNeeded(port);
                 lblWSjttyStatus.Text = $"Waiting for WS on port {port}";
             }
             catch (Exception ex)
@@ -189,6 +190,46 @@ namespace XMMTwrapper1
             _jttyTxActive = false;
             btnStopTX.BackColor = SystemColors.Control;
             btnStopTX.UseVisualStyleBackColor = true;
+        }
+
+        // settings.ini [JTTY]
+        //   WsPath=C:\path\to\ws.exe     (blank = don't launch)
+        //   AutoStartWs=True
+        private void LaunchWsIfNeeded(int port)
+        {
+            if (!_ini.GetValue("JTTY", "AutoStartWs", "True")
+                     .Equals("True", StringComparison.OrdinalIgnoreCase)) return;
+
+            string wsPath = _ini.GetValue("JTTY", "WsPath", "");
+            if (wsPath == "" || !File.Exists(wsPath))
+            {
+                lblWSjttyStatus.Text = "WS path not set - start WS manually";
+                return;
+            }
+
+            // Already running? It won't connect to us, so tell the user rather than start a second copy
+            string exeName = Path.GetFileNameWithoutExtension(wsPath);
+            if (System.Diagnostics.Process.GetProcessesByName(exeName).Length > 0)
+            {
+                lblWSjttyStatus.Text = "WS already running - restart it to connect";
+                return;
+            }
+
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = wsPath,
+                    Arguments = $"-p {port}",
+                    WorkingDirectory = Path.GetDirectoryName(wsPath)!,
+                    UseShellExecute = true,
+                });
+                lblWSjttyStatus.Text = $"Starting WS on port {port}...";
+            }
+            catch (Exception ex)
+            {
+                lblWSjttyStatus.Text = $"Could not start WS: {ex.Message}";
+            }
         }
     }
 }
