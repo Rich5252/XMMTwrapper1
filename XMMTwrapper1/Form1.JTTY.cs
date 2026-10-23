@@ -14,7 +14,7 @@
 // settings.ini, section [JTTY]:
 //   Port=52001            TCP port WS connects to (must match WS -p)
 //   SuppressOwnTx=True    hide decodes of our own transmission
-//   RxHoldoffMs=2500      keep suppressing this long after {TXE} (WS decode latency)
+//   RxHoldoffMs=0         optional: keep suppressing RX this long after {TXE} (0 = off)
 
 namespace XMMTwrapper1
 {
@@ -27,7 +27,7 @@ namespace XMMTwrapper1
         private bool _jttyLastWasCR = false;                // for CRLF folding across fragments
 
         private bool _jttySuppressOwnTx = true;
-        private int _jttyRxHoldoffMs = 2500;
+        private int _jttyRxHoldoffMs = 0;
 
         // A lost {TXE} must not mute the receiver for ever
         private static readonly TimeSpan JttyTxWatchdog = TimeSpan.FromSeconds(120);
@@ -51,7 +51,7 @@ namespace XMMTwrapper1
             int port = TextToInt(_ini.GetValue("JTTY", "Port", "52001"));
             _jttySuppressOwnTx = _ini.GetValue("JTTY", "SuppressOwnTx", "True")
                 .Equals("True", StringComparison.OrdinalIgnoreCase);
-            _jttyRxHoldoffMs = TextToInt(_ini.GetValue("JTTY", "RxHoldoffMs", "2500"));
+            _jttyRxHoldoffMs = TextToInt(_ini.GetValue("JTTY", "RxHoldoffMs", "0"));
 
             _jttyLink.RxText += OnJttyRxText;
             _jttyLink.TagReceived += OnJttyTagReceived;
@@ -79,6 +79,8 @@ namespace XMMTwrapper1
 
         private void btnJTTY_CheckedChanged(object? sender, EventArgs e)
         {
+            _jttyTxLineOpen = false;                    // SelectMode clears the text box
+            _jttySkipRxNewline = false;
             SelectMode();
         }
 
@@ -95,6 +97,22 @@ namespace XMMTwrapper1
         private void OnJttyRxText(string text)
         {
             if (!btnJTTY.Checked) return;
+
+            // {TXE} lost for too long - stop treating text as our own TX
+            if (_jttyTxActive && DateTime.UtcNow - _jttyTxStartedUtc >= JttyTxWatchdog)
+            {
+                _jttyTxActive = false;
+                Log.Mark("JTTY: TX watchdog expired without {TXE}");
+            }
+
+            // Between our TXTEXT and OUTPUTCOMPLETE, WS is echoing our own text
+            if (_jttyTxActive)
+            {
+                ShowTxEcho(text);
+                return;
+            }
+            CloseTxLine();                              // finish any open yellow line
+
             if (IsJttyRxSuppressed()) return;
 
             // Feed one character at a time so DisplayNextChar's CR/LF handling and the
@@ -102,6 +120,14 @@ namespace XMMTwrapper1
             // WS puts \r\n before each new message - fold CRLF (or a lone LF) to a single CR.
             foreach (char c in text)
             {
+                // we are already at the start of a line after our TX line: skip WS's leading return
+                if ((c == '\r' || c == '\n') && _jttySkipRxNewline)
+                {
+                    _jttyLastWasCR = (c == '\r');
+                    continue;
+                }
+                _jttySkipRxNewline = false;
+
                 if (c == '\n')
                 {
                     if (_jttyLastWasCR) { _jttyLastWasCR = false; continue; }
@@ -136,15 +162,57 @@ namespace XMMTwrapper1
 
             if (tag == "OUTPUTCOMPLETE")
             {
-                TryHandleJttyPipeMessage("{TXE}");      // end TX, start RX holdoff
-
-                if (btnJTTY.Checked)
-                {
-                    // Bypass OnJttyRxText so suppression can't hide it
-                    DisplayNextChar(" ETX");
-                    DisplayNextChar("\r");               // next decode starts on a new line
-                }
+                TryHandleJttyPipeMessage("{TXE}");      // end TX (and optional RX holdoff)
+                CloseTxLine();                          // WS echoes all of our TX before this tag
             }
+        }
+
+        // ---------------------------------------------------------------- TX echo (yellow)
+
+        private bool _jttyTxLineOpen = false;       // a yellow TX line is currently being built
+        private bool _jttyTxPendingSpace = false;   // WS sent a return between two TXTEXTs
+        private bool _jttySkipRxNewline = false;    // swallow WS's leading return after a TX line
+
+        // WS echoes each TXTEXT with a leading return. Join all the TXTEXTs of one
+        // transmission onto a single highlighted line, space separated.
+        // Bypasses DisplayNextChar so our own calls don't reach the callsign checker.
+        private void ShowTxEcho(string text)
+        {
+            foreach (char c in text)
+            {
+                if (c == '\r' || c == '\n') { _jttyTxPendingSpace = _jttyTxLineOpen; continue; }
+
+                if (!_jttyTxLineOpen)
+                {
+                    // start our TX on a fresh line
+                    if (tbTextReceived.TextLength > 0 && lastChar != Environment.NewLine)
+                        tbTextReceived.AppendText(Environment.NewLine);
+                    _jttyTxLineOpen = true;
+                }
+                if (_jttyTxPendingSpace) { AppendTx(" "); _jttyTxPendingSpace = false; }
+                AppendTx(c.ToString());
+            }
+            tbTextReceived.ScrollToCaret();
+        }
+
+        private void AppendTx(string s)
+        {
+            tbTextReceived.SelectionStart = tbTextReceived.TextLength;
+            tbTextReceived.SelectionLength = 0;
+            tbTextReceived.SelectionBackColor = Color.Yellow;
+            tbTextReceived.AppendText(s);
+            tbTextReceived.SelectionBackColor = tbTextReceived.BackColor;   // so later RX text isn't yellow
+            lastChar = s;
+        }
+
+        private void CloseTxLine()
+        {
+            if (!_jttyTxLineOpen) return;
+            tbTextReceived.AppendText(Environment.NewLine);
+            lastChar = Environment.NewLine;
+            _jttyTxLineOpen = false;
+            _jttyTxPendingSpace = false;
+            _jttySkipRxNewline = true;              // next RX message starts on this fresh line
         }
 
         // ---------------------------------------------------------------- transmit

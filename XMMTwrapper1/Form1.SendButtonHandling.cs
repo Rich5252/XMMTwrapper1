@@ -104,7 +104,10 @@ namespace XMMTwrapper1
             {
                 string outMsg = _macroProvider.ParseJTTY(MacroTemplate);
                 if (outMsg == "") return;
-                _jttyLink.SendTag("TXTEXT", outMsg.ToUpper());   // transmit text via WS
+                if (_jttyLink.SendTag("TXTEXT", outMsg.ToUpper()))     // transmit text via WS
+                    TryHandleJttyPipeMessage("{TXS}");                 // TX started: WS echo is shown as TX
+                else
+                    lblWSjttyStatus.Text = "WS not connected - not sent";
             }
         }
 
@@ -227,6 +230,8 @@ namespace XMMTwrapper1
             else if (btnJTTY.Checked)
             {
                 _jttyLink.SendTag("ABORT");          // stop via WS
+                TryHandleJttyPipeMessage("{TXE}");   // WS may not send OUTPUTCOMPLETE after an abort
+                CloseTxLine();
             }
         }
     }

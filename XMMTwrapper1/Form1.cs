@@ -26,7 +26,7 @@ namespace XMMTwrapper1
         private static extern IntPtr GetForegroundWindow();
 
         private bool tbReportOutAuto = false;                //flag to indicate report out was auto filled from received text
-        
+
         public Form1()
         {
             Log.Mark("Form1 before init");
@@ -119,9 +119,9 @@ namespace XMMTwrapper1
 
 
             //restore contest settings
-            tbReportOut.Text = _ini.GetValue("General", "ReportOut", "599");
+            tbReportOut.Text = _ini.GetValue("General", "ReportOut", "");
             tbSerialNumOut.Text = _ini.GetValue("General", "SerialNumOut", "");
-            tbReportIn.Text = _ini.GetValue("General", "ReportIn", "599");
+            tbReportIn.Text = _ini.GetValue("General", "ReportIn", "");
             tbSerialNumIn.Text = _ini.GetValue("General", "SerialNumIn", "");
             string autoInc = _ini.GetValue("General", "AutoIncr", "false");
             cbSerialNumAutoInc.Checked = (autoInc == "True");
@@ -163,6 +163,10 @@ namespace XMMTwrapper1
 
             //diagnostic to explore ocx interface
             //DumpSpecDrawSignature();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -270,10 +274,10 @@ namespace XMMTwrapper1
                 // No modifier keys, copy to callsign
                 ClearDownUiAfterLog();              //clears tbReportOut if it was auto filled from received text
                 tbCallsign.Text = selectedWord;
-                tbReportOutAuto =  tbReportOut.Text == "" ?  true : false;        //set flag to indicate report out was auto filled from received text
+                tbReportOutAuto = tbReportOut.Text == "" ? true : false;        //set flag to indicate report out was auto filled from received text
                 if (btnJTTY.Checked && LogRST != null && tbReportOutAuto)
                 {
-                    tbReportOut.Text = LogRST.Length >= 3 ? LogRST.Substring(0, 3) : LogRST;                 
+                    tbReportOut.Text = LogRST.Length >= 3 ? LogRST.Substring(0, 3) : LogRST;
                 }
             }
         }
@@ -414,5 +418,7 @@ namespace XMMTwrapper1
                 }
             }
         }
+
+
     }
 }
