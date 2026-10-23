@@ -395,6 +395,18 @@ namespace XMMTwrapper1
             }
         }
 
+        private void tbFreeText_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13) // Enter key
+            {
+                e.Handled = true;
+                SendOutputMacro(tbFreeText.Text);
 
+                if (cbAutoClearFreeText.Checked)
+                {
+                    tbFreeText.Clear();
+                }
+            }
+        }
     }
 }

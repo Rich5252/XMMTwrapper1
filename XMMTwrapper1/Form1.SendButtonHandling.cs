@@ -70,34 +70,43 @@ namespace XMMTwrapper1
             else
             {
                 // 2. SEND MODE
-                //Special case of BARTG RTTY contest that includes HHMM after serial num
-                // if no time generated yet add it to serial num. eg 001-1533
-                // note serial number update resets this each time
-                if (msg.Template.Contains("%TimOut") && !tbSerialNumOut.Text.Contains("-"))
-                {
-                    string timeStr = DateTime.Now.ToString("HHmm");
-                    tbSerialNumOut.Text = $"{tbSerialNumOut.Text}-{timeStr}";
-                }
-                // Update variables from textboxes right before parsing
-                UpdateButtonMacroInserts();
-               
-                if (btnCW.Checked)
-                {
-                    string outMsg = _macroProvider.ParseCW(msg.Template);
-                    _serial.SendMessage(outMsg);
-                }
-                else if (btnRTTY.Checked)
-                {
-                    //"RTTY:{M1}{Z" + btnStr + "}{X1}"
-                    string outMsg = _macroProvider.ParseRTTY(msg.Template);
-                    _NamedPipeClient.SendCommand(outMsg);
-                }
-                else if (btnJTTY.Checked)
-                {
-                    string outMsg = _macroProvider.ParseJTTY(msg.Template);
-                    if (outMsg == "") return;
-                    _jttyLink.SendTag("TXTEXT", outMsg);   // transmit text via WS
-                }
+                
+
+                SendOutputMacro(msg.Template);
+                
+            }
+        }
+
+        private void SendOutputMacro(string MacroTemplate)
+        {
+            //Special case of BARTG RTTY contest that includes HHMM after serial num
+            // if no time generated yet add it to serial num. eg 001-1533
+            // note serial number update resets this each time
+            if (MacroTemplate.Contains("%TimOut") && !tbSerialNumOut.Text.Contains("-"))
+            {
+                string timeStr = DateTime.Now.ToString("HHmm");
+                tbSerialNumOut.Text = $"{tbSerialNumOut.Text}-{timeStr}";
+            }
+
+            // Update macro variable set before parsing
+            UpdateButtonMacroInserts();
+            if (btnCW.Checked)
+            {
+                string outMsg = _macroProvider.ParseCW(MacroTemplate);
+                if (outMsg == "") return;
+                _serial.SendMessage(outMsg);
+            }
+            else if (btnRTTY.Checked)
+            {
+                string outMsg = _macroProvider.ParseRTTY(MacroTemplate);
+                if (outMsg == "") return;
+                _NamedPipeClient.SendCommand(outMsg);
+            }
+            else if (btnJTTY.Checked)
+            {
+                string outMsg = _macroProvider.ParseJTTY(MacroTemplate);
+                if (outMsg == "") return;
+                _jttyLink.SendTag("TXTEXT", outMsg);   // transmit text via WS
             }
         }
 

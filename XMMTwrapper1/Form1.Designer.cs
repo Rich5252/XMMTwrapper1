@@ -68,6 +68,7 @@ namespace XMMTwrapper1
             pnlKeyIndicator = new Panel();
             statusStrip1 = new StatusStrip();
             lblMMTTYstatus = new ToolStripStatusLabel();
+            toolStripStatusLabel3 = new ToolStripStatusLabel();
             lblPipeStatus = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             lblWSjttyStatus = new ToolStripStatusLabel();
@@ -138,7 +139,7 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
-            toolStripStatusLabel3 = new ToolStripStatusLabel();
+            cbAutoClearFreeText = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -579,6 +580,12 @@ namespace XMMTwrapper1
             lblMMTTYstatus.Size = new Size(82, 17);
             lblMMTTYstatus.Text = "MMTTY status";
             lblMMTTYstatus.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // toolStripStatusLabel3
+            // 
+            toolStripStatusLabel3.Name = "toolStripStatusLabel3";
+            toolStripStatusLabel3.Size = new Size(16, 17);
+            toolStripStatusLabel3.Text = " | ";
             // 
             // lblPipeStatus
             // 
@@ -1202,8 +1209,9 @@ namespace XMMTwrapper1
             // 
             tbFreeText.Location = new Point(149, 504);
             tbFreeText.Name = "tbFreeText";
-            tbFreeText.Size = new Size(369, 23);
+            tbFreeText.Size = new Size(303, 23);
             tbFreeText.TabIndex = 85;
+            tbFreeText.KeyPress += tbFreeText_KeyPress;
             // 
             // label16
             // 
@@ -1223,17 +1231,23 @@ namespace XMMTwrapper1
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
             // 
-            // toolStripStatusLabel3
+            // cbAutoClearFreeText
             // 
-            toolStripStatusLabel3.Name = "toolStripStatusLabel3";
-            toolStripStatusLabel3.Size = new Size(16, 17);
-            toolStripStatusLabel3.Text = " | ";
+            cbAutoClearFreeText.AutoSize = true;
+            cbAutoClearFreeText.CheckAlign = ContentAlignment.MiddleRight;
+            cbAutoClearFreeText.Location = new Point(465, 506);
+            cbAutoClearFreeText.Name = "cbAutoClearFreeText";
+            cbAutoClearFreeText.Size = new Size(53, 19);
+            cbAutoClearFreeText.TabIndex = 88;
+            cbAutoClearFreeText.Text = "Clear";
+            cbAutoClearFreeText.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(802, 559);
+            Controls.Add(cbAutoClearFreeText);
             Controls.Add(label16);
             Controls.Add(tbFreeText);
             Controls.Add(btnSend14);
@@ -1438,5 +1452,6 @@ namespace XMMTwrapper1
         private ToolStripStatusLabel toolStripStatusLabel1;
         private ToolStripStatusLabel toolStripStatusLabel2;
         private ToolStripStatusLabel toolStripStatusLabel3;
+        private CheckBox cbAutoClearFreeText;
     }
 }
