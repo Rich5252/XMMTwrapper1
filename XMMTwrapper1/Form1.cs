@@ -26,7 +26,8 @@ namespace XMMTwrapper1
         private static extern IntPtr GetForegroundWindow();
 
         private bool tbReportOutAuto = false;                //flag to indicate report out was auto filled from received text
-
+        private bool tbReportInAuto = false;                 //flag to indicate report in was auto filled from received text
+                                                             //
         public Form1()
         {
             Log.Mark("Form1 before init");
@@ -249,6 +250,7 @@ namespace XMMTwrapper1
                 {
                     tbReportIn.Text = selectedWord.Length >= 3 ? selectedWord.Substring(0, 3) : selectedWord;
                     tbSerialNumIn.Text = selectedWord.Length > 3 ? selectedWord.Substring(3) : "";
+                    tbReportInAuto = true;        //set flag to indicate report in was auto filled from received text
                 }
                 else
                 {

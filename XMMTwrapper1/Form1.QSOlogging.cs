@@ -78,6 +78,7 @@ namespace XMMTwrapper1
             tbComment.Text = "";
             ClearSerialNumOutTim();
             if (tbReportOutAuto) { tbReportOut.Text = ""; }          //only clear if auto filled from received text
+            if (tbReportInAuto) { tbReportIn.Text = ""; }            //only clear if auto filled from received text
         }
 
 
