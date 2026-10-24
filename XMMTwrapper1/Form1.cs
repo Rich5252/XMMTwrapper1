@@ -25,9 +25,6 @@ namespace XMMTwrapper1
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
-        private bool tbReportOutAuto = false;                //flag to indicate report out was auto filled from received text
-        private bool tbReportInAuto = false;                 //flag to indicate report in was auto filled from received text
-                                                             //
         public Form1()
         {
             Log.Mark("Form1 before init");
@@ -254,16 +251,16 @@ namespace XMMTwrapper1
             }
             else if (isShiftDown && !isCtrlDown)        // If Shift is down, copy report in
             {
+                string rpt = TextBoxWordSelect.StripRogerPrefix(selectedWord);   // "R+00" -> "+00"
+
                 if (tbReportIn.Text == "")
                 {
-                    tbReportIn.Text = selectedWord.Length >= 3 ? selectedWord.Substring(0, 3) : selectedWord;
-                    tbSerialNumIn.Text = selectedWord.Length > 3 ? selectedWord.Substring(3) : "";
-                    tbReportInAuto = true;        //set flag to indicate report in was auto filled from received text
+                    tbReportIn.Text = rpt.Length >= 3 ? rpt.Substring(0, 3) : rpt;
+                    tbSerialNumIn.Text = rpt.Length > 3 ? rpt.Substring(3) : "";
                 }
                 else
                 {
-                    // If Shift is down and report in already has value, copy to serial number in
-                    tbSerialNumIn.Text = selectedWord;
+                    tbSerialNumIn.Text = rpt;
                 }
             }
             else if (isCtrlDown && isShiftDown)
@@ -281,8 +278,7 @@ namespace XMMTwrapper1
                 // No modifier keys, copy to callsign
                 ClearDownUiAfterLog();              //clears tbReportOut if it was auto filled from received text
                 tbCallsign.Text = selectedWord;
-                tbReportOutAuto = tbReportOut.Text == "" ? true : false;        //set flag to indicate report out was auto filled from received text
-                if (btnJTTY.Checked && LogRST != null && tbReportOutAuto)
+                if (btnJTTY.Checked && LogRST != null && !(bool)tbReportOut.Tag)        //only fill if not fixed
                 {
                     tbReportOut.Text = LogRST.Length >= 3 ? LogRST.Substring(0, 3) : LogRST;
                 }
