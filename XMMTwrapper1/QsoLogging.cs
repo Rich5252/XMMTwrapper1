@@ -175,9 +175,38 @@ public class AdifLogger
         // Get the part before the dot (e.g., "28")
         string bandMhz = freqMhz.Split('.')[0];
 
-        return _loggedEntries.FindIndex(e =>
+        return _loggedEntries.FindLastIndex(e =>
             e.Callsign.Equals(callsign, StringComparison.OrdinalIgnoreCase) &&
             e.FrequencyMHz.Split('.')[0] == bandMhz);
+    }
+
+    // Friendly time of a logged QSO (index from GetDupeIndex), e.g.
+    //   "Sat 24 Oct 13:42 UTC (1h 18m ago)"
+    // Returns "" for an invalid index.
+    public string GetQsoTimeText(int index)
+    {
+        if (index < 0 || index >= _loggedEntries.Count) return "";
+        var e = _loggedEntries[index];
+
+        // ADIF: QSO_DATE yyyyMMdd, TIME_ON HHmm or HHmmss, both UTC
+        if (!DateTime.TryParseExact($"{e.Date} {e.Time}", new[] { "yyyyMMdd HHmm", "yyyyMMdd HHmmss" },
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AssumeUniversal | System.Globalization.DateTimeStyles.AdjustToUniversal,
+                out DateTime utc))
+            return $"{e.Date} {e.Time}".Trim();                 // unparseable: show it as logged
+
+        DateTime now = DateTime.UtcNow;
+        string fmt = utc.Year == now.Year ? "ddd d MMM HH:mm" : "ddd d MMM yyyy HH:mm";
+        string text = utc.ToString(fmt, System.Globalization.CultureInfo.InvariantCulture) + " UTC";
+
+        TimeSpan ago = now - utc;
+        if (ago < TimeSpan.Zero) return text;                   // clock oddity: no "ago"
+        string agoText =
+            ago.TotalMinutes < 1 ? "just now" :
+            ago.TotalMinutes < 60 ? $"{(int)ago.TotalMinutes}m ago" :
+            ago.TotalHours < 48 ? $"{(int)ago.TotalHours}h {ago.Minutes}m ago" :
+                                    $"{(int)ago.TotalDays}d ago";
+        return $"{text} ({agoText})";
     }
 
     public int TotalLogged => _loggedEntries.Count;

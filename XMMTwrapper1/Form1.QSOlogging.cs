@@ -106,11 +106,15 @@ namespace XMMTwrapper1
             {
                 lblDUPE.Visible = false;
                 lblDupeTimeDate.Visible = false;
+                tbDupeTimeDate.Visible = false;
+                tbDupeTimeDate.Text = "";
             }
             else 
             {
                 lblDUPE.Visible = true; 
                 lblDupeTimeDate.Visible = true;
+                tbDupeTimeDate.Visible = true;
+                tbDupeTimeDate.Text = _QSOlogger.GetQsoTimeText(dupeIndex);
             }
         }
 

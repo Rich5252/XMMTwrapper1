@@ -1364,7 +1364,7 @@ namespace XMMTwrapper1
             lblDupeTimeDate.AutoSize = true;
             lblDupeTimeDate.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblDupeTimeDate.ForeColor = Color.Red;
-            lblDupeTimeDate.Location = new Point(10, 1);
+            lblDupeTimeDate.Location = new Point(0, 1);
             lblDupeTimeDate.Name = "lblDupeTimeDate";
             lblDupeTimeDate.Size = new Size(67, 30);
             lblDupeTimeDate.TabIndex = 76;
@@ -1382,10 +1382,12 @@ namespace XMMTwrapper1
             // 
             // tbDupeTimeDate
             // 
-            tbDupeTimeDate.Location = new Point(83, 8);
+            tbDupeTimeDate.Location = new Point(64, 8);
             tbDupeTimeDate.Name = "tbDupeTimeDate";
-            tbDupeTimeDate.Size = new Size(166, 23);
+            tbDupeTimeDate.Size = new Size(187, 23);
             tbDupeTimeDate.TabIndex = 77;
+            tbDupeTimeDate.Visible = false;
+            tbDupeTimeDate.WordWrap = false;
             // 
             // Form1
             // 
