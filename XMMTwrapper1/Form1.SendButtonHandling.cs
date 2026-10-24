@@ -229,8 +229,9 @@ namespace XMMTwrapper1
             }
             else if (btnJTTY.Checked)
             {
-                _jttyLink.SendTag("ABORT");          // stop via WS
-                TryHandleJttyPipeMessage("{TXE}");   // WS may not send OUTPUTCOMPLETE after an abort
+                _NamedPipeClient.SendCommand("RTTY:{X0}");      //fastest way to stop is direct to TXLink
+                _jttyLink.SendTag("ABORT");                     // stop via WS
+                TryHandleJttyPipeMessage("{TXE}");              // WS may not send OUTPUTCOMPLETE after an abort
                 CloseTxLine();
             }
         }
