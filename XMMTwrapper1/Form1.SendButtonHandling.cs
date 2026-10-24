@@ -105,7 +105,10 @@ namespace XMMTwrapper1
                 string outMsg = _macroProvider.ParseJTTY(MacroTemplate);
                 if (outMsg == "") return;
                 if (_jttyLink.SendTag("TXTEXT", outMsg.ToUpper()))     // transmit text via WS
+                {
+                    NoteJttyTxSent(outMsg);                            // so its echo can be told from real RX
                     TryHandleJttyPipeMessage("{TXS}");                 // TX started: WS echo is shown as TX
+                }
                 else
                     lblWSjttyStatus.Text = "WS not connected - not sent";
             }

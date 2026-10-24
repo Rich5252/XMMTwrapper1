@@ -108,13 +108,19 @@ namespace XMMTwrapper1
             // Between our TXTEXT and OUTPUTCOMPLETE, WS is echoing our own text
             if (_jttyTxActive)
             {
-                ShowTxEcho(text);
+                RouteTxPeriodText(text);
                 return;
             }
             CloseTxLine();                              // finish any open yellow line
 
             if (IsJttyRxSuppressed()) return;
 
+            DisplayRxText(text);
+        }
+
+        // Normal (unhighlighted) receive display
+        private void DisplayRxText(string text)
+        {
             // Feed one character at a time so DisplayNextChar's CR/LF handling and the
             // callsign checker behave exactly as they do for RTTY.
             // WS puts \r\n before each new message - fold CRLF (or a lone LF) to a single CR.
@@ -165,6 +171,84 @@ namespace XMMTwrapper1
                 TryHandleJttyPipeMessage("{TXE}");      // end TX (and optional RX holdoff)
                 CloseTxLine();                          // WS echoes all of our TX before this tag
             }
+        }
+
+        // ---------------------------------------------------------------- TX period routing
+
+        // Text we have sent with TXTEXT this transmission (normalised), newest first.
+        // WS echoes it back as RXTEXT; anything else arriving during TX is real receive text.
+        private readonly List<string> _jttyTxSent = new();
+        private bool _jttyLastSegWasTx = false;         // the message segment handled last was our echo
+
+        private static string NormalizeTxText(string s) =>
+            string.Join(' ', s.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)).ToUpperInvariant();
+
+        // Call after a successful TXTEXT send
+        private void NoteJttyTxSent(string sentText)
+        {
+            string n = NormalizeTxText(sentText);
+            if (n != "") _jttyTxSent.Insert(0, n);
+        }
+
+        // While transmitting, RXTEXT can hold our echo AND real receive text that WS was in
+        // the middle of decoding when we keyed up, e.g. "...0 001\r\nCQ TEST G4AHN" or
+        // " 001CQ TEST G4AHN". Split by message (CR/LF) and use the text we sent to tell them apart.
+        private void RouteTxPeriodText(string text)
+        {
+            bool startsNewMessage = text.Length > 0 && (text[0] == '\r' || text[0] == '\n');
+            string[] parts = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                // part 0 without a leading return carries on the message already in progress
+                bool continuation = (i == 0 && !startsNewMessage);
+                RouteTxPeriodSegment(parts[i], continuation);
+            }
+        }
+
+        private void RouteTxPeriodSegment(string seg, bool continuation)
+        {
+            string lead = continuation ? "" : "\r";    // a return marks the start of a new message
+
+            // 1. WS receive line ("hhmmss freq snr ...") can't be our echo: it is real RX
+            if (!continuation && TextBoxWordSelect.HasRxPrefix(seg))
+            {
+                CloseTxLine();
+                DisplayRxText("\r" + seg);
+                _jttyLastSegWasTx = false;
+                return;
+            }
+
+            // 2. Segment ends with something we sent: anything in front of it is real RX
+            string trimmed = seg.TrimEnd();
+            foreach (string sent in _jttyTxSent)
+            {
+                if (trimmed.Length >= sent.Length &&
+                    trimmed.EndsWith(sent, StringComparison.OrdinalIgnoreCase))
+                {
+                    string head = trimmed.Substring(0, trimmed.Length - sent.Length);
+                    if (head.Trim().Length > 0)
+                    {
+                        CloseTxLine();
+                        DisplayRxText(lead + head.TrimEnd());
+                        _jttyLastSegWasTx = false;
+                    }
+                    ShowTxEcho("\r" + trimmed.Substring(trimmed.Length - sent.Length));
+                    _jttyLastSegWasTx = true;
+                    return;
+                }
+            }
+
+            // 3. No match. The rest of a message that was in progress when we keyed up is RX;
+            //    anything else (a new message, or the next piece of our echo) is shown as TX.
+            if (continuation && !_jttyLastSegWasTx)
+            {
+                CloseTxLine();
+                DisplayRxText(seg);
+                return;
+            }
+            ShowTxEcho(lead + seg);
+            _jttyLastSegWasTx = true;
         }
 
         // ---------------------------------------------------------------- TX echo (yellow)
@@ -222,12 +306,15 @@ namespace XMMTwrapper1
             switch (msg)
             {
                 case "{TXS}":
+                    _jttyLastSegWasTx = false;
                     _jttyTxActive = true;
                     _jttyTxStartedUtc = DateTime.UtcNow;
                     btnStopTX.BackColor = Color.Red;
                     return true;
 
                 case "{TXE}":
+                    _jttyTxSent.Clear();
+                    _jttyLastSegWasTx = false;
                     _jttyTxActive = false;
                     _jttyRxHoldoffUntilUtc = DateTime.UtcNow.AddMilliseconds(_jttyRxHoldoffMs);
                     btnStopTX.BackColor = SystemColors.Control;

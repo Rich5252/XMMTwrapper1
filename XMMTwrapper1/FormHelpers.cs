@@ -53,6 +53,9 @@ public static class TextBoxWordSelect
         @"^\s*(?<time>\d{6})\s+(?<freq>\d{1,4})\s+(?<snr>[+-]?\d{1,3})\s",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    /// True if the text starts like a WS receive line ("hhmmss freq snr ..."). Our own TX echo never does.
+    public static bool HasRxPrefix(string text) => RxTextPrefix.IsMatch(text);
+
     private static readonly Regex ReportWord = new Regex(
         @"^[+-]?\d{1,3}$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
