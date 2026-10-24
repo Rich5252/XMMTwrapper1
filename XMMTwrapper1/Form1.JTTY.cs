@@ -158,7 +158,7 @@ namespace XMMTwrapper1
         private void OnJttyTagReceived(string tag, string data)
         {
             Log.Mark($"JTTY link tag <{tag}> {data}");
-            lblWSjttyStatus.Text = $"WS: <{tag}>{(data == "" ? "" : " " + data)}  {DateTime.Now:HH:mm:ss}";
+            //lblWSjttyStatus.Text = $"WS: <{tag}>{(data == "" ? "" : " " + data)}  {DateTime.Now:HH:mm:ss}";
 
             if (tag == "OUTPUTCOMPLETE")
             {
@@ -215,21 +215,6 @@ namespace XMMTwrapper1
             _jttySkipRxNewline = true;              // next RX message starts on this fresh line
         }
 
-        // ---------------------------------------------------------------- transmit
-
-        // Called from MacroButton_Click in JTTY mode, after UpdateButtonMacroInserts()
-        private void SendJttyMacro(string template)
-        {
-            string cmd = _macroProvider.ParseJTTY(template);
-            if (cmd == "") return;                      // nothing left to send
-            _NamedPipeClient.SendCommand(cmd);
-        }
-
-        private void StopJttyTx()
-        {
-            _NamedPipeClient.SendCommand("JTTY:{X0}");
-        }
-
         // TXLink -> logger status messages. Returns true if the message was a JTTY one.
         // Called from PipeConnectTimer_Tick before the frequency handling.
         private bool TryHandleJttyPipeMessage(string msg)
@@ -252,14 +237,6 @@ namespace XMMTwrapper1
             return false;
         }
 
-        // If the pipe drops while transmitting we will never see {TXE}
-        private void ResetJttyTxState()
-        {
-            if (!_jttyTxActive) return;
-            _jttyTxActive = false;
-            btnStopTX.BackColor = SystemColors.Control;
-            btnStopTX.UseVisualStyleBackColor = true;
-        }
 
         // settings.ini [JTTY]
         //   WsPath=C:\path\to\ws.exe     (blank = don't launch)

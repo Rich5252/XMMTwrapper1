@@ -86,6 +86,9 @@ namespace XMMTwrapper1
             tbCallsign = new TextBox();
             PipeConnectTimer = new System.Windows.Forms.Timer(components);
             tbReportOut = new TextBox();
+            contextMenuStripReportFields = new ContextMenuStrip(components);
+            fixToolStripMenuItem = new ToolStripMenuItem();
+            clearToolStripMenuItem = new ToolStripMenuItem();
             btnTemplate = new AxXMMBtn();
             btnSend1 = new Button();
             gbRttyCW = new GroupBox();
@@ -157,6 +160,7 @@ namespace XMMTwrapper1
             ((System.ComponentModel.ISupportInitialize)sbAudioLevel).BeginInit();
             statusStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
+            contextMenuStripReportFields.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnTemplate).BeginInit();
             gbRttyCW.SuspendLayout();
             panelButtons.SuspendLayout();
@@ -574,7 +578,7 @@ namespace XMMTwrapper1
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, toolStripStatusLabel3, lblPipeStatus, toolStripStatusLabel1, lblWSjttyStatus, toolStripStatusLabel2, lblLogFileName });
-            statusStrip1.Location = new Point(0, 565);
+            statusStrip1.Location = new Point(0, 571);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(804, 22);
             statusStrip1.TabIndex = 22;
@@ -712,11 +716,35 @@ namespace XMMTwrapper1
             // tbReportOut
             // 
             tbReportOut.CharacterCasing = CharacterCasing.Upper;
+            tbReportOut.ContextMenuStrip = contextMenuStripReportFields;
             tbReportOut.Location = new Point(204, 37);
             tbReportOut.Name = "tbReportOut";
             tbReportOut.Size = new Size(42, 23);
             tbReportOut.TabIndex = 26;
+            tbReportOut.Tag = "false";
             tbReportOut.Text = "599";
+            // 
+            // contextMenuStripReportFields
+            // 
+            contextMenuStripReportFields.Items.AddRange(new ToolStripItem[] { fixToolStripMenuItem, clearToolStripMenuItem });
+            contextMenuStripReportFields.Name = "contextMenuStripReportFields";
+            contextMenuStripReportFields.Size = new Size(102, 48);
+            contextMenuStripReportFields.Opening += contextMenuStripReportFields_Opening;
+            // 
+            // fixToolStripMenuItem
+            // 
+            fixToolStripMenuItem.CheckOnClick = true;
+            fixToolStripMenuItem.Name = "fixToolStripMenuItem";
+            fixToolStripMenuItem.Size = new Size(101, 22);
+            fixToolStripMenuItem.Text = "Fix";
+            fixToolStripMenuItem.Click += fixToolStripMenuItem_Click;
+            // 
+            // clearToolStripMenuItem
+            // 
+            clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            clearToolStripMenuItem.Size = new Size(101, 22);
+            clearToolStripMenuItem.Text = "Clear";
+            clearToolStripMenuItem.Click += clearToolStripMenuItem_Click;
             // 
             // btnTemplate
             // 
@@ -797,26 +825,32 @@ namespace XMMTwrapper1
             // tbSerialNumOut
             // 
             tbSerialNumOut.CharacterCasing = CharacterCasing.Upper;
+            tbSerialNumOut.ContextMenuStrip = contextMenuStripReportFields;
             tbSerialNumOut.Location = new Point(255, 37);
             tbSerialNumOut.Name = "tbSerialNumOut";
             tbSerialNumOut.Size = new Size(57, 23);
             tbSerialNumOut.TabIndex = 31;
+            tbSerialNumOut.Tag = "false";
             // 
             // tbSerialNumIn
             // 
             tbSerialNumIn.CharacterCasing = CharacterCasing.Upper;
+            tbSerialNumIn.ContextMenuStrip = contextMenuStripReportFields;
             tbSerialNumIn.Location = new Point(255, 66);
             tbSerialNumIn.Name = "tbSerialNumIn";
             tbSerialNumIn.Size = new Size(57, 23);
             tbSerialNumIn.TabIndex = 33;
+            tbSerialNumIn.Tag = "false";
             // 
             // tbReportIn
             // 
             tbReportIn.CharacterCasing = CharacterCasing.Upper;
+            tbReportIn.ContextMenuStrip = contextMenuStripReportFields;
             tbReportIn.Location = new Point(204, 66);
             tbReportIn.Name = "tbReportIn";
             tbReportIn.Size = new Size(42, 23);
             tbReportIn.TabIndex = 32;
+            tbReportIn.Tag = "false";
             // 
             // tbQTH
             // 
@@ -1325,7 +1359,7 @@ namespace XMMTwrapper1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(804, 587);
+            ClientSize = new Size(804, 593);
             Controls.Add(panelTextReceived);
             Controls.Add(panelLogging);
             Controls.Add(panelButtons);
@@ -1365,6 +1399,7 @@ namespace XMMTwrapper1
             statusStrip1.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            contextMenuStripReportFields.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)btnTemplate).EndInit();
             gbRttyCW.ResumeLayout(false);
             gbRttyCW.PerformLayout();
@@ -1492,5 +1527,8 @@ namespace XMMTwrapper1
         private Panel panelButtons;
         private Panel panelLogging;
         private Panel panelTextReceived;
+        private ContextMenuStrip contextMenuStripReportFields;
+        private ToolStripMenuItem fixToolStripMenuItem;
+        private ToolStripMenuItem clearToolStripMenuItem;
     }
 }

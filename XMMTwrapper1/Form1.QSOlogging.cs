@@ -53,8 +53,9 @@ namespace XMMTwrapper1
             newEntry.RstRcvd = str;
 
             newEntry.Comment = tbLocator.Text;
-            newEntry.Remarks = tbComment.Text;
+            newEntry.Remarks = tbQTH.Text + " " + tbComment.Text;
             newEntry.Power = tbPwr.Text;
+
 
             if (!_QSOlogger.LogQso(newEntry))
             {
@@ -71,14 +72,15 @@ namespace XMMTwrapper1
         private void ClearDownUiAfterLog()
         {
             tbCallsign.Text = "";
-            tbSerialNumIn.Text = "";
             tbLocator.Text = "";
             tbQTH.Text = "";
             tbOpName.Text = "";
             tbComment.Text = "";
             ClearSerialNumOutTim();
-            if (tbReportOutAuto) { tbReportOut.Text = ""; }          //only clear if auto filled from received text
-            if (tbReportInAuto) { tbReportIn.Text = ""; }            //only clear if auto filled from received text
+            if (tbReportOut.Tag != null && !(bool)tbReportOut.Tag) { tbReportOut.Text = ""; }          //clear if not fixed
+            if (tbReportIn.Tag != null && !(bool)tbReportIn.Tag) { tbReportIn.Text = ""; }            
+            if (tbSerialNumIn.Tag != null && !(bool)tbSerialNumIn.Tag) { tbSerialNumIn.Text = ""; } 
+            if (tbSerialNumOut.Tag != null && !(bool)tbSerialNumOut.Tag) { tbSerialNumOut.Text = ""; }
         }
 
 
@@ -146,6 +148,34 @@ namespace XMMTwrapper1
             {
                 tbComment.Text = "Not found in QRZ";
             }  
+        }
+
+
+        //Context menu for report text boxes to set fix/auto mode.
+        private void contextMenuStripReportFields_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var menu = (ContextMenuStrip)sender!;
+            var tb = menu.SourceControl as TextBoxBase;
+            fixToolStripMenuItem.Checked = tb?.Tag is bool isChecked && isChecked;
+        }
+        private void fixToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var tb = SourceBox(sender);
+            if (tb == null) return;
+            tb.Tag = fixToolStripMenuItem.Checked;
+        }
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var tb = SourceBox(sender);
+            tb.Clear();
+        }
+
+        // Find the text box the menu was opened on, from a clicked menu item
+        private static TextBoxBase? SourceBox(object? sender)
+        {
+            if (sender is ToolStripItem item && item.Owner is ContextMenuStrip menu)
+                return menu.SourceControl as TextBoxBase;
+            return null;
         }
     }
 }

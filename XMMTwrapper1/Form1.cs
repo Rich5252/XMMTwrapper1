@@ -122,9 +122,13 @@ namespace XMMTwrapper1
 
             //restore contest settings
             tbReportOut.Text = _ini.GetValue("General", "ReportOut", "");
+            tbReportOut.Tag = _ini.GetValue("General", "ReportOutFix", "false") == "True";  //restore fix/auto state
             tbSerialNumOut.Text = _ini.GetValue("General", "SerialNumOut", "");
+            tbSerialNumOut.Tag = _ini.GetValue("General", "SerialNumOutFix", "false") == "True";  //restore fix/auto state
             tbReportIn.Text = _ini.GetValue("General", "ReportIn", "");
+            tbReportIn.Tag = _ini.GetValue("General", "ReportInFix", "false") == "True";  //restore fix/auto state
             tbSerialNumIn.Text = _ini.GetValue("General", "SerialNumIn", "");
+            tbSerialNumIn.Tag = _ini.GetValue("General", "SerialNumInFix", "false") == "True";  //restore fix/auto state
             string autoInc = _ini.GetValue("General", "AutoIncr", "false");
             cbSerialNumAutoInc.Checked = (autoInc == "True");
 
@@ -181,9 +185,13 @@ namespace XMMTwrapper1
 
             //save contest settings
             _ini.SetValue("General", "ReportOut", tbReportOut.Text);
+            _ini.SetValue("General", "ReportOutFix", $"{tbReportOut.Tag}");
             _ini.SetValue("General", "SerialNumOut", tbSerialNumOut.Text);
+            _ini.SetValue("General", "SerialNumOutFix", $"{tbSerialNumOut.Tag}");
             _ini.SetValue("General", "ReportIn", tbReportIn.Text);
+            _ini.SetValue("General", "ReportInFix", $"{tbReportIn.Tag}");
             _ini.SetValue("General", "SerialNumIn", tbSerialNumIn.Text);
+            _ini.SetValue("General", "SerialNumInFix", $"{tbSerialNumIn.Tag}");
             _ini.SetValue("General", "AutoIncr", $"{cbSerialNumAutoInc.Checked}");
         }
 
@@ -417,7 +425,6 @@ namespace XMMTwrapper1
                 }
             }
         }
-
 
     }
 }
