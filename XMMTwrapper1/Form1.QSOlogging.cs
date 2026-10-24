@@ -102,8 +102,16 @@ namespace XMMTwrapper1
             string freq = tbRxFrequency.Text;
             if (freq.Length > 4) freq = freq.Substring (0, freq.Length-4);
             int dupeIndex = _QSOlogger.GetDupeIndex(tbCallsign.Text, freq);
-            if (dupeIndex == -1) {lblDUPE.Visible = false;}
-            else {lblDUPE.Visible = true;}
+            if (dupeIndex == -1)
+            {
+                lblDUPE.Visible = false;
+                lblDupeTimeDate.Visible = false;
+            }
+            else 
+            {
+                lblDUPE.Visible = true; 
+                lblDupeTimeDate.Visible = true;
+            }
         }
 
 

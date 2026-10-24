@@ -119,16 +119,28 @@ public static class TextBoxWordSelect
         return value.ToString("+00;-00;+00", CultureInfo.InvariantCulture);  // +05, -06, +00
     }
 
-    private static readonly Regex RogerReport = new Regex(
-    @"^R(?<rpt>[+-]?\d{1,3})$",
-    RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+    // Optional leading R (roger), a 1-3 digit report with optional sign, optional trailing DB
+    private static readonly Regex DecoratedReport = new Regex(
+        @"^(?<r>R)?(?<rpt>[+-]?\d{1,3})(?<db>DB)?$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-    /// "R+00" / "R-12" / "R599" -> "+00" / "-12" / "599"  (drops the Roger prefix).
-    /// Anything else is returned unchanged, so callsigns like R1ABC are not touched.
-    public static string StripRogerPrefix(string word)
+    /// Cleans a clicked report word:
+    ///   "+8DB" -> "+08"   "R+00" -> "+00"   "R-12" -> "-12"   "R599" -> "599"
+    /// Signed or dB reports are padded the same way as the auto-filled Report Out (+08, -12).
+    /// Anything that isn't one of these forms (callsigns, serials, "599107") is returned unchanged.
+    public static string NormalizeReportWord(string word)
     {
-        var m = RogerReport.Match(word.Trim());
-        return m.Success ? m.Groups["rpt"].Value : word;
+        var m = DecoratedReport.Match(word.Trim());
+        if (!m.Success) return word;
+
+        string rpt = m.Groups["rpt"].Value;
+        bool hasR = m.Groups["r"].Success;
+        bool hasDb = m.Groups["db"].Success;
+        bool signed = rpt[0] == '+' || rpt[0] == '-';
+
+        if (!hasR && !hasDb && !signed) return word;         // plain number: leave as typed
+        if (signed || hasDb) return FormatReport(rpt) ?? rpt;
+        return rpt;                                          // "R599" -> "599"
     }
 }
 

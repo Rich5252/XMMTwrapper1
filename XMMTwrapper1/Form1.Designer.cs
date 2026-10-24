@@ -146,6 +146,9 @@ namespace XMMTwrapper1
             panelButtons = new Panel();
             panelLogging = new Panel();
             panelTextReceived = new Panel();
+            lblDupeTimeDate = new Label();
+            panelLogging2 = new Panel();
+            tbDupeTimeDate = new TextBox();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -166,6 +169,7 @@ namespace XMMTwrapper1
             panelButtons.SuspendLayout();
             panelLogging.SuspendLayout();
             panelTextReceived.SuspendLayout();
+            panelLogging2.SuspendLayout();
             SuspendLayout();
             // 
             // axxmmxy1
@@ -1355,11 +1359,40 @@ namespace XMMTwrapper1
             panelTextReceived.Size = new Size(405, 250);
             panelTextReceived.TabIndex = 91;
             // 
+            // lblDupeTimeDate
+            // 
+            lblDupeTimeDate.AutoSize = true;
+            lblDupeTimeDate.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblDupeTimeDate.ForeColor = Color.Red;
+            lblDupeTimeDate.Location = new Point(10, 1);
+            lblDupeTimeDate.Name = "lblDupeTimeDate";
+            lblDupeTimeDate.Size = new Size(67, 30);
+            lblDupeTimeDate.TabIndex = 76;
+            lblDupeTimeDate.Text = "DUPE";
+            lblDupeTimeDate.Visible = false;
+            // 
+            // panelLogging2
+            // 
+            panelLogging2.Controls.Add(tbDupeTimeDate);
+            panelLogging2.Controls.Add(lblDupeTimeDate);
+            panelLogging2.Location = new Point(535, 475);
+            panelLogging2.Name = "panelLogging2";
+            panelLogging2.Size = new Size(253, 42);
+            panelLogging2.TabIndex = 92;
+            // 
+            // tbDupeTimeDate
+            // 
+            tbDupeTimeDate.Location = new Point(83, 8);
+            tbDupeTimeDate.Name = "tbDupeTimeDate";
+            tbDupeTimeDate.Size = new Size(166, 23);
+            tbDupeTimeDate.TabIndex = 77;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(804, 593);
+            Controls.Add(panelLogging2);
             Controls.Add(panelTextReceived);
             Controls.Add(panelLogging);
             Controls.Add(panelButtons);
@@ -1409,6 +1442,8 @@ namespace XMMTwrapper1
             panelLogging.PerformLayout();
             panelTextReceived.ResumeLayout(false);
             panelTextReceived.PerformLayout();
+            panelLogging2.ResumeLayout(false);
+            panelLogging2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1530,5 +1565,8 @@ namespace XMMTwrapper1
         private ContextMenuStrip contextMenuStripReportFields;
         private ToolStripMenuItem fixToolStripMenuItem;
         private ToolStripMenuItem clearToolStripMenuItem;
+        private Label lblDupeTimeDate;
+        private Panel panelLogging2;
+        private TextBox tbDupeTimeDate;
     }
 }

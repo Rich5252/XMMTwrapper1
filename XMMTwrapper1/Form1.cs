@@ -251,7 +251,7 @@ namespace XMMTwrapper1
             }
             else if (isShiftDown && !isCtrlDown)        // If Shift is down, copy report in
             {
-                string rpt = TextBoxWordSelect.StripRogerPrefix(selectedWord);   // "R+00" -> "+00"
+                string rpt = TextBoxWordSelect.NormalizeReportWord(selectedWord);   // "+8DB" -> "+08"   "R+00" -> "+00"   "R-12" -> "-12"   "R599" -> "599" 
 
                 if (tbReportIn.Text == "")
                 {

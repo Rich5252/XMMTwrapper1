@@ -59,6 +59,8 @@ namespace XMMTwrapper1
 
             // Logging: right edge
             panelLogging.Left = ClientSize.Width - _marginLoggingRight - panelLogging.Width;
+            panelLogging2.Left = panelLogging.Right - 253;
+            panelLogging2.Top = panelLogging.Bottom;
 
             // Optional: keep the XY scope above it on the right edge as well
             // axxmmxy1.Left = ClientSize.Width - _marginLoggingRight - axxmmxy1.Width;
