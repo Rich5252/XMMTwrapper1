@@ -232,8 +232,9 @@ namespace XMMTwrapper1
             }
             else if (btnJTTY.Checked)
             {
-                _NamedPipeClient.SendCommand("RTTY:{X0}");      //fastest way to stop is direct to TXLink
+                _NamedPipeClient.SendCommand("JTTY:{X0}");      //fastest way to stop is direct to TXLink
                 _jttyLink.SendTag("ABORT");                     // stop via WS
+                _jttyLink.SendTag("ABORT");                     //WS needs 2 aborts to stop TX if it is in the middle of sending a long message
                 TryHandleJttyPipeMessage("{TXE}");              // WS may not send OUTPUTCOMPLETE after an abort
                 CloseTxLine();
             }
