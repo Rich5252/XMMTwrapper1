@@ -431,5 +431,20 @@ namespace XMMTwrapper1
         {
             _jttyLink.SendTag("FTOL", "500");
         }
+
+        private void btnTune_Click(object sender, EventArgs e)
+        {
+            if(btnTune.BackColor == Color.Red)
+            {
+                _NamedPipeClient.SendCommand("JTTY:{W0}{X0}");      //W0 needed in case not in JTTY mode.
+                btnTune.BackColor = SystemColors.Control;
+                btnTune.UseVisualStyleBackColor = true;
+            }
+            else
+            {
+                _NamedPipeClient.SendCommand("JTTY:{JT}{W30000}{X1}");
+                btnTune.BackColor = Color.Red;
+            }
+        }
     }
 }

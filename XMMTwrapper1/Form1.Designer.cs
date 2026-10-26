@@ -142,15 +142,16 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
+            btnTol500 = new Button();
+            btnTol10 = new Button();
             cbAutoClearFreeText = new CheckBox();
             panelButtons = new Panel();
             panelLogging = new Panel();
             panelTextReceived = new Panel();
+            btnTune = new Button();
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
-            btnTol10 = new Button();
-            btnTol500 = new Button();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1270,6 +1271,7 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
+            gbJTTYcontrols.Controls.Add(btnTune);
             gbJTTYcontrols.Controls.Add(btnTol500);
             gbJTTYcontrols.Controls.Add(btnTol10);
             gbJTTYcontrols.Location = new Point(12, 27);
@@ -1278,6 +1280,26 @@ namespace XMMTwrapper1
             gbJTTYcontrols.TabIndex = 87;
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
+            // 
+            // btnTol500
+            // 
+            btnTol500.Location = new Point(8, 53);
+            btnTol500.Name = "btnTol500";
+            btnTol500.Size = new Size(51, 23);
+            btnTol500.TabIndex = 1;
+            btnTol500.Text = "Tol 500";
+            btnTol500.UseVisualStyleBackColor = true;
+            btnTol500.Click += btnTol500_Click;
+            // 
+            // btnTol10
+            // 
+            btnTol10.Location = new Point(8, 24);
+            btnTol10.Name = "btnTol10";
+            btnTol10.Size = new Size(51, 23);
+            btnTol10.TabIndex = 0;
+            btnTol10.Text = "Tol 10";
+            btnTol10.UseVisualStyleBackColor = true;
+            btnTol10.Click += btnTol10_Click;
             // 
             // cbAutoClearFreeText
             // 
@@ -1364,6 +1386,16 @@ namespace XMMTwrapper1
             panelTextReceived.Size = new Size(405, 250);
             panelTextReceived.TabIndex = 91;
             // 
+            // btnTune
+            // 
+            btnTune.Location = new Point(154, 158);
+            btnTune.Name = "btnTune";
+            btnTune.Size = new Size(51, 23);
+            btnTune.TabIndex = 70;
+            btnTune.Text = "Tune";
+            btnTune.UseVisualStyleBackColor = true;
+            btnTune.Click += btnTune_Click;
+            // 
             // lblDupeTimeDate
             // 
             lblDupeTimeDate.AutoSize = true;
@@ -1393,26 +1425,6 @@ namespace XMMTwrapper1
             tbDupeTimeDate.TabIndex = 77;
             tbDupeTimeDate.Visible = false;
             tbDupeTimeDate.WordWrap = false;
-            // 
-            // btnTol10
-            // 
-            btnTol10.Location = new Point(8, 24);
-            btnTol10.Name = "btnTol10";
-            btnTol10.Size = new Size(51, 23);
-            btnTol10.TabIndex = 0;
-            btnTol10.Text = "Tol 10";
-            btnTol10.UseVisualStyleBackColor = true;
-            btnTol10.Click += btnTol10_Click;
-            // 
-            // btnTol500
-            // 
-            btnTol500.Location = new Point(8, 53);
-            btnTol500.Name = "btnTol500";
-            btnTol500.Size = new Size(51, 23);
-            btnTol500.TabIndex = 1;
-            btnTol500.Text = "Tol 500";
-            btnTol500.UseVisualStyleBackColor = true;
-            btnTol500.Click += btnTol500_Click;
             // 
             // Form1
             // 
@@ -1598,5 +1610,6 @@ namespace XMMTwrapper1
         private TextBox tbDupeTimeDate;
         private Button btnTol500;
         private Button btnTol10;
+        private Button btnTune;
     }
 }

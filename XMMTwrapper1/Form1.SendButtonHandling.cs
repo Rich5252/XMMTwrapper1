@@ -228,14 +228,16 @@ namespace XMMTwrapper1
             else if (btnRTTY.Checked)
             {
                 //"RTTY:{M1}{Z" + btnStr + "}{X1}"
-                _NamedPipeClient.SendCommand("RTTY:{X0}");
+                _NamedPipeClient.SendCommand("RTTY:{W0}{X0}");
             }
             else if (btnJTTY.Checked)
             {
-                _NamedPipeClient.SendCommand("JTTY:{X0}");      //fastest way to stop is direct to TXLink
-                _jttyLink.SendTag("ABORT");                     // stop via WS
-                _jttyLink.SendTag("ABORT");                     //WS needs 2 aborts to stop TX if it is in the middle of sending a long message
-                TryHandleJttyPipeMessage("{TXE}");              // WS may not send OUTPUTCOMPLETE after an abort
+                _NamedPipeClient.SendCommand("JTTY:{W0}{X0}");      //fastest way to stop is direct to TXLink
+                _jttyLink.SendTag("ABORT");                         // stop via WS
+                _jttyLink.SendTag("ABORT");                         //WS needs 2 aborts to stop TX if it is in the middle of sending a long message
+                TryHandleJttyPipeMessage("{TXE}");                  // WS may not send OUTPUTCOMPLETE after an abort
+                btnTune.BackColor = SystemColors.Control;           //cancel tune
+                btnTune.UseVisualStyleBackColor = true;
                 CloseTxLine();
             }
         }
