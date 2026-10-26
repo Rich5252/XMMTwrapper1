@@ -142,16 +142,17 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
+            btnTune = new Button();
             btnTol500 = new Button();
             btnTol10 = new Button();
             cbAutoClearFreeText = new CheckBox();
             panelButtons = new Panel();
             panelLogging = new Panel();
             panelTextReceived = new Panel();
-            btnTune = new Button();
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
+            btnResetRxFreq = new Button();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1271,6 +1272,7 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
+            gbJTTYcontrols.Controls.Add(btnResetRxFreq);
             gbJTTYcontrols.Controls.Add(btnTune);
             gbJTTYcontrols.Controls.Add(btnTol500);
             gbJTTYcontrols.Controls.Add(btnTol10);
@@ -1280,6 +1282,16 @@ namespace XMMTwrapper1
             gbJTTYcontrols.TabIndex = 87;
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
+            // 
+            // btnTune
+            // 
+            btnTune.Location = new Point(154, 158);
+            btnTune.Name = "btnTune";
+            btnTune.Size = new Size(51, 23);
+            btnTune.TabIndex = 70;
+            btnTune.Text = "Tune";
+            btnTune.UseVisualStyleBackColor = true;
+            btnTune.Click += btnTune_Click;
             // 
             // btnTol500
             // 
@@ -1386,16 +1398,6 @@ namespace XMMTwrapper1
             panelTextReceived.Size = new Size(405, 250);
             panelTextReceived.TabIndex = 91;
             // 
-            // btnTune
-            // 
-            btnTune.Location = new Point(154, 158);
-            btnTune.Name = "btnTune";
-            btnTune.Size = new Size(51, 23);
-            btnTune.TabIndex = 70;
-            btnTune.Text = "Tune";
-            btnTune.UseVisualStyleBackColor = true;
-            btnTune.Click += btnTune_Click;
-            // 
             // lblDupeTimeDate
             // 
             lblDupeTimeDate.AutoSize = true;
@@ -1425,6 +1427,16 @@ namespace XMMTwrapper1
             tbDupeTimeDate.TabIndex = 77;
             tbDupeTimeDate.Visible = false;
             tbDupeTimeDate.WordWrap = false;
+            // 
+            // btnResetRxFreq
+            // 
+            btnResetRxFreq.Location = new Point(8, 82);
+            btnResetRxFreq.Name = "btnResetRxFreq";
+            btnResetRxFreq.Size = new Size(51, 23);
+            btnResetRxFreq.TabIndex = 71;
+            btnResetRxFreq.Text = "Reset";
+            btnResetRxFreq.UseVisualStyleBackColor = true;
+            btnResetRxFreq.Click += btnResetRxFreq_Click;
             // 
             // Form1
             // 
@@ -1611,5 +1623,6 @@ namespace XMMTwrapper1
         private Button btnTol500;
         private Button btnTol10;
         private Button btnTune;
+        private Button btnResetRxFreq;
     }
 }

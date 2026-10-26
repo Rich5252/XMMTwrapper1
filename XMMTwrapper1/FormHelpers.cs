@@ -66,20 +66,27 @@ public static class TextBoxWordSelect
     /// If selectReport is true, the raw report word is selected in the textbox
     /// (this replaces the current selection).
     /// </summary>
-    public static string GetReportOnSelectedLine(TextBoxBase tb, bool selectReport = false)
+        // Logical line (between '\n's, not the word-wrapped display line) holding the caret/selection.
+    private static bool TryGetSelectedLine(TextBoxBase tb, out string line, out int lineStart)
     {
-        if (tb is null || tb.TextLength == 0) return null;
+        line = null; lineStart = 0;
+        if (tb is null || tb.TextLength == 0) return false;
 
         string text = tb.Text;
         int pos = Math.Max(0, Math.Min(tb.SelectionStart, text.Length - 1));
 
-        // Logical line (between '\n's), not the word-wrapped display line
-        int lineStart = pos > 0 ? text.LastIndexOf('\n', pos - 1) + 1 : 0;
+        lineStart = pos > 0 ? text.LastIndexOf('\n', pos - 1) + 1 : 0;
         int lineEnd = text.IndexOf('\n', pos);
         if (lineEnd < 0) lineEnd = text.Length;
 
         // TextBox uses "\r\n", RichTextBox uses "\n"
-        string line = text.Substring(lineStart, lineEnd - lineStart).TrimEnd('\r');
+        line = text.Substring(lineStart, lineEnd - lineStart).TrimEnd('\r');
+        return true;
+    }
+
+    public static string GetReportOnSelectedLine(TextBoxBase tb, bool selectReport = false)
+    {
+        if (!TryGetSelectedLine(tb, out string line, out int lineStart)) return null;
 
         Match m = RxTextPrefix.Match(line);
         if (!m.Success) return null;
@@ -92,6 +99,32 @@ public static class TextBoxWordSelect
             tb.ScrollToCaret();
         }
         return FormatReport(g.Value);
+    }
+
+    /// <summary>
+    /// Audio frequency (Hz) from the WS RXTEXT "hhmmss freq snr" prefix of the line holding
+    /// the current selection, e.g. "154821 1499  -5  CQ EA2CU" -> 1499.
+    /// Returns null if the line has no prefix. If selectFreq is true the freq word is
+    /// selected in the textbox (this replaces the current selection).
+    /// </summary>
+    public static int? GetFreqOnSelectedLine(TextBoxBase tb, bool selectFreq = false)
+    {
+        if (!TryGetSelectedLine(tb, out string line, out int lineStart)) return null;
+
+        Match m = RxTextPrefix.Match(line);
+        if (!m.Success) return null;
+
+        Group g = m.Groups["freq"];
+        if (!int.TryParse(g.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int hz))
+            return null;
+
+        if (selectFreq)
+        {
+            tb.SelectionStart = lineStart + g.Index;
+            tb.SelectionLength = g.Length;
+            tb.ScrollToCaret();
+        }
+        return hz;
     }
 
     /// <summary>

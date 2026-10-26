@@ -243,6 +243,7 @@ namespace XMMTwrapper1
             string selectedWord = tb.SelectedText.Trim();
             if (string.IsNullOrEmpty(selectedWord)) return;
             string LogRST = TextBoxWordSelect.GetReportOnSelectedLine(tb, selectReport: true);
+            int? Hz = TextBoxWordSelect.GetFreqOnSelectedLine(tb, selectFreq: true);
 
             if (isCtrlDown && !isShiftDown)
             {
@@ -282,6 +283,15 @@ namespace XMMTwrapper1
                 {
                     tbReportOut.Text = LogRST.Length >= 3 ? LogRST.Substring(0, 3) : LogRST;
                 }
+                if (btnJTTY.Checked && Hz.HasValue)
+                {
+                    if (Hz is int f && f >= 200 && f <= 5000)
+                    {
+                        _jttyLink.SendTag("RXFREQ", f.ToString());
+                        _jttyLink.SendTag("FTOL", "10");
+                    }
+                }
+
             }
         }
 
@@ -432,9 +442,15 @@ namespace XMMTwrapper1
             _jttyLink.SendTag("FTOL", "500");
         }
 
+        private void btnResetRxFreq_Click(object sender, EventArgs e)
+        {
+            _jttyLink.SendTag("FTOL", "500");
+            _jttyLink.SendTag("RXFREQ", "1500");
+        }
+
         private void btnTune_Click(object sender, EventArgs e)
         {
-            if(btnTune.BackColor == Color.Red)
+            if (btnTune.BackColor == Color.Red)
             {
                 _NamedPipeClient.SendCommand("JTTY:{W0}{X0}");      //W0 needed in case not in JTTY mode.
                 btnTune.BackColor = SystemColors.Control;
