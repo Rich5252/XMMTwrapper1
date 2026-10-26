@@ -422,5 +422,14 @@ namespace XMMTwrapper1
             }
         }
 
+        private void btnTol10_Click(object sender, EventArgs e)
+        {
+            _jttyLink.SendTag("FTOL", "10");
+        }
+
+        private void btnTol500_Click(object sender, EventArgs e)
+        {
+            _jttyLink.SendTag("FTOL", "500");
+        }
     }
 }

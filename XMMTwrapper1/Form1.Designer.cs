@@ -149,6 +149,8 @@ namespace XMMTwrapper1
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
+            btnTol10 = new Button();
+            btnTol500 = new Button();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -166,6 +168,7 @@ namespace XMMTwrapper1
             contextMenuStripReportFields.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnTemplate).BeginInit();
             gbRttyCW.SuspendLayout();
+            gbJTTYcontrols.SuspendLayout();
             panelButtons.SuspendLayout();
             panelLogging.SuspendLayout();
             panelTextReceived.SuspendLayout();
@@ -1267,6 +1270,8 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
+            gbJTTYcontrols.Controls.Add(btnTol500);
+            gbJTTYcontrols.Controls.Add(btnTol10);
             gbJTTYcontrols.Location = new Point(12, 27);
             gbJTTYcontrols.Name = "gbJTTYcontrols";
             gbJTTYcontrols.Size = new Size(211, 187);
@@ -1389,6 +1394,26 @@ namespace XMMTwrapper1
             tbDupeTimeDate.Visible = false;
             tbDupeTimeDate.WordWrap = false;
             // 
+            // btnTol10
+            // 
+            btnTol10.Location = new Point(8, 24);
+            btnTol10.Name = "btnTol10";
+            btnTol10.Size = new Size(51, 23);
+            btnTol10.TabIndex = 0;
+            btnTol10.Text = "Tol 10";
+            btnTol10.UseVisualStyleBackColor = true;
+            btnTol10.Click += btnTol10_Click;
+            // 
+            // btnTol500
+            // 
+            btnTol500.Location = new Point(8, 53);
+            btnTol500.Name = "btnTol500";
+            btnTol500.Size = new Size(51, 23);
+            btnTol500.TabIndex = 1;
+            btnTol500.Text = "Tol 500";
+            btnTol500.UseVisualStyleBackColor = true;
+            btnTol500.Click += btnTol500_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1438,6 +1463,7 @@ namespace XMMTwrapper1
             ((System.ComponentModel.ISupportInitialize)btnTemplate).EndInit();
             gbRttyCW.ResumeLayout(false);
             gbRttyCW.PerformLayout();
+            gbJTTYcontrols.ResumeLayout(false);
             panelButtons.ResumeLayout(false);
             panelButtons.PerformLayout();
             panelLogging.ResumeLayout(false);
@@ -1570,5 +1596,7 @@ namespace XMMTwrapper1
         private Label lblDupeTimeDate;
         private Panel panelLogging2;
         private TextBox tbDupeTimeDate;
+        private Button btnTol500;
+        private Button btnTol10;
     }
 }
