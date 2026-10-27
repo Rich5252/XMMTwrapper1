@@ -71,14 +71,32 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="Form1.CW.cs">
+			<DependentUpon>Form1.cs</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Form1.JTTY.cs">
+			<DependentUpon>Form1.cs</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
 		<Compile Update="Form1.Layout.cs">
+			<DependentUpon>Form1.cs</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Form1.QSOlogging.cs">
+			<DependentUpon>Form1.cs</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Form1.SendButtonHandling.cs">
+			<DependentUpon>Form1.cs</DependentUpon>
 			<SubType>Code</SubType>
 		</Compile>
 		<Compile Update="Form1.XmmtOcxSupport.cs">
+			<DependentUpon>Form1.cs</DependentUpon>
 			<SubType>Code</SubType>
 		</Compile>
 	</ItemGroup>
-
+	
   <ItemGroup>
     <EmbeddedResource Remove="Form1.SendButtonHandling.resx" />
   </ItemGroup>
