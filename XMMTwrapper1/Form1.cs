@@ -25,6 +25,8 @@ namespace XMMTwrapper1
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
+        private Action? _pendingAction;     //auto select confirm action
+
         public Form1()
         {
             Log.Mark("Form1 before init");
@@ -277,22 +279,53 @@ namespace XMMTwrapper1
             else
             {
                 // No modifier keys, copy to callsign
-                ClearDownUiAfterLog();              //clears tbReportOut if it was auto filled from received text
-                tbCallsign.Text = selectedWord;
-                if (btnJTTY.Checked && LogRST != null && !(bool)tbReportOut.Tag)        //only fill if not fixed
+                if (tbCallsign.Text != "")
                 {
-                    tbReportOut.Text = LogRST.Length >= 3 ? LogRST.Substring(0, 3) : LogRST;
+                    _pendingAction = () => ApplyCallsignSelection(selectedWord, LogRST, Hz);
+                    cmsLogOverwrite.Show(Cursor.Position);        //show context menu to confirm overwrite of callsign
                 }
-                if (btnJTTY.Checked && Hz.HasValue)
+                else
                 {
-                    if (Hz is int f && f >= 200 && f <= 5000)
-                    {
-                        _jttyLink.SendTag("RXFREQ", f.ToString());
-                        _jttyLink.SendTag("FTOL", "10");
-                    }
+                //no change, don't clear report in or serial in
+                ApplyCallsignSelection(selectedWord, LogRST, Hz);
                 }
+                
 
+               
             }
+        }
+
+        private void ApplyCallsignSelection(string word, string? logRst, int? hz)
+        {
+            ClearDownUiAfterLog();              // clears tbReportOut if it was auto filled from received text
+            tbCallsign.Text = word;
+
+            if (btnJTTY.Checked && logRst != null && !(bool)tbReportOut.Tag)        // only fill if not fixed
+                tbReportOut.Text = logRst.Length >= 3 ? logRst.Substring(0, 3) : logRst;
+
+            if (btnJTTY.Checked && hz is int f && f >= 200 && f <= 5000)
+            {
+                _jttyLink.SendTag("RXFREQ", f.ToString());
+                _jttyLink.SendTag("FTOL", "10");
+            }
+        }
+
+        private void cmsLogOverwrite_Closed(object? sender, ToolStripDropDownClosedEventArgs e)
+        {
+            // Clicking away or pressing Esc closes the menu without an item click = cancel.
+            if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
+        }
+
+        private void cmsLogOverwriteConfirm_Click(object? sender, EventArgs e)
+        {
+            var a = _pendingAction;
+            _pendingAction = null;
+            a?.Invoke();
+        }
+
+        private void cmsLogOverwriteCancel_Click(object? sender, EventArgs e)
+        {
+            _pendingAction = null;
         }
 
         private void PipeConnectTimer_Tick(object sender, EventArgs e)

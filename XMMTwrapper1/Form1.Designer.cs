@@ -83,6 +83,9 @@ namespace XMMTwrapper1
             exportCabrilloToolStripMenuItem = new ToolStripMenuItem();
             openLogDirectoryToolStripMenuItem = new ToolStripMenuItem();
             tbTextReceived = new RichTextBox();
+            cmsLogOverwrite = new ContextMenuStrip(components);
+            cmsLogOverwriteConfirm = new ToolStripMenuItem();
+            cmsLogOverwriteCancel = new ToolStripMenuItem();
             tbCallsign = new TextBox();
             PipeConnectTimer = new System.Windows.Forms.Timer(components);
             tbReportOut = new TextBox();
@@ -142,6 +145,7 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
+            btnResetRxFreq = new Button();
             btnTune = new Button();
             btnTol500 = new Button();
             btnTol10 = new Button();
@@ -152,7 +156,6 @@ namespace XMMTwrapper1
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
-            btnResetRxFreq = new Button();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -167,6 +170,7 @@ namespace XMMTwrapper1
             ((System.ComponentModel.ISupportInitialize)sbAudioLevel).BeginInit();
             statusStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
+            cmsLogOverwrite.SuspendLayout();
             contextMenuStripReportFields.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnTemplate).BeginInit();
             gbRttyCW.SuspendLayout();
@@ -698,6 +702,7 @@ namespace XMMTwrapper1
             // tbTextReceived
             // 
             tbTextReceived.AcceptsTab = true;
+            tbTextReceived.ContextMenuStrip = cmsLogOverwrite;
             tbTextReceived.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tbTextReceived.Location = new Point(3, 39);
             tbTextReceived.Name = "tbTextReceived";
@@ -706,6 +711,28 @@ namespace XMMTwrapper1
             tbTextReceived.Text = "";
             tbTextReceived.WordWrap = false;
             tbTextReceived.MouseDown += tbTextReceived_MouseDown;
+            // 
+            // cmsLogOverwrite
+            // 
+            cmsLogOverwrite.Items.AddRange(new ToolStripItem[] { cmsLogOverwriteConfirm, cmsLogOverwriteCancel });
+            cmsLogOverwrite.Name = "cmsLogOverwtite";
+            cmsLogOverwrite.Size = new Size(181, 70);
+            cmsLogOverwrite.Text = "Log Overwrite";
+            cmsLogOverwrite.Closed += new ToolStripDropDownClosedEventHandler(cmsLogOverwrite_Closed);
+            // 
+            // cmsLogOverwriteConfirm
+            // 
+            cmsLogOverwriteConfirm.Name = "cmsLogOverwriteConfirm";
+            cmsLogOverwriteConfirm.Size = new Size(180, 22);
+            cmsLogOverwriteConfirm.Text = "Confirm";
+            cmsLogOverwriteConfirm.Click += new EventHandler(cmsLogOverwriteConfirm_Click);
+            // 
+            // cmsLogOverwriteCancel
+            // 
+            cmsLogOverwriteCancel.Name = "cmsLogOverwriteCancel";
+            cmsLogOverwriteCancel.Size = new Size(180, 22);
+            cmsLogOverwriteCancel.Text = "Cancel";
+            cmsLogOverwriteCancel.Click += new EventHandler(cmsLogOverwriteCancel_Click);
             // 
             // tbCallsign
             // 
@@ -1276,12 +1303,22 @@ namespace XMMTwrapper1
             gbJTTYcontrols.Controls.Add(btnTune);
             gbJTTYcontrols.Controls.Add(btnTol500);
             gbJTTYcontrols.Controls.Add(btnTol10);
-            gbJTTYcontrols.Location = new Point(12, 27);
+            gbJTTYcontrols.Location = new Point(-500, 27);
             gbJTTYcontrols.Name = "gbJTTYcontrols";
             gbJTTYcontrols.Size = new Size(211, 187);
             gbJTTYcontrols.TabIndex = 87;
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
+            // 
+            // btnResetRxFreq
+            // 
+            btnResetRxFreq.Location = new Point(8, 82);
+            btnResetRxFreq.Name = "btnResetRxFreq";
+            btnResetRxFreq.Size = new Size(51, 23);
+            btnResetRxFreq.TabIndex = 71;
+            btnResetRxFreq.Text = "Reset";
+            btnResetRxFreq.UseVisualStyleBackColor = true;
+            btnResetRxFreq.Click += btnResetRxFreq_Click;
             // 
             // btnTune
             // 
@@ -1428,16 +1465,6 @@ namespace XMMTwrapper1
             tbDupeTimeDate.Visible = false;
             tbDupeTimeDate.WordWrap = false;
             // 
-            // btnResetRxFreq
-            // 
-            btnResetRxFreq.Location = new Point(8, 82);
-            btnResetRxFreq.Name = "btnResetRxFreq";
-            btnResetRxFreq.Size = new Size(51, 23);
-            btnResetRxFreq.TabIndex = 71;
-            btnResetRxFreq.Text = "Reset";
-            btnResetRxFreq.UseVisualStyleBackColor = true;
-            btnResetRxFreq.Click += btnResetRxFreq_Click;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1483,6 +1510,7 @@ namespace XMMTwrapper1
             statusStrip1.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            cmsLogOverwrite.ResumeLayout(false);
             contextMenuStripReportFields.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)btnTemplate).EndInit();
             gbRttyCW.ResumeLayout(false);
@@ -1624,5 +1652,8 @@ namespace XMMTwrapper1
         private Button btnTol10;
         private Button btnTune;
         private Button btnResetRxFreq;
+        private ContextMenuStrip cmsLogOverwrite;
+        private ToolStripMenuItem cmsLogOverwriteConfirm;
+        private ToolStripMenuItem cmsLogOverwriteCancel;
     }
 }
