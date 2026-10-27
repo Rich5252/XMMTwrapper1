@@ -84,6 +84,8 @@ namespace XMMTwrapper1
             }
         }
 
+
+        //context menu actions for log overwrite confirmation
         private void cmsLogOverwrite_Closed(object? sender, ToolStripDropDownClosedEventArgs e)
         {
             // Clicking away or pressing Esc closes the menu without an item click = cancel.
@@ -101,7 +103,17 @@ namespace XMMTwrapper1
         {
             _pendingAction = null;
         }
+        private void cmsLogQSOFirst_Click(object? sender, EventArgs e)
+        {
+            bool success = LogQSO();      //returns true if QSO logged, false if not
 
+            if (success)                //if logging was successful, then clear the pending action and invoke it
+            {
+                var a = _pendingAction;
+                _pendingAction = null;
+                a?.Invoke();
+            }
+        }
 
     }
 }

@@ -31,7 +31,11 @@ namespace XMMTwrapper1
                 lblLogFileName.Text = _QSOlogger.LogFileName;
                 return;
             }
+            LogQSO();
+        }
 
+        private bool LogQSO()
+        {
             // otherwise log a QSO
             QsoEntry newEntry = new QsoEntry();
 
@@ -58,13 +62,14 @@ namespace XMMTwrapper1
             if (!_QSOlogger.LogQso(newEntry))
             {
                 MessageBox.Show("Error: valid Callsign & Frequency not specified");
-                return;
+                return false;
             }
 
             ClearDownUiAfterLog();
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
             lblLogFileName.Text = _QSOlogger.LogFileName;
             if (cbSerialNumAutoInc.Checked) { tbSerialNumOut.Increment(); }
+            return true;
         }
 
         /// Normalises a frequency entry to MHz.kHz:
