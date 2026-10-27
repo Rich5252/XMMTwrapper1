@@ -10,7 +10,7 @@
 
 namespace XMMTwrapper1
 {
-    [System.ComponentModel.DesignerCategory("Code")]
+    //[System.ComponentModel.DesignerCategory("Code")]
     public partial class Form1
     {
 

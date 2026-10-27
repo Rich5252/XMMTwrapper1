@@ -70,6 +70,15 @@
     <Compile Remove="XmmXYocxContracts.cs" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Compile Update="Form1.Layout.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Form1.XmmtOcxSupport.cs">
+			<SubType>Code</SubType>
+		</Compile>
+	</ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Remove="Form1.SendButtonHandling.resx" />
   </ItemGroup>
