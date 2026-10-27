@@ -35,10 +35,8 @@ namespace XMMTwrapper1
             // otherwise log a QSO
             QsoEntry newEntry = new QsoEntry();
 
-            newEntry.Callsign = tbCallsign.Text;
-            string freq = tbRxFrequency.Text;
-            if (freq.Length > 4) freq = freq.Substring(0, freq.Length-4);       //28.189.000 in UI, needs 28.180 in log
-            newEntry.FrequencyMHz = freq;                                       //in log kHz res format eg 28.180
+            newEntry.Callsign = tbCallsign.Text;                        
+            newEntry.FrequencyMHz = NormalizeFreqKhz(tbRxFrequency.Text);       //28.189.000 in UI, needs 28.180 in log                                //in log kHz res format eg 28.180
             newEntry.Timestamp = DateTime.UtcNow;
             newEntry.Mode = btnCW.Checked ? "CW" : btnRTTY.Checked ? "RTTY" : "MFSK";
             if (btnJTTY.Checked) newEntry.SubMode = "JTTY";
@@ -67,6 +65,27 @@ namespace XMMTwrapper1
             tbNumberQSOs.Text = _QSOlogger.TotalLogged.ToString();
             lblLogFileName.Text = _QSOlogger.LogFileName;
             if (cbSerialNumAutoInc.Checked) { tbSerialNumOut.Increment(); }
+        }
+
+        /// Normalises a frequency entry to MHz.kHz:
+        ///   "14" -> "14"   "14.09" -> "14.090"   "14.090" -> "14.090"   "14.090.000" -> "14.090"
+        /// A 2nd group is the kHz part, right-padded to 3 digits ("09" = 090, as in a decimal "14.09").
+        /// More than 3 digits there is truncated to kHz ("14.0905" -> "14.090"). A 3rd group (Hz) is dropped.
+        /// Returns null if the entry isn't a number in one of these forms.
+        public static string? NormalizeFreqKhz(string? entry)
+        {
+            if (string.IsNullOrWhiteSpace(entry)) return null;
+
+            string[] p = entry.Trim().Split('.');
+            if (p.Length > 3 || p.Any(g => !g.All(char.IsAsciiDigit))) return null;
+            if (p[0].Length == 0) return null;
+
+            string mhz = p[0].TrimStart('0');
+            if (mhz.Length == 0) mhz = "0";
+            if (p.Length == 1 || p[1].Length == 0) return mhz;
+
+            string khz = p[1].Length > 3 ? p[1][..3] : p[1].PadRight(3, '0');
+            return $"{mhz}.{khz}";
         }
 
         private void ClearDownUiAfterLog()
@@ -99,9 +118,7 @@ namespace XMMTwrapper1
         //this is also called when tbFreq changes
         private void tbCallsign_TextChanged(object sender, EventArgs e)
         {
-            string freq = tbRxFrequency.Text;
-            if (freq.Length > 4) freq = freq.Substring (0, freq.Length-4);
-            int dupeIndex = _QSOlogger.GetDupeIndex(tbCallsign.Text, freq);
+            int dupeIndex = _QSOlogger.GetDupeIndex(tbCallsign.Text, NormalizeFreqKhz(tbRxFrequency.Text));
             if (dupeIndex == -1)
             {
                 lblDUPE.Visible = false;
