@@ -95,6 +95,10 @@
 			<DependentUpon>Form1.cs</DependentUpon>
 			<SubType>Code</SubType>
 		</Compile>
+		<Compile Update="Form1.ReceivedText.cs">
+			<DependentUpon>Form1.cs</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
 	</ItemGroup>
 	
   <ItemGroup>
