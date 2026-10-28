@@ -158,6 +158,10 @@ namespace XMMTwrapper1
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
+            cmsLogSave = new ContextMenuStrip(components);
+            cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
+            cmsLogSaveMenuClearLog = new ToolStripMenuItem();
+            cmsLogSaveMenuCancel = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -181,6 +185,7 @@ namespace XMMTwrapper1
             panelLogging.SuspendLayout();
             panelTextReceived.SuspendLayout();
             panelLogging2.SuspendLayout();
+            cmsLogSave.SuspendLayout();
             SuspendLayout();
             // 
             // axxmmxy1
@@ -718,28 +723,33 @@ namespace XMMTwrapper1
             // 
             cmsLogOverwrite.Items.AddRange(new ToolStripItem[] { cmsLogOverwriteConfirm, cmsLogOverwriteCancel, toolStripSeparator1, cmsLogQSOFirst });
             cmsLogOverwrite.Name = "cmsLogOverwtite";
-            cmsLogOverwrite.Size = new Size(181, 98);
+            cmsLogOverwrite.Size = new Size(145, 76);
             cmsLogOverwrite.Text = "Log Overwrite";
             cmsLogOverwrite.Closed += cmsLogOverwrite_Closed;
             // 
             // cmsLogOverwriteConfirm
             // 
             cmsLogOverwriteConfirm.Name = "cmsLogOverwriteConfirm";
-            cmsLogOverwriteConfirm.Size = new Size(180, 22);
+            cmsLogOverwriteConfirm.Size = new Size(144, 22);
             cmsLogOverwriteConfirm.Text = "Confirm";
             cmsLogOverwriteConfirm.Click += cmsLogOverwriteConfirm_Click;
             // 
             // cmsLogOverwriteCancel
             // 
             cmsLogOverwriteCancel.Name = "cmsLogOverwriteCancel";
-            cmsLogOverwriteCancel.Size = new Size(180, 22);
+            cmsLogOverwriteCancel.Size = new Size(144, 22);
             cmsLogOverwriteCancel.Text = "Cancel";
             cmsLogOverwriteCancel.Click += cmsLogOverwriteCancel_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(141, 6);
             // 
             // cmsLogQSOFirst
             // 
             cmsLogQSOFirst.Name = "cmsLogQSOFirst";
-            cmsLogQSOFirst.Size = new Size(180, 22);
+            cmsLogQSOFirst.Size = new Size(144, 22);
             cmsLogQSOFirst.Text = "Log QSO first";
             cmsLogQSOFirst.Click += cmsLogQSOFirst_Click;
             // 
@@ -1474,12 +1484,34 @@ namespace XMMTwrapper1
             tbDupeTimeDate.Visible = false;
             tbDupeTimeDate.WordWrap = false;
             // 
-            // toolStripSeparator1
+            // cmsLogSave
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(177, 6);
+            cmsLogSave.Items.AddRange(new ToolStripItem[] { cmsLogSaveMenuLogQSO, cmsLogSaveMenuClearLog, cmsLogSaveMenuCancel });
+            cmsLogSave.Name = "cmsLogSave";
+            cmsLogSave.Size = new Size(129, 70);
+            cmsLogSave.Closed += cmsLogSave_Closed;
             // 
-
+            // cmsLogSaveMenuLogQSO
+            // 
+            cmsLogSaveMenuLogQSO.Name = "cmsLogSaveMenuLogQSO";
+            cmsLogSaveMenuLogQSO.Size = new Size(128, 22);
+            cmsLogSaveMenuLogQSO.Text = "Log QSO";
+            cmsLogSaveMenuLogQSO.Click += cmsLogSaveMenuLogQSO_Click;
+            // 
+            // cmsLogSaveMenuClearLog
+            // 
+            cmsLogSaveMenuClearLog.Name = "cmsLogSaveMenuClearLog";
+            cmsLogSaveMenuClearLog.Size = new Size(128, 22);
+            cmsLogSaveMenuClearLog.Text = "Clear Log";
+            cmsLogSaveMenuClearLog.Click += cmsLogSaveMenuClearLog_Click;
+            // 
+            // cmsLogSaveMenuCancel
+            // 
+            cmsLogSaveMenuCancel.Name = "cmsLogSaveMenuCancel";
+            cmsLogSaveMenuCancel.Size = new Size(128, 22);
+            cmsLogSaveMenuCancel.Text = "No Action";
+            cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1539,6 +1571,7 @@ namespace XMMTwrapper1
             panelTextReceived.PerformLayout();
             panelLogging2.ResumeLayout(false);
             panelLogging2.PerformLayout();
+            cmsLogSave.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1672,5 +1705,9 @@ namespace XMMTwrapper1
         private ToolStripMenuItem cmsLogOverwriteCancel;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem cmsLogQSOFirst;
+        private ContextMenuStrip cmsLogSave;
+        private ToolStripMenuItem cmsLogSaveMenuLogQSO;
+        private ToolStripMenuItem cmsLogSaveMenuClearLog;
+        private ToolStripMenuItem cmsLogSaveMenuCancel;
     }
 }

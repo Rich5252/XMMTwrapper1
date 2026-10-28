@@ -103,6 +103,8 @@ namespace XMMTwrapper1
         {
             _pendingAction = null;
         }
+
+
         private void cmsLogQSOFirst_Click(object? sender, EventArgs e)
         {
             bool success = LogQSO();      //returns true if QSO logged, false if not
@@ -115,5 +117,27 @@ namespace XMMTwrapper1
             }
         }
 
+        private void cmsLogSaveMenuLogQSO_Click(object sender, EventArgs e)
+        {
+            LogQSO();
+            _pendingAction = null;
+        }
+
+        private void cmsLogSaveMenuClearLog_Click(object sender, EventArgs e)
+        {
+            ClearDownUiAfterLog();
+            _pendingAction = null;  
+        }
+
+        private void cmsLogSaveMenuCancel_Click(object sender, EventArgs e)
+        {
+            _pendingAction = null;
+        }
+
+        private void cmsLogSave_Closed(object sender, ToolStripDropDownClosedEventArgs e)
+        {
+            // Clicking away or pressing Esc closes the menu without an item click = cancel.
+            if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
+        }
     }
 }

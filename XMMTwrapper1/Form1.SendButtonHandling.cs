@@ -108,6 +108,10 @@ namespace XMMTwrapper1
                 {
                     NoteJttyTxSent(outMsg);                            // so its echo can be told from real RX
                     TryHandleJttyPipeMessage("{TXS}");                 // TX started: WS echo is shown as TX
+
+                    //In case we forgot to save last contact
+                    if (outMsg.Contains("CQ") && tbCallsign.Text != "" && tbReportOut.Text != "" && tbReportIn.Text != "")
+                        cmsLogSave.Show(tbTextReceived, new Point(tbTextReceived.Width/2, tbTextReceived.Height/2));  //show log save menu if CQ sent
                 }
                 else
                     lblWSjttyStatus.Text = "WS not connected - not sent";
