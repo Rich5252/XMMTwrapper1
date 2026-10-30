@@ -172,7 +172,7 @@ public class AdifLogger
 
     public int GetDupeIndex(string callsign, string freqMhz)
     {
-        if (callsign == "" || freqMhz == "") return -1;
+        if (string.IsNullOrWhiteSpace(callsign) || string.IsNullOrWhiteSpace(freqMhz)) return -1;
 
         // Get the part before the dot (e.g., "28")
         string bandMhz = freqMhz.Split('.')[0];
