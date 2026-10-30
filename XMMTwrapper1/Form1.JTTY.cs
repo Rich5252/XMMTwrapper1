@@ -74,6 +74,10 @@ namespace XMMTwrapper1
                 _jttyLink.SendTag("RXFREQ", lane.Freq.ToString()); //select this lane as RX freq with 10Hz Ftol
                 _jttyLink.SendTag("FTOL", "10");
             };
+            RxTextScroller.LaneRightClicked += (lane, word, e) =>
+            {
+                RxScroller_LaneRightClicked(lane, word, e);
+            };
 
             try
             {
@@ -383,5 +387,38 @@ namespace XMMTwrapper1
                 lblWSjttyStatus.Text = $"Could not start WS: {ex.Message}";
             }
         }
-    }
+
+        private void RxScroller_LaneRightClicked(TickerLane lane, string? word, MouseEventArgs e)
+        {
+            _pendingActionDeleteLane = () =>
+            {
+                RxTextScroller.Model.RemoveLane(lane);
+            };
+            _pendingActionDeleteLaneAll = () =>
+            {
+                RxTextScroller.Model.Clear();
+            };
+            cmsScroller.Show(Cursor.Position);
+        }
+
+        private void cmsScroller_Closed(object? sender, ToolStripDropDownClosedEventArgs e)
+        {
+            // Clicking away or pressing Esc closes the menu without an item click = cancel.
+            if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
+        }
+
+        private void cmsScrollerMenuDeleteLane_Click(object? sender, EventArgs e)
+        {
+            var a = _pendingActionDeleteLane;
+            _pendingActionDeleteLane = null;
+            a?.Invoke();
+        }
+
+        private void cmsScrollerMenuDeleteAll_Click(object? sender, EventArgs e)
+        {
+            var a = _pendingActionDeleteLaneAll;
+            _pendingActionDeleteLaneAll = null;
+            a?.Invoke();
+        }
+    }   
 }

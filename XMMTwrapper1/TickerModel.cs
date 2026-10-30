@@ -44,8 +44,10 @@ namespace XMMTwrapper1
 
     public sealed class TickerModel
     {
-        /// A message within this many Hz of a lane's last frequency joins that lane.
-        public int FreqTolerance { get; set; } = 10;
+        /// A new message within this many Hz (+/-) of a lane's last frequency joins that lane;
+        /// otherwise it starts a new lane. Small values separate crowded stations; too small a
+        /// value splits one drifting station across lanes.
+        public int FreqTolerance { get; set; } = 2;
 
         /// Idle lanes (no update for this long) are dropped by Prune(), unless pinned by a manual call.
         public TimeSpan LaneTimeout { get; set; } = TimeSpan.FromMinutes(10);
@@ -124,6 +126,16 @@ namespace XMMTwrapper1
             Prune(t, raise: false);
             Changed?.Invoke();
             return lane;
+        }
+
+        /// Deletes a lane and its text. If a message that was still being received on it sends
+        /// another update, it reappears as a new lane (with the full text so far).
+        public bool RemoveLane(TickerLane lane)
+        {
+            if (!_lanes.Remove(lane)) return false;
+            ForgetMessages(lane);
+            Changed?.Invoke();
+            return true;
         }
 
         /// Drops idle lanes. Lanes with a manually set call stay.

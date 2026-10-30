@@ -156,6 +156,9 @@ namespace XMMTwrapper1
             panelLogging = new Panel();
             panelTextReceived = new Panel();
             RxTextScroller = new TickerControl();
+            cmsScroller = new ContextMenuStrip(components);
+            cmsScrollerMenuDeleteLane = new ToolStripMenuItem();
+            cmsScrollerMenuDeleteAll = new ToolStripMenuItem();
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
@@ -185,6 +188,7 @@ namespace XMMTwrapper1
             panelButtons.SuspendLayout();
             panelLogging.SuspendLayout();
             panelTextReceived.SuspendLayout();
+            cmsScroller.SuspendLayout();
             panelLogging2.SuspendLayout();
             cmsLogSave.SuspendLayout();
             SuspendLayout();
@@ -1459,6 +1463,7 @@ namespace XMMTwrapper1
             // RxTextScroller
             // 
             RxTextScroller.BackColor = SystemColors.Window;
+            RxTextScroller.ContextMenuStrip = cmsScroller;
             RxTextScroller.Font = new Font("Consolas", 10F);
             RxTextScroller.ForeColor = SystemColors.WindowText;
             RxTextScroller.Location = new Point(0, 143);
@@ -1466,6 +1471,26 @@ namespace XMMTwrapper1
             RxTextScroller.Size = new Size(402, 107);
             RxTextScroller.TabIndex = 70;
             RxTextScroller.Text = "tickerControl1";
+            // 
+            // cmsScroller
+            // 
+            cmsScroller.Items.AddRange(new ToolStripItem[] { cmsScrollerMenuDeleteLane, cmsScrollerMenuDeleteAll });
+            cmsScroller.Name = "cmsScroller";
+            cmsScroller.Size = new Size(181, 70);
+            // 
+            // cmsScrollerMenuDeleteLane
+            // 
+            cmsScrollerMenuDeleteLane.Name = "cmsScrollerMenuDeleteLane";
+            cmsScrollerMenuDeleteLane.Size = new Size(180, 22);
+            cmsScrollerMenuDeleteLane.Text = "Delete Lane";
+            cmsScrollerMenuDeleteLane.Click += cmsScrollerMenuDeleteLane_Click;
+            // 
+            // cmsScrollerMenuDeleteAll
+            // 
+            cmsScrollerMenuDeleteAll.Name = "cmsScrollerMenuDeleteAll";
+            cmsScrollerMenuDeleteAll.Size = new Size(180, 22);
+            cmsScrollerMenuDeleteAll.Text = "Delete All";
+            cmsScrollerMenuDeleteAll.Click += cmsScrollerMenuDeleteAll_Click;
             // 
             // lblDupeTimeDate
             // 
@@ -1582,6 +1607,7 @@ namespace XMMTwrapper1
             panelLogging.PerformLayout();
             panelTextReceived.ResumeLayout(false);
             panelTextReceived.PerformLayout();
+            cmsScroller.ResumeLayout(false);
             panelLogging2.ResumeLayout(false);
             panelLogging2.PerformLayout();
             cmsLogSave.ResumeLayout(false);
@@ -1723,5 +1749,8 @@ namespace XMMTwrapper1
         private ToolStripMenuItem cmsLogSaveMenuClearLog;
         private ToolStripMenuItem cmsLogSaveMenuCancel;
         private TickerControl RxTextScroller;
+        private ContextMenuStrip cmsScroller;
+        private ToolStripMenuItem cmsScrollerMenuDeleteLane;
+        private ToolStripMenuItem cmsScrollerMenuDeleteAll;
     }
 }

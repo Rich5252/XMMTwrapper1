@@ -27,6 +27,14 @@ namespace XMMTwrapper1
         /// One of the lane's left-hand columns (Freq, SNR, ID, Call) was clicked.
         public event Action<TickerLane, MouseEventArgs>? LaneClicked;
 
+        /// Right mouse button pressed on a lane (anywhere in the row). The word under the pointer
+        /// is passed too, or null if the pointer is not on a word. The lane is also selected
+        /// (SelectedLane) and the word kept in ClickedWord, so a ContextMenuStrip assigned to
+        /// this control can use those in its item handlers. This fires before the menu opens,
+        /// so it is the place to enable/disable items. Right-clicking empty space gives
+        /// SelectedLane == null.
+        public event Action<TickerLane, string?, MouseEventArgs>? LaneRightClicked;
+
         // ---- appearance ---------------------------------------------------------------------
 
         [Category("Appearance"), DefaultValue(true)]
@@ -42,6 +50,28 @@ namespace XMMTwrapper1
 
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TickerLane? SelectedLane { get; private set; }
+
+        /// The word under the pointer at the last mouse press (null if none).
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string? ClickedWord { get; private set; }
+
+        /// Lane resolution: a new message joins a lane whose last frequency is within +/- this many Hz.
+        [Category("Behavior"), DefaultValue(2)]
+        public int LaneTolerance
+        {
+            get => Model.FreqTolerance;
+            set => Model.FreqTolerance = Math.Max(0, value);
+        }
+
+        /// Deletes a lane (and its text).
+        public bool RemoveLane(TickerLane lane)
+        {
+            if (ReferenceEquals(lane, SelectedLane)) SelectedLane = null;
+            return Model.RemoveLane(lane);
+        }
+
+        /// Deletes the selected lane (the one last clicked), if any.
+        public bool RemoveSelectedLane() => SelectedLane != null && RemoveLane(SelectedLane);
 
         /// Sets the lane's callsign by hand (it then stays until the lane is pruned/cleared).
         public void SetLaneCall(TickerLane lane, string call)
@@ -253,29 +283,42 @@ namespace XMMTwrapper1
             base.OnMouseDown(e);
             Focus();
 
+            ClickedWord = null;
             int rowIndex = (e.Y - _headerH) / _rowH;
-            if (e.Y < _headerH || rowIndex < 0 || rowIndex >= VisibleRows) return;
             int idx = (_vbar.Visible ? _vbar.Value : 0) + rowIndex;
-            if (idx >= Model.Lanes.Count) return;
+            if (e.Y < _headerH || rowIndex < 0 || rowIndex >= VisibleRows || idx >= Model.Lanes.Count)
+            {
+                SelectedLane = null;                 // pressed on empty space
+                Invalidate();
+                return;
+            }
 
             TickerLane lane = Model.Lanes[idx];
             SelectedLane = lane;
             Invalidate();
 
-            int textX0 = TextLeft - PadX;
-            if (e.X < textX0)
+            bool inLeftColumns = e.X < TextLeft - PadX;
+            if (!inLeftColumns)
             {
-                LaneClicked?.Invoke(lane, e);
+                string full = lane.FullText;
+                int ci = (int)Math.Floor((e.X - LaneTextX(lane, full.Length)) / _cw);
+                if (ci >= 0 && ci < full.Length && full[ci] != ' ')
+                {
+                    int a = ci, b = ci;
+                    while (a > 0 && full[a - 1] != ' ') a--;
+                    while (b < full.Length - 1 && full[b + 1] != ' ') b++;
+                    ClickedWord = full.Substring(a, b - a + 1);
+                }
+            }
+
+            if (e.Button == MouseButtons.Right)
+            {
+                LaneRightClicked?.Invoke(lane, ClickedWord, e);
                 return;
             }
 
-            string full = lane.FullText;
-            int ci = (int)Math.Floor((e.X - LaneTextX(lane, full.Length)) / _cw);
-            if (ci < 0 || ci >= full.Length || full[ci] == ' ') return;
-            int a = ci, b = ci;
-            while (a > 0 && full[a - 1] != ' ') a--;
-            while (b < full.Length - 1 && full[b + 1] != ' ') b++;
-            WordClicked?.Invoke(lane, full.Substring(a, b - a + 1), e);
+            if (inLeftColumns) LaneClicked?.Invoke(lane, e);
+            else if (ClickedWord != null) WordClicked?.Invoke(lane, ClickedWord, e);
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)

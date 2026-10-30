@@ -26,6 +26,8 @@ namespace XMMTwrapper1
         private static extern IntPtr GetForegroundWindow();
 
         private Action? _pendingAction;     //auto select confirm action
+        private Action? _pendingActionDeleteLane;    //auto select confirm action for second dialog
+        private Action? _pendingActionDeleteLaneAll;    //auto select confirm action for third dialog
 
         public Form1()
         {
