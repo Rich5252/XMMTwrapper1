@@ -211,22 +211,11 @@ namespace XMMTwrapper1
                 int y = _headerH + r * _rowH;
                 var row = new Rectangle(0, y, viewRight, _rowH);
 
-                if (lane.InQsoWindow)
-                    using (var b = new SolidBrush(_qsoBack)) g.FillRectangle(b, row);
-                if (ReferenceEquals(lane, SelectedLane))
-                    using (var pen = new Pen(SystemColors.Highlight))
-                        g.DrawRectangle(pen, row.X, row.Y, row.Width - 1, row.Height - 1);
+                Color rowBack = lane.InQsoWindow ? _qsoBack : BackColor;
+                using (var b = new SolidBrush(rowBack)) g.FillRectangle(b, row);
 
-                TextRenderer.DrawText(g, lane.Freq.ToString(), Font, new Rectangle(x1 + PadX / 2, y, FreqW, _rowH), ForeColor, tf);
-                TextRenderer.DrawText(g, lane.Snr.ToString("+0;-0;0"), Font, new Rectangle(x2 + PadX / 2, y, SnrW, _rowH), ForeColor, tf);
-                if (_showId)
-                    TextRenderer.DrawText(g, lane.LastMessageId.ToString(), Font, new Rectangle(x3 + PadX / 2, y, IdW, _rowH), dim, tf);
-                TextRenderer.DrawText(g, lane.Call, Font, new Rectangle(x4 + PadX / 2, y, CallW, _rowH),
-                                      lane.CallIsManual ? ForeColor : dim, tf);
-
-                // text: clipped to its column, right-aligned, drawn message by message
-                var old = g.Clip;
-                g.SetClip(new Rectangle(x5, y, Math.Max(1, viewRight - x5), _rowH));
+                // 1) the scrolling text first. GDI text (TextRenderer) does not reliably honour the
+                //    Graphics clip region, so this may spill left over the fixed columns...
                 string full = lane.FullText;
                 float x = LaneTextX(lane, full.Length);
                 bool firstSeg = true;
@@ -241,7 +230,21 @@ namespace XMMTwrapper1
                                               TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix | TextFormatFlags.Left);
                     x += w;
                 }
-                g.Clip = old;
+
+                // 2) ...so repaint the fixed Freq/SNR/ID/Call columns on top of it.
+                using (var b = new SolidBrush(rowBack)) g.FillRectangle(b, new Rectangle(0, y, x5, _rowH));
+                TextRenderer.DrawText(g, lane.Freq.ToString(), Font, new Rectangle(x1 + PadX / 2, y, FreqW, _rowH), ForeColor, tf);
+                TextRenderer.DrawText(g, lane.Snr.ToString("+0;-0;0"), Font, new Rectangle(x2 + PadX / 2, y, SnrW, _rowH), ForeColor, tf);
+                if (_showId)
+                    TextRenderer.DrawText(g, lane.LastMessageId.ToString(), Font, new Rectangle(x3 + PadX / 2, y, IdW, _rowH), dim, tf);
+                TextRenderer.DrawText(g, lane.Call, Font, new Rectangle(x4 + PadX / 2, y, CallW, _rowH),
+                                      lane.CallIsManual ? ForeColor : dim, tf);
+                using (var pen = new Pen(Color.FromArgb(60, ForeColor)))
+                    g.DrawLine(pen, x5 - PadX / 2, y, x5 - PadX / 2, y + _rowH - 1);
+
+                if (ReferenceEquals(lane, SelectedLane))
+                    using (var pen = new Pen(SystemColors.Highlight))
+                        g.DrawRectangle(pen, row.X, row.Y, row.Width - 1, row.Height - 1);
             }
         }
 
