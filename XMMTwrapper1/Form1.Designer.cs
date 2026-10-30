@@ -605,7 +605,7 @@ namespace XMMTwrapper1
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, toolStripStatusLabel3, lblPipeStatus, toolStripStatusLabel1, lblWSjttyStatus, toolStripStatusLabel2, lblLogFileName });
             statusStrip1.Location = new Point(0, 571);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(804, 22);
+            statusStrip1.Size = new Size(902, 22);
             statusStrip1.TabIndex = 22;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -659,7 +659,7 @@ namespace XMMTwrapper1
             menuStrip1.Items.AddRange(new ToolStripItem[] { OptionMenu, audioSelectToolStripMenuItem, exportLogToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(804, 24);
+            menuStrip1.Size = new Size(902, 24);
             menuStrip1.TabIndex = 23;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -718,7 +718,7 @@ namespace XMMTwrapper1
             tbTextReceived.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tbTextReceived.Location = new Point(0, 42);
             tbTextReceived.Name = "tbTextReceived";
-            tbTextReceived.Size = new Size(402, 95);
+            tbTextReceived.Size = new Size(598, 95);
             tbTextReceived.TabIndex = 24;
             tbTextReceived.Text = "";
             tbTextReceived.WordWrap = false;
@@ -761,7 +761,7 @@ namespace XMMTwrapper1
             // tbCallsign
             // 
             tbCallsign.CharacterCasing = CharacterCasing.Upper;
-            tbCallsign.Location = new Point(204, 8);
+            tbCallsign.Location = new Point(108, 12);
             tbCallsign.Name = "tbCallsign";
             tbCallsign.Size = new Size(108, 23);
             tbCallsign.TabIndex = 25;
@@ -777,7 +777,7 @@ namespace XMMTwrapper1
             // 
             tbReportOut.CharacterCasing = CharacterCasing.Upper;
             tbReportOut.ContextMenuStrip = contextMenuStripReportFields;
-            tbReportOut.Location = new Point(204, 37);
+            tbReportOut.Location = new Point(108, 41);
             tbReportOut.Name = "tbReportOut";
             tbReportOut.Size = new Size(42, 23);
             tbReportOut.TabIndex = 26;
@@ -877,7 +877,7 @@ namespace XMMTwrapper1
             // 
             // tbComment
             // 
-            tbComment.Location = new Point(204, 182);
+            tbComment.Location = new Point(108, 186);
             tbComment.Name = "tbComment";
             tbComment.Size = new Size(168, 23);
             tbComment.TabIndex = 30;
@@ -886,7 +886,7 @@ namespace XMMTwrapper1
             // 
             tbSerialNumOut.CharacterCasing = CharacterCasing.Upper;
             tbSerialNumOut.ContextMenuStrip = contextMenuStripReportFields;
-            tbSerialNumOut.Location = new Point(255, 37);
+            tbSerialNumOut.Location = new Point(159, 41);
             tbSerialNumOut.Name = "tbSerialNumOut";
             tbSerialNumOut.Size = new Size(57, 23);
             tbSerialNumOut.TabIndex = 31;
@@ -896,7 +896,7 @@ namespace XMMTwrapper1
             // 
             tbSerialNumIn.CharacterCasing = CharacterCasing.Upper;
             tbSerialNumIn.ContextMenuStrip = contextMenuStripReportFields;
-            tbSerialNumIn.Location = new Point(255, 66);
+            tbSerialNumIn.Location = new Point(159, 70);
             tbSerialNumIn.Name = "tbSerialNumIn";
             tbSerialNumIn.Size = new Size(57, 23);
             tbSerialNumIn.TabIndex = 33;
@@ -906,7 +906,7 @@ namespace XMMTwrapper1
             // 
             tbReportIn.CharacterCasing = CharacterCasing.Upper;
             tbReportIn.ContextMenuStrip = contextMenuStripReportFields;
-            tbReportIn.Location = new Point(204, 66);
+            tbReportIn.Location = new Point(108, 70);
             tbReportIn.Name = "tbReportIn";
             tbReportIn.Size = new Size(42, 23);
             tbReportIn.TabIndex = 32;
@@ -914,14 +914,14 @@ namespace XMMTwrapper1
             // 
             // tbQTH
             // 
-            tbQTH.Location = new Point(204, 153);
+            tbQTH.Location = new Point(108, 157);
             tbQTH.Name = "tbQTH";
             tbQTH.Size = new Size(108, 23);
             tbQTH.TabIndex = 34;
             // 
             // tbOpName
             // 
-            tbOpName.Location = new Point(204, 124);
+            tbOpName.Location = new Point(108, 128);
             tbOpName.Name = "tbOpName";
             tbOpName.Size = new Size(108, 23);
             tbOpName.TabIndex = 35;
@@ -929,7 +929,7 @@ namespace XMMTwrapper1
             // tbLocator
             // 
             tbLocator.CharacterCasing = CharacterCasing.Upper;
-            tbLocator.Location = new Point(204, 95);
+            tbLocator.Location = new Point(108, 99);
             tbLocator.Name = "tbLocator";
             tbLocator.Size = new Size(108, 23);
             tbLocator.TabIndex = 36;
@@ -937,7 +937,7 @@ namespace XMMTwrapper1
             // btnSerialNumInc
             // 
             btnSerialNumInc.Font = new Font("Segoe UI", 8.25F);
-            btnSerialNumInc.Location = new Point(316, 29);
+            btnSerialNumInc.Location = new Point(220, 33);
             btnSerialNumInc.Margin = new Padding(1);
             btnSerialNumInc.Name = "btnSerialNumInc";
             btnSerialNumInc.Size = new Size(35, 20);
@@ -950,7 +950,7 @@ namespace XMMTwrapper1
             // btnSerialNumDec
             // 
             btnSerialNumDec.Font = new Font("Segoe UI", 8.25F);
-            btnSerialNumDec.Location = new Point(316, 50);
+            btnSerialNumDec.Location = new Point(220, 54);
             btnSerialNumDec.Name = "btnSerialNumDec";
             btnSerialNumDec.Size = new Size(35, 20);
             btnSerialNumDec.TabIndex = 38;
@@ -961,7 +961,7 @@ namespace XMMTwrapper1
             // cbSerialNumAutoInc
             // 
             cbSerialNumAutoInc.AutoSize = true;
-            cbSerialNumAutoInc.Location = new Point(357, 41);
+            cbSerialNumAutoInc.Location = new Point(261, 45);
             cbSerialNumAutoInc.Name = "cbSerialNumAutoInc";
             cbSerialNumAutoInc.Size = new Size(15, 14);
             cbSerialNumAutoInc.TabIndex = 39;
@@ -1030,7 +1030,7 @@ namespace XMMTwrapper1
             // 
             // btnLogQSO
             // 
-            btnLogQSO.Location = new Point(204, 213);
+            btnLogQSO.Location = new Point(108, 217);
             btnLogQSO.Name = "btnLogQSO";
             btnLogQSO.Size = new Size(75, 23);
             btnLogQSO.TabIndex = 46;
@@ -1040,7 +1040,7 @@ namespace XMMTwrapper1
             // 
             // tbNumberQSOs
             // 
-            tbNumberQSOs.Location = new Point(306, 214);
+            tbNumberQSOs.Location = new Point(210, 218);
             tbNumberQSOs.Name = "tbNumberQSOs";
             tbNumberQSOs.Size = new Size(66, 23);
             tbNumberQSOs.TabIndex = 47;
@@ -1048,7 +1048,7 @@ namespace XMMTwrapper1
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(286, 217);
+            label1.Location = new Point(190, 221);
             label1.Name = "label1";
             label1.Size = new Size(14, 15);
             label1.TabIndex = 48;
@@ -1057,7 +1057,7 @@ namespace XMMTwrapper1
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(153, 11);
+            label2.Location = new Point(57, 15);
             label2.Name = "label2";
             label2.Size = new Size(45, 15);
             label2.TabIndex = 49;
@@ -1067,7 +1067,7 @@ namespace XMMTwrapper1
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(146, 41);
+            label3.Location = new Point(50, 45);
             label3.Name = "label3";
             label3.Size = new Size(52, 15);
             label3.TabIndex = 50;
@@ -1077,7 +1077,7 @@ namespace XMMTwrapper1
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(121, 70);
+            label4.Location = new Point(25, 74);
             label4.Name = "label4";
             label4.Size = new Size(77, 15);
             label4.TabIndex = 51;
@@ -1087,7 +1087,7 @@ namespace XMMTwrapper1
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(113, 98);
+            label5.Location = new Point(17, 102);
             label5.Name = "label5";
             label5.Size = new Size(85, 15);
             label5.TabIndex = 52;
@@ -1097,7 +1097,7 @@ namespace XMMTwrapper1
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(103, 127);
+            label6.Location = new Point(7, 131);
             label6.Name = "label6";
             label6.Size = new Size(95, 15);
             label6.TabIndex = 53;
@@ -1107,7 +1107,7 @@ namespace XMMTwrapper1
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(142, 156);
+            label7.Location = new Point(46, 160);
             label7.Name = "label7";
             label7.Size = new Size(56, 15);
             label7.TabIndex = 54;
@@ -1117,7 +1117,7 @@ namespace XMMTwrapper1
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(137, 185);
+            label8.Location = new Point(41, 189);
             label8.Name = "label8";
             label8.Size = new Size(61, 15);
             label8.TabIndex = 55;
@@ -1126,7 +1126,7 @@ namespace XMMTwrapper1
             // 
             // btnClearText
             // 
-            btnClearText.Location = new Point(373, 13);
+            btnClearText.Location = new Point(553, 13);
             btnClearText.Name = "btnClearText";
             btnClearText.Size = new Size(23, 23);
             btnClearText.TabIndex = 66;
@@ -1158,18 +1158,18 @@ namespace XMMTwrapper1
             // 
             // tbCallSignList
             // 
-            tbCallSignList.Location = new Point(2, 38);
+            tbCallSignList.Location = new Point(794, 55);
             tbCallSignList.Multiline = true;
             tbCallSignList.Name = "tbCallSignList";
             tbCallSignList.ScrollBars = ScrollBars.Vertical;
-            tbCallSignList.Size = new Size(100, 199);
+            tbCallSignList.Size = new Size(100, 168);
             tbCallSignList.TabIndex = 70;
             tbCallSignList.MouseDoubleClick += tbCallSignList_MouseDoubleClick;
             // 
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(17, 16);
+            label14.Location = new Point(809, 38);
             label14.Name = "label14";
             label14.Size = new Size(54, 15);
             label14.TabIndex = 71;
@@ -1177,7 +1177,7 @@ namespace XMMTwrapper1
             // 
             // tbPwr
             // 
-            tbPwr.Location = new Point(345, 153);
+            tbPwr.Location = new Point(249, 157);
             tbPwr.Name = "tbPwr";
             tbPwr.Size = new Size(27, 23);
             tbPwr.TabIndex = 72;
@@ -1186,7 +1186,7 @@ namespace XMMTwrapper1
             // label15
             // 
             label15.AutoSize = true;
-            label15.Location = new Point(314, 156);
+            label15.Location = new Point(218, 160);
             label15.Name = "label15";
             label15.Size = new Size(27, 15);
             label15.TabIndex = 73;
@@ -1197,7 +1197,7 @@ namespace XMMTwrapper1
             lblDUPE.AutoSize = true;
             lblDUPE.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblDUPE.ForeColor = Color.Red;
-            lblDUPE.Location = new Point(307, 1);
+            lblDUPE.Location = new Point(211, 5);
             lblDUPE.Name = "lblDUPE";
             lblDUPE.Size = new Size(67, 30);
             lblDUPE.TabIndex = 74;
@@ -1206,7 +1206,7 @@ namespace XMMTwrapper1
             // 
             // btnLookup
             // 
-            btnLookup.Location = new Point(316, 94);
+            btnLookup.Location = new Point(220, 98);
             btnLookup.Name = "btnLookup";
             btnLookup.Size = new Size(56, 23);
             btnLookup.TabIndex = 75;
@@ -1421,9 +1421,7 @@ namespace XMMTwrapper1
             panelLogging.Controls.Add(tbReportOut);
             panelLogging.Controls.Add(tbPwr);
             panelLogging.Controls.Add(tbComment);
-            panelLogging.Controls.Add(label14);
             panelLogging.Controls.Add(tbSerialNumOut);
-            panelLogging.Controls.Add(tbCallSignList);
             panelLogging.Controls.Add(tbReportIn);
             panelLogging.Controls.Add(tbSerialNumIn);
             panelLogging.Controls.Add(tbQTH);
@@ -1441,9 +1439,9 @@ namespace XMMTwrapper1
             panelLogging.Controls.Add(label1);
             panelLogging.Controls.Add(label3);
             panelLogging.Controls.Add(label2);
-            panelLogging.Location = new Point(414, 221);
+            panelLogging.Location = new Point(609, 221);
             panelLogging.Name = "panelLogging";
-            panelLogging.Size = new Size(374, 249);
+            panelLogging.Size = new Size(285, 249);
             panelLogging.TabIndex = 90;
             // 
             // panelTextReceived
@@ -1457,7 +1455,7 @@ namespace XMMTwrapper1
             panelTextReceived.Controls.Add(label9);
             panelTextReceived.Location = new Point(12, 220);
             panelTextReceived.Name = "panelTextReceived";
-            panelTextReceived.Size = new Size(405, 250);
+            panelTextReceived.Size = new Size(598, 250);
             panelTextReceived.TabIndex = 91;
             // 
             // RxTextScroller
@@ -1468,7 +1466,7 @@ namespace XMMTwrapper1
             RxTextScroller.ForeColor = SystemColors.WindowText;
             RxTextScroller.Location = new Point(0, 143);
             RxTextScroller.Name = "RxTextScroller";
-            RxTextScroller.Size = new Size(402, 107);
+            RxTextScroller.Size = new Size(598, 107);
             RxTextScroller.TabIndex = 70;
             RxTextScroller.Text = "tickerControl1";
             // 
@@ -1476,19 +1474,19 @@ namespace XMMTwrapper1
             // 
             cmsScroller.Items.AddRange(new ToolStripItem[] { cmsScrollerMenuDeleteLane, cmsScrollerMenuDeleteAll });
             cmsScroller.Name = "cmsScroller";
-            cmsScroller.Size = new Size(181, 70);
+            cmsScroller.Size = new Size(136, 48);
             // 
             // cmsScrollerMenuDeleteLane
             // 
             cmsScrollerMenuDeleteLane.Name = "cmsScrollerMenuDeleteLane";
-            cmsScrollerMenuDeleteLane.Size = new Size(180, 22);
+            cmsScrollerMenuDeleteLane.Size = new Size(135, 22);
             cmsScrollerMenuDeleteLane.Text = "Delete Lane";
             cmsScrollerMenuDeleteLane.Click += cmsScrollerMenuDeleteLane_Click;
             // 
             // cmsScrollerMenuDeleteAll
             // 
             cmsScrollerMenuDeleteAll.Name = "cmsScrollerMenuDeleteAll";
-            cmsScrollerMenuDeleteAll.Size = new Size(180, 22);
+            cmsScrollerMenuDeleteAll.Size = new Size(135, 22);
             cmsScrollerMenuDeleteAll.Text = "Delete All";
             cmsScrollerMenuDeleteAll.Click += cmsScrollerMenuDeleteAll_Click;
             // 
@@ -1554,13 +1552,15 @@ namespace XMMTwrapper1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(804, 593);
+            ClientSize = new Size(902, 593);
             Controls.Add(panelLogging2);
             Controls.Add(panelTextReceived);
             Controls.Add(panelLogging);
             Controls.Add(panelButtons);
+            Controls.Add(label14);
             Controls.Add(gbRttyCW);
             Controls.Add(statusStrip1);
+            Controls.Add(tbCallSignList);
             Controls.Add(menuStrip1);
             Controls.Add(axXMMSpec1);
             Controls.Add(axXMMLevel1);
