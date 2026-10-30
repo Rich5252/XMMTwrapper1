@@ -39,7 +39,7 @@ namespace XMMTwrapper1
             _gapTextToButtons = panelButtons.Top - panelTextReceived.Bottom;
 
             _tbRightMargin = panelTextReceived.ClientSize.Width - tbTextReceived.Right;
-            _tbBottomMargin = panelTextReceived.ClientSize.Height - tbTextReceived.Bottom;
+            _tbBottomMargin = panelTextReceived.ClientSize.Height - RxTextScroller.Bottom;
             _clearBtnRightMargin = panelTextReceived.ClientSize.Width - btnClearText.Right;
 
             // The designed layout is the smallest the panels can be laid out at
@@ -72,12 +72,14 @@ namespace XMMTwrapper1
 
             // ... and its contents
             Size inner = panelTextReceived.ClientSize;
+            int H = (inner.Height - _tbBottomMargin);
             tbTextReceived.Size = new Size(
                 Math.Max(inner.Width - _tbRightMargin - tbTextReceived.Left, 50),
-                Math.Max(inner.Height - _tbBottomMargin - tbTextReceived.Top, 30));
+                Math.Max(H/2 - 40, 30));
             RxTextScroller.Size = new Size(
                 Math.Max(inner.Width - _tbRightMargin - RxTextScroller.Left, 50),
-                Math.Max(inner.Height - _tbBottomMargin - RxTextScroller.Top, 30));
+                Math.Max(H/2, 30));
+            RxTextScroller.Top = tbTextReceived.Bottom + 2;
             btnClearText.Left = inner.Width - _clearBtnRightMargin - btnClearText.Width;
 
             ResumeLayout(true);

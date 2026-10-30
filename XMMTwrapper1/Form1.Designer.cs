@@ -714,10 +714,9 @@ namespace XMMTwrapper1
             tbTextReceived.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tbTextReceived.Location = new Point(0, 42);
             tbTextReceived.Name = "tbTextReceived";
-            tbTextReceived.Size = new Size(402, 208);
+            tbTextReceived.Size = new Size(402, 95);
             tbTextReceived.TabIndex = 24;
             tbTextReceived.Text = "";
-            tbTextReceived.Visible = false;
             tbTextReceived.WordWrap = false;
             tbTextReceived.MouseDown += tbTextReceived_MouseDown;
             // 
@@ -1462,9 +1461,9 @@ namespace XMMTwrapper1
             RxTextScroller.BackColor = SystemColors.Window;
             RxTextScroller.Font = new Font("Consolas", 10F);
             RxTextScroller.ForeColor = SystemColors.WindowText;
-            RxTextScroller.Location = new Point(5, 42);
+            RxTextScroller.Location = new Point(0, 143);
             RxTextScroller.Name = "RxTextScroller";
-            RxTextScroller.Size = new Size(391, 205);
+            RxTextScroller.Size = new Size(402, 107);
             RxTextScroller.TabIndex = 70;
             RxTextScroller.Text = "tickerControl1";
             // 
