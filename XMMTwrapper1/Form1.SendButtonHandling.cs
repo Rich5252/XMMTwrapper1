@@ -110,8 +110,10 @@ namespace XMMTwrapper1
                     TryHandleJttyPipeMessage("{TXS}");                 // TX started: WS echo is shown as TX
 
                     //In case we forgot to save last contact
-                    if (outMsg.Contains("CQ") && tbCallsign.Text != "" && tbReportOut.Text != "" && tbReportIn.Text != "")
+                    if (outMsg.Contains("CQ G4AHN") && tbCallsign.Text != "" && tbReportOut.Text != "" && tbReportIn.Text != "")
                         cmsLogSave.Show(tbTextReceived, new Point(tbTextReceived.Width/2, tbTextReceived.Height/2));  //show log save menu if CQ sent
+
+                    if (outMsg.Contains("CQ G4AHN") && cbResetOnCQ.Checked) btnResetRxFreq_Click(null, null);  //reset RX freq to default if CQ sent
                 }
                 else
                     lblWSjttyStatus.Text = "WS not connected - not sent";

@@ -166,6 +166,7 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
+            cbResetOnCQ = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1323,11 +1324,12 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
+            gbJTTYcontrols.Controls.Add(cbResetOnCQ);
             gbJTTYcontrols.Controls.Add(btnResetRxFreq);
             gbJTTYcontrols.Controls.Add(btnTune);
             gbJTTYcontrols.Controls.Add(btnTol500);
             gbJTTYcontrols.Controls.Add(btnTol10);
-            gbJTTYcontrols.Location = new Point(-500, 27);
+            gbJTTYcontrols.Location = new Point(12, 27);
             gbJTTYcontrols.Name = "gbJTTYcontrols";
             gbJTTYcontrols.Size = new Size(211, 187);
             gbJTTYcontrols.TabIndex = 87;
@@ -1548,6 +1550,20 @@ namespace XMMTwrapper1
             cmsLogSaveMenuCancel.Text = "No Action";
             cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
             // 
+            // cbResetOnCQ
+            // 
+            cbResetOnCQ.AutoSize = true;
+            cbResetOnCQ.CheckAlign = ContentAlignment.MiddleRight;
+            cbResetOnCQ.Checked = true;
+            cbResetOnCQ.CheckState = CheckState.Checked;
+            cbResetOnCQ.Location = new Point(63, 85);
+            cbResetOnCQ.Name = "cbResetOnCQ";
+            cbResetOnCQ.Size = new Size(91, 19);
+            cbResetOnCQ.TabIndex = 72;
+            cbResetOnCQ.Text = "Reset on CQ";
+            cbResetOnCQ.TextAlign = ContentAlignment.MiddleRight;
+            cbResetOnCQ.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1601,6 +1617,7 @@ namespace XMMTwrapper1
             gbRttyCW.ResumeLayout(false);
             gbRttyCW.PerformLayout();
             gbJTTYcontrols.ResumeLayout(false);
+            gbJTTYcontrols.PerformLayout();
             panelButtons.ResumeLayout(false);
             panelButtons.PerformLayout();
             panelLogging.ResumeLayout(false);
@@ -1752,5 +1769,6 @@ namespace XMMTwrapper1
         private ContextMenuStrip cmsScroller;
         private ToolStripMenuItem cmsScrollerMenuDeleteLane;
         private ToolStripMenuItem cmsScrollerMenuDeleteAll;
+        private CheckBox cbResetOnCQ;
     }
 }
