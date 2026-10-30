@@ -16,6 +16,8 @@
 //   SuppressOwnTx=True    hide decodes of our own transmission
 //   RxHoldoffMs=0         optional: keep suppressing RX this long after {TXE} (0 = off)
 
+using XMMTwrapper1;
+
 namespace XMMTwrapper1
 {
     public partial class Form1
@@ -57,6 +59,21 @@ namespace XMMTwrapper1
             _jttyLink.TagReceived += OnJttyTagReceived;
             _jttyLink.ConnectionChanged += OnJttyConnectionChanged;
 
+            // --- scrolling ticker ---
+            _jttyLink.RxMessage += m => RxTextScroller.Model.Update(m);
+            RxTextScroller.Model.CallFinder = w => ITU_Prefix_Checker.IsCallsign(w);   // optional, see below
+
+            RxTextScroller.WordClicked += (lane, word, e) =>
+            {
+                RxTextScroller.SetLaneCall(lane, word);
+                tbCallsign.Text = word;                      // or your overwrite-confirm logic
+            };
+            RxTextScroller.LaneClicked += (lane, e) =>
+            {
+                _jttyLink.SendTag("RXFREQ", lane.Freq.ToString());
+                _jttyLink.SendTag("FTOL", "10");
+            };
+
             try
             {
                 _jttyLink.Start(port);      //start looking before WS starts, so we don't miss its connect
@@ -92,6 +109,7 @@ namespace XMMTwrapper1
             lblWSjttyStatus.Text = connected
                     ? $"WS connected on port {_jttyLink.Port}"
                     : $"Waiting for WS on port {_jttyLink.Port}";
+            if (!connected) RxTextScroller.Model.Clear();
         }
 
         private void OnJttyRxText(string text)
@@ -353,7 +371,7 @@ namespace XMMTwrapper1
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = wsPath,
-                    Arguments = $"-p {port} --n1mm-rxtext-info",
+                    Arguments = $"-p {port} --n1mm-rxtext-info --n1mm-rxmsg",
                     WorkingDirectory = Path.GetDirectoryName(wsPath)!,
                     UseShellExecute = true,
                 });

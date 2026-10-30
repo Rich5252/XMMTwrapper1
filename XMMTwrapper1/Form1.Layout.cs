@@ -75,6 +75,9 @@ namespace XMMTwrapper1
             tbTextReceived.Size = new Size(
                 Math.Max(inner.Width - _tbRightMargin - tbTextReceived.Left, 50),
                 Math.Max(inner.Height - _tbBottomMargin - tbTextReceived.Top, 30));
+            RxTextScroller.Size = new Size(
+                Math.Max(inner.Width - _tbRightMargin - RxTextScroller.Left, 50),
+                Math.Max(inner.Height - _tbBottomMargin - RxTextScroller.Top, 30));
             btnClearText.Left = inner.Width - _clearBtnRightMargin - btnClearText.Width;
 
             ResumeLayout(true);

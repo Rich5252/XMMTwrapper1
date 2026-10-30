@@ -155,6 +155,7 @@ namespace XMMTwrapper1
             panelButtons = new Panel();
             panelLogging = new Panel();
             panelTextReceived = new Panel();
+            RxTextScroller = new TickerControl();
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
@@ -711,11 +712,12 @@ namespace XMMTwrapper1
             tbTextReceived.AcceptsTab = true;
             tbTextReceived.ContextMenuStrip = cmsLogOverwrite;
             tbTextReceived.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            tbTextReceived.Location = new Point(3, 39);
+            tbTextReceived.Location = new Point(0, 42);
             tbTextReceived.Name = "tbTextReceived";
-            tbTextReceived.Size = new Size(393, 200);
+            tbTextReceived.Size = new Size(402, 208);
             tbTextReceived.TabIndex = 24;
             tbTextReceived.Text = "";
+            tbTextReceived.Visible = false;
             tbTextReceived.WordWrap = false;
             tbTextReceived.MouseDown += tbTextReceived_MouseDown;
             // 
@@ -1443,6 +1445,7 @@ namespace XMMTwrapper1
             // 
             // panelTextReceived
             // 
+            panelTextReceived.Controls.Add(RxTextScroller);
             panelTextReceived.Controls.Add(tbTextReceived);
             panelTextReceived.Controls.Add(axXMMR1);
             panelTextReceived.Controls.Add(btnTemplate);
@@ -1453,6 +1456,17 @@ namespace XMMTwrapper1
             panelTextReceived.Name = "panelTextReceived";
             panelTextReceived.Size = new Size(405, 250);
             panelTextReceived.TabIndex = 91;
+            // 
+            // RxTextScroller
+            // 
+            RxTextScroller.BackColor = SystemColors.Window;
+            RxTextScroller.Font = new Font("Consolas", 10F);
+            RxTextScroller.ForeColor = SystemColors.WindowText;
+            RxTextScroller.Location = new Point(5, 42);
+            RxTextScroller.Name = "RxTextScroller";
+            RxTextScroller.Size = new Size(391, 205);
+            RxTextScroller.TabIndex = 70;
+            RxTextScroller.Text = "tickerControl1";
             // 
             // lblDupeTimeDate
             // 
@@ -1709,5 +1723,6 @@ namespace XMMTwrapper1
         private ToolStripMenuItem cmsLogSaveMenuLogQSO;
         private ToolStripMenuItem cmsLogSaveMenuClearLog;
         private ToolStripMenuItem cmsLogSaveMenuCancel;
+        private TickerControl RxTextScroller;
     }
 }

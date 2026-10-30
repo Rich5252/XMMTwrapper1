@@ -26,6 +26,12 @@ namespace XMMTwrapper1
         // Decoded text from WS (may be a fragment of a message, may contain \r\n)
         public event Action<string>? RxText;
 
+        // Full state of one message from WS (needs the ws-rxmsg-tcp patch and WS started with
+        // --n1mm-rxmsg). Carries the whole text so far, tagged with the message id, for ALL
+        // frequencies - see JttyRxMessage. Preferred over RxText, which cannot be told apart
+        // when several messages update at once.
+        public event Action<JttyRxMessage>? RxMessage;
+
         // Any other tag from WS, e.g. ("OUTPUTCOMPLETE", ""). Data is "" for tags without a length.
         public event Action<string, string>? TagReceived;
 
@@ -176,6 +182,12 @@ namespace XMMTwrapper1
             if (tag.Equals("RXTEXT", StringComparison.OrdinalIgnoreCase))
             {
                 if (data.Length > 0) Post(() => RxText?.Invoke(data));
+            }
+            else if (tag.Equals("RXMSG", StringComparison.OrdinalIgnoreCase))
+            {
+                var msg = JttyRxMessage.TryParse(data);
+                if (msg != null) Post(() => RxMessage?.Invoke(msg));
+                else Log.Mark($"JttyLink: bad RXMSG <{data}>");
             }
             else
             {
