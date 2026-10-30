@@ -1506,7 +1506,7 @@ namespace XMMTwrapper1
             // 
             panelLogging2.Controls.Add(tbDupeTimeDate);
             panelLogging2.Controls.Add(lblDupeTimeDate);
-            panelLogging2.Location = new Point(535, 475);
+            panelLogging2.Location = new Point(641, 476);
             panelLogging2.Name = "panelLogging2";
             panelLogging2.Size = new Size(253, 42);
             panelLogging2.TabIndex = 92;
