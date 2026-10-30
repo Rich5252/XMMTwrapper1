@@ -66,11 +66,12 @@ namespace XMMTwrapper1
             RxTextScroller.WordClicked += (lane, word, e) =>
             {
                 RxTextScroller.SetLaneCall(lane, word);
-                tbCallsign.Text = word;                      // or your overwrite-confirm logic
+                QuerySetNewDxCallsign(word, lane.Snr.ToString(),  lane.Freq);
             };
             RxTextScroller.LaneClicked += (lane, e) =>
             {
-                _jttyLink.SendTag("RXFREQ", lane.Freq.ToString());
+                if (lane.Call != null && lane.Call != tbCallsign.Text) QuerySetNewDxCallsign(lane.Call, lane.Snr.ToString(), lane.Freq);
+                _jttyLink.SendTag("RXFREQ", lane.Freq.ToString()); //select this lane as RX freq with 10Hz Ftol
                 _jttyLink.SendTag("FTOL", "10");
             };
 

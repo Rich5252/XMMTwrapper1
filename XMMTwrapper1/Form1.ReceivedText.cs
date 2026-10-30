@@ -52,20 +52,23 @@ namespace XMMTwrapper1
             else
             {
                 // No modifier keys, copy to callsign
-                if (tbCallsign.Text != "")
-                {
-                    _pendingAction = () => ApplyCallsignSelection(selectedWord, LogRST, Hz);
-                    cmsLogOverwriteConfirm.Text = $"Replace {tbCallsign.Text.Trim()} with {selectedWord}";
-                    cmsLogOverwrite.Show(Cursor.Position);        //show context menu to confirm overwrite of callsign
-                }
-                else
-                {
-                    //no change, don't clear report in or serial in
-                    ApplyCallsignSelection(selectedWord, LogRST, Hz);
-                }
+                QuerySetNewDxCallsign(selectedWord, LogRST, Hz);
+            }
+        }
 
-
-
+        private void QuerySetNewDxCallsign(string selectedWord, string LogRST, int? Hz)
+        {
+            if (tbCallsign.Text != "")
+            {
+                //There is an entry pending in Log entry table so ask what to do.
+                _pendingAction = () => ApplyCallsignSelection(selectedWord, LogRST, Hz);
+                cmsLogOverwriteConfirm.Text = $"Replace {tbCallsign.Text.Trim()} with {selectedWord}";
+                cmsLogOverwrite.Show(Cursor.Position);        //show context menu to confirm overwrite of callsign
+            }
+            else
+            {
+                //No current DXcallsign in Log entry table so tidy up and add selection
+                ApplyCallsignSelection(selectedWord, LogRST, Hz);
             }
         }
 
