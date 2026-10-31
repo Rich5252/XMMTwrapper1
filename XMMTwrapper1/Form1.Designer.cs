@@ -160,6 +160,10 @@ namespace XMMTwrapper1
             cmsScroller = new ContextMenuStrip(components);
             cmsScrollerMenuDeleteLane = new ToolStripMenuItem();
             cmsScrollerMenuDeleteAll = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            cmsScrollerMenuCopyLane = new ToolStripMenuItem();
+            cmsScrollerMenuCopyAll = new ToolStripMenuItem();
+            cmsScrollerMenuCopyText = new ToolStripMenuItem();
             lblDupeTimeDate = new Label();
             panelLogging2 = new Panel();
             tbDupeTimeDate = new TextBox();
@@ -167,10 +171,6 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
-            toolStripSeparator2 = new ToolStripSeparator();
-            cmsScrollerMenuCopyLane = new ToolStripMenuItem();
-            cmsScrollerMenuCopyAll = new ToolStripMenuItem();
-            cmsScrollerMenuCopyText = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1495,6 +1495,7 @@ namespace XMMTwrapper1
             cmsScroller.Items.AddRange(new ToolStripItem[] { cmsScrollerMenuDeleteLane, cmsScrollerMenuDeleteAll, toolStripSeparator2, cmsScrollerMenuCopyLane, cmsScrollerMenuCopyAll, cmsScrollerMenuCopyText });
             cmsScroller.Name = "cmsScroller";
             cmsScroller.Size = new Size(181, 142);
+            cmsScroller.Closed += cmsScroller_Closed;
             // 
             // cmsScrollerMenuDeleteLane
             // 
@@ -1509,6 +1510,32 @@ namespace XMMTwrapper1
             cmsScrollerMenuDeleteAll.Size = new Size(180, 22);
             cmsScrollerMenuDeleteAll.Text = "Delete All";
             cmsScrollerMenuDeleteAll.Click += cmsScrollerMenuDeleteAll_Click;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(177, 6);
+            // 
+            // cmsScrollerMenuCopyLane
+            // 
+            cmsScrollerMenuCopyLane.Name = "cmsScrollerMenuCopyLane";
+            cmsScrollerMenuCopyLane.Size = new Size(180, 22);
+            cmsScrollerMenuCopyLane.Text = "Copy Lane";
+            cmsScrollerMenuCopyLane.Click += cmsScrollerMenuCopyLane_Click;
+            // 
+            // cmsScrollerMenuCopyAll
+            // 
+            cmsScrollerMenuCopyAll.Name = "cmsScrollerMenuCopyAll";
+            cmsScrollerMenuCopyAll.Size = new Size(180, 22);
+            cmsScrollerMenuCopyAll.Text = "Copy All";
+            cmsScrollerMenuCopyAll.Click += cmsScrollerMenuCopyAll_Click;
+            // 
+            // cmsScrollerMenuCopyText
+            // 
+            cmsScrollerMenuCopyText.Name = "cmsScrollerMenuCopyText";
+            cmsScrollerMenuCopyText.Size = new Size(180, 22);
+            cmsScrollerMenuCopyText.Text = "Copy Text";
+            cmsScrollerMenuCopyText.Click += cmsScrollerMenuCopyText_Click;
             // 
             // lblDupeTimeDate
             // 
@@ -1567,32 +1594,6 @@ namespace XMMTwrapper1
             cmsLogSaveMenuCancel.Size = new Size(128, 22);
             cmsLogSaveMenuCancel.Text = "No Action";
             cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
-            // 
-            // toolStripSeparator2
-            // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(177, 6);
-            // 
-            // cmsScrollerMenuCopyLane
-            // 
-            cmsScrollerMenuCopyLane.Name = "cmsScrollerMenuCopyLane";
-            cmsScrollerMenuCopyLane.Size = new Size(180, 22);
-            cmsScrollerMenuCopyLane.Text = "Copy Lane";
-            cmsScrollerMenuCopyLane.Click += cmsScrollerMenuCopyLane_Click;
-            // 
-            // cmsScrollerMenuCopyAll
-            // 
-            cmsScrollerMenuCopyAll.Name = "cmsScrollerMenuCopyAll";
-            cmsScrollerMenuCopyAll.Size = new Size(180, 22);
-            cmsScrollerMenuCopyAll.Text = "Copy All";
-            cmsScrollerMenuCopyAll.Click += cmsScrollerMenuCopyAll_Click;
-            // 
-            // cmsScrollerMenuCopyText
-            // 
-            cmsScrollerMenuCopyText.Name = "cmsScrollerMenuCopyText";
-            cmsScrollerMenuCopyText.Size = new Size(180, 22);
-            cmsScrollerMenuCopyText.Text = "Copy Text";
-            cmsScrollerMenuCopyText.Click += cmsScrollerMenuCopyText_Click;
             // 
             // Form1
             // 
