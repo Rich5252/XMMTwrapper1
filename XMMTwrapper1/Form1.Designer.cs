@@ -147,6 +147,7 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
+            cbResetOnCQ = new CheckBox();
             btnResetRxFreq = new Button();
             btnTune = new Button();
             btnTol500 = new Button();
@@ -166,7 +167,10 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
-            cbResetOnCQ = new CheckBox();
+            toolStripSeparator2 = new ToolStripSeparator();
+            cmsScrollerMenuCopyLane = new ToolStripMenuItem();
+            cmsScrollerMenuCopyAll = new ToolStripMenuItem();
+            cmsScrollerMenuCopyText = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1336,6 +1340,20 @@ namespace XMMTwrapper1
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
             // 
+            // cbResetOnCQ
+            // 
+            cbResetOnCQ.AutoSize = true;
+            cbResetOnCQ.CheckAlign = ContentAlignment.MiddleRight;
+            cbResetOnCQ.Checked = true;
+            cbResetOnCQ.CheckState = CheckState.Checked;
+            cbResetOnCQ.Location = new Point(63, 85);
+            cbResetOnCQ.Name = "cbResetOnCQ";
+            cbResetOnCQ.Size = new Size(91, 19);
+            cbResetOnCQ.TabIndex = 72;
+            cbResetOnCQ.Text = "Reset on CQ";
+            cbResetOnCQ.TextAlign = ContentAlignment.MiddleRight;
+            cbResetOnCQ.UseVisualStyleBackColor = true;
+            // 
             // btnResetRxFreq
             // 
             btnResetRxFreq.Location = new Point(8, 82);
@@ -1474,21 +1492,21 @@ namespace XMMTwrapper1
             // 
             // cmsScroller
             // 
-            cmsScroller.Items.AddRange(new ToolStripItem[] { cmsScrollerMenuDeleteLane, cmsScrollerMenuDeleteAll });
+            cmsScroller.Items.AddRange(new ToolStripItem[] { cmsScrollerMenuDeleteLane, cmsScrollerMenuDeleteAll, toolStripSeparator2, cmsScrollerMenuCopyLane, cmsScrollerMenuCopyAll, cmsScrollerMenuCopyText });
             cmsScroller.Name = "cmsScroller";
-            cmsScroller.Size = new Size(136, 48);
+            cmsScroller.Size = new Size(181, 142);
             // 
             // cmsScrollerMenuDeleteLane
             // 
             cmsScrollerMenuDeleteLane.Name = "cmsScrollerMenuDeleteLane";
-            cmsScrollerMenuDeleteLane.Size = new Size(135, 22);
+            cmsScrollerMenuDeleteLane.Size = new Size(180, 22);
             cmsScrollerMenuDeleteLane.Text = "Delete Lane";
             cmsScrollerMenuDeleteLane.Click += cmsScrollerMenuDeleteLane_Click;
             // 
             // cmsScrollerMenuDeleteAll
             // 
             cmsScrollerMenuDeleteAll.Name = "cmsScrollerMenuDeleteAll";
-            cmsScrollerMenuDeleteAll.Size = new Size(135, 22);
+            cmsScrollerMenuDeleteAll.Size = new Size(180, 22);
             cmsScrollerMenuDeleteAll.Text = "Delete All";
             cmsScrollerMenuDeleteAll.Click += cmsScrollerMenuDeleteAll_Click;
             // 
@@ -1550,19 +1568,31 @@ namespace XMMTwrapper1
             cmsLogSaveMenuCancel.Text = "No Action";
             cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
             // 
-            // cbResetOnCQ
+            // toolStripSeparator2
             // 
-            cbResetOnCQ.AutoSize = true;
-            cbResetOnCQ.CheckAlign = ContentAlignment.MiddleRight;
-            cbResetOnCQ.Checked = true;
-            cbResetOnCQ.CheckState = CheckState.Checked;
-            cbResetOnCQ.Location = new Point(63, 85);
-            cbResetOnCQ.Name = "cbResetOnCQ";
-            cbResetOnCQ.Size = new Size(91, 19);
-            cbResetOnCQ.TabIndex = 72;
-            cbResetOnCQ.Text = "Reset on CQ";
-            cbResetOnCQ.TextAlign = ContentAlignment.MiddleRight;
-            cbResetOnCQ.UseVisualStyleBackColor = true;
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(177, 6);
+            // 
+            // cmsScrollerMenuCopyLane
+            // 
+            cmsScrollerMenuCopyLane.Name = "cmsScrollerMenuCopyLane";
+            cmsScrollerMenuCopyLane.Size = new Size(180, 22);
+            cmsScrollerMenuCopyLane.Text = "Copy Lane";
+            cmsScrollerMenuCopyLane.Click += cmsScrollerMenuCopyLane_Click;
+            // 
+            // cmsScrollerMenuCopyAll
+            // 
+            cmsScrollerMenuCopyAll.Name = "cmsScrollerMenuCopyAll";
+            cmsScrollerMenuCopyAll.Size = new Size(180, 22);
+            cmsScrollerMenuCopyAll.Text = "Copy All";
+            cmsScrollerMenuCopyAll.Click += cmsScrollerMenuCopyAll_Click;
+            // 
+            // cmsScrollerMenuCopyText
+            // 
+            cmsScrollerMenuCopyText.Name = "cmsScrollerMenuCopyText";
+            cmsScrollerMenuCopyText.Size = new Size(180, 22);
+            cmsScrollerMenuCopyText.Text = "Copy Text";
+            cmsScrollerMenuCopyText.Click += cmsScrollerMenuCopyText_Click;
             // 
             // Form1
             // 
@@ -1770,5 +1800,9 @@ namespace XMMTwrapper1
         private ToolStripMenuItem cmsScrollerMenuDeleteLane;
         private ToolStripMenuItem cmsScrollerMenuDeleteAll;
         private CheckBox cbResetOnCQ;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem cmsScrollerMenuCopyLane;
+        private ToolStripMenuItem cmsScrollerMenuCopyAll;
+        private ToolStripMenuItem cmsScrollerMenuCopyText;
     }
 }

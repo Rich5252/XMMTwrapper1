@@ -73,6 +73,42 @@ namespace XMMTwrapper1
         /// Deletes the selected lane (the one last clicked), if any.
         public bool RemoveSelectedLane() => SelectedLane != null && RemoveLane(SelectedLane);
 
+        // ---- Clipboard ---------------------------------------------------------------
+
+        /// One lane as a text line: "freq  snr  call  text" (tab separated, so it pastes
+        /// into Excel as columns). Call is blank if not set.
+        public static string LaneToText(TickerLane lane) =>
+            $"{lane.Freq}\t{lane.Snr}\t{lane.Call}\t{lane.FullText}";
+
+        /// All lanes (in the order shown), one per line, with a header row if asked.
+        public string AllLanesToText(bool header = false)
+        {
+            var sb = new System.Text.StringBuilder();
+            if (header) sb.AppendLine("Freq\tSNR\tCall\tText");
+            foreach (var l in Model.Lanes) sb.AppendLine(LaneToText(l));
+            return sb.ToString();
+        }
+
+        /// Copies one lane to the clipboard. Returns false if the clipboard was busy.
+        public bool CopyLane(TickerLane lane) => SetClipboard(LaneToText(lane));
+
+        /// Copies the selected lane (last clicked). False if none selected.
+        public bool CopySelectedLane() => SelectedLane != null && CopyLane(SelectedLane);
+
+        /// Copies only the text of a lane (no freq/snr/call columns).
+        public bool CopyLaneTextOnly(TickerLane lane) => SetClipboard(lane.FullText);
+
+        /// Copies every lane to the clipboard. False if there are none or clipboard was busy.
+        public bool CopyAllLanes(bool header = false) =>
+            Model.Lanes.Count > 0 && SetClipboard(AllLanesToText(header));
+
+        private static bool SetClipboard(string text)
+        {
+            try { Clipboard.SetText(text); return true; }
+            catch (System.Runtime.InteropServices.ExternalException) { return false; } // clipboard locked
+            catch (System.Threading.ThreadStateException) { return false; }
+        }
+
         /// Sets the lane's callsign by hand (it then stays until the lane is pruned/cleared).
         public void SetLaneCall(TickerLane lane, string call)
         {
