@@ -1,4 +1,12 @@
+/*
+ // DONE
+ //     A few prefixes cover several entities and need the digit, or even the suffix, to tell them apart:
 
+    KG4 is Guantanamo only with a 2-letter suffix.
+    VK9 covers several entities: Cocos (VK9C), Christmas Island (VK9X), Norfolk (VK9N), Lord Howe (VK9L) and Willis (VK9W).
+    PJ2/4/5/7 are separate entities.
+    UA9/UA0 are Asiatic Russia.
+*/
 
 
 public static partial class ITU_Prefix_Checker
@@ -186,6 +194,8 @@ public static partial class ITU_Prefix_Checker
         { "PP", "Brazil" }, { "PQ", "Brazil" }, { "PR", "Brazil" }, { "PS", "Brazil" }, { "PT", "Brazil" },
         { "PU", "Brazil" }, { "PV", "Brazil" }, { "PW", "Brazil" }, { "PX", "Brazil" }, { "PY", "Brazil" },
         { "PZ", "Suriname" },
+        { "PJ2", "Curacao" }, { "PJ4", "Bonaire" }, { "PJ5", "Saba & St Eustatius" },
+        { "PJ6", "Saba & St Eustatius" }, { "PJ7", "Sint Maarten" },
 
         // ---------- R ----------
         { "R", "Russia" },
@@ -219,6 +229,7 @@ public static partial class ITU_Prefix_Checker
         { "UN", "Kazakhstan" }, { "UO", "Kazakhstan" }, { "UP", "Kazakhstan" }, { "UQ", "Kazakhstan" },
         { "UR", "Ukraine" }, { "US", "Ukraine" }, { "UT", "Ukraine" }, { "UU", "Ukraine" }, { "UV", "Ukraine" },
         { "UW", "Ukraine" }, { "UX", "Ukraine" }, { "UY", "Ukraine" }, { "UZ", "Ukraine" },
+        { "UA9", "Asiatic Russia" }, { "UA0", "Asiatic Russia" },
 
         // ---------- V ----------
         { "V2", "Antigua" }, { "V3", "Belize" }, { "V4", "St Kitts" }, { "V5", "Namibia" },
@@ -232,6 +243,11 @@ public static partial class ITU_Prefix_Checker
         { "VP9", "Bermuda" }, { "VQ9", "Chagos" }, { "VR2", "Hong Kong" },
         { "VT", "India" }, { "VU", "India" }, { "VV", "India" }, { "VW", "India" },
         { "VX", "Canada" }, { "VY", "Canada" }, { "VZ", "Australia" },
+        { "VK9C", "Cocos (Keeling)" }, { "VK9X", "Christmas I" }, { "VK9N", "Norfolk I" },
+        { "VK9L", "Lord Howe I" },     { "VK9W", "Willis I" },    { "VK9M", "Mellish Reef" },
+        { "VK0H", "Heard I" },         { "VK0M", "Macquarie I" },
+        // VP8 sub-entities removed: Diego Garcia is VQ9, Bouvet is 3Y, and Falklands calls such as
+        // VP8DMH / VP8SDZ use the same first suffix letters, so VP8 stays "Falkland Is"
 
         // ---------- W ----------
         { "W", "USA" }, { "WH", "USA Pacific" }, { "WL", "Alaska" }, { "WP", "USA Caribbean" },

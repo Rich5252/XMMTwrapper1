@@ -1,11 +1,14 @@
-﻿
+
 public static partial class ITU_Prefix_Checker
 {
-    // A HashSet of 1, 2 and 3 character prefixes for rapid lookup
+    // A Dictionary of 1, 2, 3 and 4 character prefixes for rapid lookup
     //see ITU_PrefixTable.cs for the full list of prefixes and their corresponding country entities
 
     public static string Entity { get; set; } = "";        //country entity for last search
-                                                           // null unless last search returned true
+                                                           // "" unless last search returned true
+
+    // 3-char prefixes that only apply with a 2-letter suffix (KG4AB = Guantanamo, KG4ABC = USA)
+    private static readonly HashSet<string> TwoLetterSuffixOnly = new HashSet<string> { "KG4", "KC6" };
 
     private static string strWordReceived = "";
     private static bool WaitForSpace = false;
@@ -36,9 +39,8 @@ public static partial class ITU_Prefix_Checker
                 if (!IsTerminator(c)) WaitForSpace = true;          //must get a terminator before next search
                 return ret;                                         // ***** SUCCESS  *******
             }
-            else if (IsTerminator(c) && c != ' ')                   // if callsign sent with spaces keep it
-            {                                                       // otherwise a terminator cancels this word   
-                string ret = strWordReceived;
+            else if (IsTerminator(c))                               // FIX: any terminator (incl. space) ends the word,
+            {                                                       // otherwise "DE G4AHN" is read as "DEG4AHN"
                 strWordReceived = "";
                 return "";
             }
@@ -65,8 +67,11 @@ public static partial class ITU_Prefix_Checker
 
     public static bool IsPotentialCallsign(string word)
     {
+        Entity = "";                // FIX: reset first, so a failed search never leaves a stale entity
+
         if (string.IsNullOrWhiteSpace(word) || word.Length < 3)
             return false;
+        word = word.ToUpper();
 
         // Rule 1: Must contain at least one digit (The Anchor)
         bool hasDigit = false;
@@ -76,67 +81,60 @@ public static partial class ITU_Prefix_Checker
         }
         if (!hasDigit) return false;
 
-        string prefix = "";         //the prefix found
-        Entity = "";                // reset country entity
-        bool bS1, bS2, bS3;
-        bS1 = bS2 = bS3 = false;
+        // Rule 2: last char in any callsign should be a letter
+        if (!char.IsLetter(word[word.Length - 1])) return false;
 
-        //try 3 char first
-        string S3 = word.Length >= 3 ? word.Substring(0, 3).ToUpper() : "";
-        bS3 = PrefixTable.ContainsKey(S3);
-        if (bS3)
+        // Try the longest prefix first; if its structure doesn't fit, fall back to a shorter one
+        for (int len = 4; len >= 1; len--)
         {
-            //if a 3 char prefix then 4th must be letter
-            bool b3rdCharIsLetter = word.Length >= 3 && char.IsLetter(word[2]);
-            bool b4thCharIsLetter = word.Length >= 4 && char.IsLetter(word[3]);
-            if (word.Length > 3 && (b3rdCharIsLetter == b4thCharIsLetter)) return false;        //3rd & 4th char must be different type
-            prefix = S3;
-        }
-        else
-        {
-            // then 2 char if 3 failed
-            string S2 = word.Length >= 2 ? word.Substring(0, 2).ToUpper() : "";
-            bS2 = PrefixTable.ContainsKey(S2);
-            if (bS2)
+            if (word.Length < len) continue;
+            string prefix = word.Substring(0, len);
+            if (!PrefixTable.ContainsKey(prefix)) continue;
+            if (!StructureFits(word, len))
             {
-                //if first 2 are lettes then third should be number
-                if ((char.IsLetter(word[0]) && char.IsLetter(word[1])) && !char.IsDigit(word[2])) return false;
-                prefix = S2;
+                if (len == 4) return false;     // VK9X matched but no suffix: don't fall back to VK9
+                continue;
             }
-            else
-            {
-                // then 1 char if 3 & 2 failed
-                string S1 = word.Substring(0, 1).ToUpper();
-                bS1 = PrefixTable.ContainsKey(S1);                
-                if (bS1)
-                {
-                    //if first char is number then second must be letter and third a number
-                    if (char.IsDigit(word[0]) && !(char.IsLetter(word[1]) && char.IsDigit(word[2]))) return false;
-
-                    //if first single letter then 2nd or 3rd should be a number
-                    if (char.IsLetter(word[0]) && !(char.IsDigit(word[1]) || char.IsDigit(word[2]))) return false;
-                    prefix += S1;
-                }
-            }
-        }
-        if (bS1 || bS2 || bS3)
-        {
-            //if we get here then we've found something
-            //last char in any callsign should be a letter
-            if (!char.IsLetter(word[word.Length - 1])) return false;
+            if (TwoLetterSuffixOnly.Contains(prefix) && word.Length != 5) continue;   // KG4ABC -> falls back to "K" = USA
 
             Entity = PrefixTable[prefix];
-            return true;
+            return true;                                    // ***** found *****
         }
         //no prefix found, keep adding to word and looking
+        return false;
+    }
+
+    // Does the rest of the word fit the shape expected after a prefix of this length?
+    private static bool StructureFits(string w, int len)
+    {
+        switch (len)
+        {
+            case 4:     // VK9X + suffix letters: VK9XX
+                return w.Length >= 5 && char.IsLetter(w[4]);
+
+            case 3:
+                if (char.IsDigit(w[2]))     // EA8 / VK9 / 1A0 / PJ2 : numeral is in the prefix, suffix follows
+                    return w.Length >= 4 && char.IsLetter(w[3]);
+                else                        // 3DA : numeral follows, then suffix  (3DA0RU)
+                    return w.Length >= 5 && char.IsDigit(w[3]);
+
+            case 2:     // PA / 9A / A6 / 2E : always followed by a numeral, then suffix (PA3ABC, 9A1A, A61AB, 2E0ABC)
+                return w.Length >= 4 && char.IsDigit(w[2]);
+
+            case 1:     // G4AHN  or  DL1ABC / RA3ABC  (second letter of a 2-letter prefix not in the table)
+                if (char.IsDigit(w[0])) return false;
+                return char.IsDigit(w[1]) || (char.IsLetter(w[1]) && char.IsDigit(w[2]));
+        }
         return false;
     }
 
     //find country entity from callsign
     public static string GetEntity(string callsign)
     {
-        // Normalize and iterate backwards from length 3 down to 1
-        for (int len = 3; len >= 1; len--)
+        if (IsPotentialCallsign(callsign)) return Entity;        // same rules as detection
+
+        // fallback: plain longest-prefix lookup, length 4 down to 1
+        for (int len = 4; len >= 1; len--)
         {
             if (callsign.Length >= len)
             {
