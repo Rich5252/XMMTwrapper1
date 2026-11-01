@@ -177,6 +177,14 @@ public static class ITU_Prefix_Checker
         return "";
     }
 
+    public static string strIsPotentialCallsign(string word)
+    {
+        if (IsPotentialCallsign(word))
+            return word;
+        else
+            return "";
+    }
+
     public static bool IsPotentialCallsign(string word)
     {
         if (string.IsNullOrWhiteSpace(word) || word.Length < 3)

@@ -61,7 +61,7 @@ namespace XMMTwrapper1
 
             // --- scrolling ticker ---
             _jttyLink.RxMessage += m => RxTextScroller.Model.Update(m);
-            RxTextScroller.Model.CallFinder = w => ITU_Prefix_Checker.IsCallsign(w);   // optional, see below
+            RxTextScroller.Model.CallFinder = w => ITU_Prefix_Checker.strIsPotentialCallsign(w.Trim());   // optional, see below
 
             RxTextScroller.WordClicked += (lane, word, e) =>
             {
