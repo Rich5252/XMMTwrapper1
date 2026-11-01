@@ -155,6 +155,8 @@ namespace XMMTwrapper1
             btnTol10 = new Button();
             cbAutoClearFreeText = new CheckBox();
             panelButtons = new Panel();
+            btnSend16 = new Button();
+            btnSend15 = new Button();
             panelLogging = new Panel();
             panelTextReceived = new Panel();
             RxTextScroller = new TickerControl();
@@ -733,7 +735,7 @@ namespace XMMTwrapper1
             // 
             cmsLogOverwrite.Items.AddRange(new ToolStripItem[] { cmsLogOverwriteConfirm, cmsLogOverwriteCancel, toolStripSeparator1, cmsLogQSOFirst });
             cmsLogOverwrite.Name = "cmsLogOverwtite";
-            cmsLogOverwrite.Size = new Size(181, 98);
+            cmsLogOverwrite.Size = new Size(145, 76);
             cmsLogOverwrite.Text = "Log Overwrite";
             cmsLogOverwrite.Closed += cmsLogOverwrite_Closed;
             cmsLogOverwrite.Opening += cmsLogOverwrite_Opening;
@@ -741,26 +743,26 @@ namespace XMMTwrapper1
             // cmsLogOverwriteConfirm
             // 
             cmsLogOverwriteConfirm.Name = "cmsLogOverwriteConfirm";
-            cmsLogOverwriteConfirm.Size = new Size(180, 22);
+            cmsLogOverwriteConfirm.Size = new Size(144, 22);
             cmsLogOverwriteConfirm.Text = "Confirm";
             cmsLogOverwriteConfirm.Click += cmsLogOverwriteConfirm_Click;
             // 
             // cmsLogOverwriteCancel
             // 
             cmsLogOverwriteCancel.Name = "cmsLogOverwriteCancel";
-            cmsLogOverwriteCancel.Size = new Size(180, 22);
+            cmsLogOverwriteCancel.Size = new Size(144, 22);
             cmsLogOverwriteCancel.Text = "Cancel";
             cmsLogOverwriteCancel.Click += cmsLogOverwriteCancel_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(177, 6);
+            toolStripSeparator1.Size = new Size(141, 6);
             // 
             // cmsLogQSOFirst
             // 
             cmsLogQSOFirst.Name = "cmsLogQSOFirst";
-            cmsLogQSOFirst.Size = new Size(180, 22);
+            cmsLogQSOFirst.Size = new Size(144, 22);
             cmsLogQSOFirst.Text = "Log QSO first";
             cmsLogQSOFirst.Click += cmsLogQSOFirst_Click;
             // 
@@ -1027,7 +1029,7 @@ namespace XMMTwrapper1
             // 
             cbEditButton.AutoSize = true;
             cbEditButton.CheckAlign = ContentAlignment.MiddleRight;
-            cbEditButton.Location = new Point(457, 7);
+            cbEditButton.Location = new Point(511, 7);
             cbEditButton.Name = "cbEditButton";
             cbEditButton.Size = new Size(46, 19);
             cbEditButton.TabIndex = 45;
@@ -1314,7 +1316,7 @@ namespace XMMTwrapper1
             // 
             tbFreeText.Location = new Point(134, 59);
             tbFreeText.Name = "tbFreeText";
-            tbFreeText.Size = new Size(303, 23);
+            tbFreeText.Size = new Size(364, 23);
             tbFreeText.TabIndex = 85;
             tbFreeText.KeyPress += tbFreeText_KeyPress;
             // 
@@ -1412,7 +1414,7 @@ namespace XMMTwrapper1
             // 
             cbAutoClearFreeText.AutoSize = true;
             cbAutoClearFreeText.CheckAlign = ContentAlignment.MiddleRight;
-            cbAutoClearFreeText.Location = new Point(450, 61);
+            cbAutoClearFreeText.Location = new Point(504, 61);
             cbAutoClearFreeText.Name = "cbAutoClearFreeText";
             cbAutoClearFreeText.Size = new Size(53, 19);
             cbAutoClearFreeText.TabIndex = 88;
@@ -1421,6 +1423,8 @@ namespace XMMTwrapper1
             // 
             // panelButtons
             // 
+            panelButtons.Controls.Add(btnSend16);
+            panelButtons.Controls.Add(btnSend15);
             panelButtons.Controls.Add(btnSend4);
             panelButtons.Controls.Add(cbAutoClearFreeText);
             panelButtons.Controls.Add(btnSend1);
@@ -1442,8 +1446,28 @@ namespace XMMTwrapper1
             panelButtons.Controls.Add(btnSend8);
             panelButtons.Location = new Point(12, 476);
             panelButtons.Name = "panelButtons";
-            panelButtons.Size = new Size(519, 88);
+            panelButtons.Size = new Size(576, 88);
             panelButtons.TabIndex = 89;
+            // 
+            // btnSend16
+            // 
+            btnSend16.Location = new Point(443, 29);
+            btnSend16.Name = "btnSend16";
+            btnSend16.Size = new Size(55, 23);
+            btnSend16.TabIndex = 90;
+            btnSend16.Text = "F16";
+            btnSend16.UseVisualStyleBackColor = true;
+            btnSend16.Click += MacroButton_Click;
+            // 
+            // btnSend15
+            // 
+            btnSend15.Location = new Point(443, 3);
+            btnSend15.Name = "btnSend15";
+            btnSend15.Size = new Size(55, 23);
+            btnSend15.TabIndex = 89;
+            btnSend15.Text = "F15";
+            btnSend15.UseVisualStyleBackColor = true;
+            btnSend15.Click += MacroButton_Click;
             // 
             // panelLogging
             // 
@@ -1820,5 +1844,7 @@ namespace XMMTwrapper1
         private ToolStripMenuItem cmsScrollerMenuCopyAll;
         private ToolStripMenuItem cmsScrollerMenuCopyText;
         private CheckBox cbAutoFtol;
+        private Button btnSend16;
+        private Button btnSend15;
     }
 }

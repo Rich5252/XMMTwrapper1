@@ -120,12 +120,40 @@ namespace XMMTwrapper1
             lane.InQsoWindow = m.InQsoWindow;
             lane.LastActivity = t;
 
-            if (!lane.CallIsManual) GuessCall(lane, m.Text, m.Complete);
+            if (!lane.CallIsManual)
+            {
+                // A message that has been followed by another on this lane is finished, so its last
+                // word is whole even if it never got an end-of-message flag. Then the current one.
+                int si = lane.SegmentList.IndexOf(seg);
+                if (si > 0) GuessCall(lane, lane.SegmentList[si - 1].Text, true);
+                GuessCall(lane, m.Text, m.Complete);
+            }
 
             _lanes.Sort((a, b) => a.Freq != b.Freq ? a.Freq.CompareTo(b.Freq) : a.Number.CompareTo(b.Number));
             Prune(t, raise: false);
             Changed?.Invoke();
             return lane;
+        }
+
+        /// Treats the last message of any lane that has been quiet for `idle` (default 6 s) as
+        /// finished, so its final word counts when guessing the call (a message often just stops
+        /// without an end-of-message flag). Call it from a timer; returns true if a call changed.
+        public bool Settle(DateTime? now = null, TimeSpan? idle = null)
+        {
+            DateTime t = now ?? DateTime.UtcNow;
+            TimeSpan limit = idle ?? TimeSpan.FromSeconds(6);
+            bool changed = false;
+            foreach (var lane in _lanes)
+            {
+                if (lane.CallIsManual || lane.SegmentList.Count == 0) continue;
+                var last = lane.SegmentList[lane.SegmentList.Count - 1];
+                if (last.Complete || t - lane.LastActivity < limit) continue;
+                string before = lane.Call;
+                GuessCall(lane, last.Text, true);
+                if (lane.Call != before) changed = true;
+            }
+            if (changed) Changed?.Invoke();
+            return changed;
         }
 
         /// Deletes a lane and its text. If a message that was still being received on it sends

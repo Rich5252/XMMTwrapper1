@@ -135,6 +135,7 @@ namespace XMMTwrapper1
         private readonly VScrollBar _vbar = new() { Visible = false };
         private readonly HScrollBar _hbar = new();
         private readonly System.Windows.Forms.Timer _pruneTimer = new() { Interval = 30_000 };
+        private readonly System.Windows.Forms.Timer _settleTimer = new() { Interval = 5_000 };
 
         public TickerControl()
         {
@@ -152,14 +153,15 @@ namespace XMMTwrapper1
 
             Model.Changed += () => { UpdateScrollBars(); Invalidate(); };
             _pruneTimer.Tick += (s, e) => Model.Prune();
-            if (!DesignMode && LicenseManager.UsageMode != LicenseUsageMode.Designtime) _pruneTimer.Start();
+            _settleTimer.Tick += (s, e) => Model.Settle();
+            if (!DesignMode && LicenseManager.UsageMode != LicenseUsageMode.Designtime) { _pruneTimer.Start(); _settleTimer.Start(); }
 
             MeasureFont();
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing) _pruneTimer.Dispose();
+            if (disposing) { _pruneTimer.Dispose(); _settleTimer.Dispose(); }
             base.Dispose(disposing);
         }
 

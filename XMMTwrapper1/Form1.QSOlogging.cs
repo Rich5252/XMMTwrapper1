@@ -39,8 +39,11 @@ namespace XMMTwrapper1
             // otherwise log a QSO
             QsoEntry newEntry = new QsoEntry();
 
-            newEntry.Callsign = tbCallsign.Text;                        
-            newEntry.FrequencyMHz = NormalizeFreqKhz(tbRxFrequency.Text);       //28.189.000 in UI, needs 28.180 in log                                //in log kHz res format eg 28.180
+            newEntry.Callsign = tbCallsign.Text;
+            string? freq = NormalizeFreqKhz(tbRxFrequency.Text);
+            if (freq == null) { MessageBox.Show("Error: valid Frequency not specified"); return false; }
+
+            newEntry.FrequencyMHz = freq;       //28.189.000 in UI, needs 28.180 in log                                //in log kHz res format eg 28.180
             newEntry.Timestamp = DateTime.UtcNow;
             newEntry.Mode = btnCW.Checked ? "CW" : btnRTTY.Checked ? "RTTY" : "MFSK";
             if (btnJTTY.Checked) newEntry.SubMode = "JTTY";
@@ -123,7 +126,10 @@ namespace XMMTwrapper1
         //this is also called when tbFreq changes
         private void tbCallsign_TextChanged(object sender, EventArgs e)
         {
-            int dupeIndex = _QSOlogger.GetDupeIndex(tbCallsign.Text, NormalizeFreqKhz(tbRxFrequency.Text));
+            string? freq = NormalizeFreqKhz(tbRxFrequency.Text);
+            if (freq == null) { MessageBox.Show("Error: valid Frequency not specified"); }
+
+            int dupeIndex = _QSOlogger.GetDupeIndex(tbCallsign.Text, freq);
             if (dupeIndex == -1)
             {
                 lblDUPE.Visible = false;
