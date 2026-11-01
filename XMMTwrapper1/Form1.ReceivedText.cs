@@ -6,6 +6,13 @@ namespace XMMTwrapper1
     {
         private void tbTextReceived_MouseDown(object sender, MouseEventArgs e)
         {
+            if (e.Button != MouseButtons.Left)
+            {
+                cmsLogOverwrite.Tag = null;
+                return; // Only handle left mouse button clicks)
+            }
+            cmsLogOverwrite.Tag = "Active";
+
             // Use the bitwise AND (&) to check for specific keys
             bool isCtrlDown = (Control.ModifierKeys & Keys.Control) == Keys.Control;
             bool isShiftDown = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
@@ -90,7 +97,14 @@ namespace XMMTwrapper1
             }
         }
 
-
+        private void cmsLogOverwrite_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (cmsLogOverwrite.Tag == null)
+            {
+                // If the context menu was opened by a left click, cancel the opening to prevent it from showing.
+                e.Cancel = true;
+            }
+        }
         //context menu actions for log overwrite confirmation
         private void cmsLogOverwrite_Closed(object? sender, ToolStripDropDownClosedEventArgs e)
         {

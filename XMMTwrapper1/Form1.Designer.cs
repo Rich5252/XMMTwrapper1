@@ -147,6 +147,7 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
+            cbAutoFtol = new CheckBox();
             cbResetOnCQ = new CheckBox();
             btnResetRxFreq = new Button();
             btnTune = new Button();
@@ -171,7 +172,6 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
-            cbAutoFtol = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -733,33 +733,34 @@ namespace XMMTwrapper1
             // 
             cmsLogOverwrite.Items.AddRange(new ToolStripItem[] { cmsLogOverwriteConfirm, cmsLogOverwriteCancel, toolStripSeparator1, cmsLogQSOFirst });
             cmsLogOverwrite.Name = "cmsLogOverwtite";
-            cmsLogOverwrite.Size = new Size(145, 76);
+            cmsLogOverwrite.Size = new Size(181, 98);
             cmsLogOverwrite.Text = "Log Overwrite";
             cmsLogOverwrite.Closed += cmsLogOverwrite_Closed;
+            cmsLogOverwrite.Opening += cmsLogOverwrite_Opening;
             // 
             // cmsLogOverwriteConfirm
             // 
             cmsLogOverwriteConfirm.Name = "cmsLogOverwriteConfirm";
-            cmsLogOverwriteConfirm.Size = new Size(144, 22);
+            cmsLogOverwriteConfirm.Size = new Size(180, 22);
             cmsLogOverwriteConfirm.Text = "Confirm";
             cmsLogOverwriteConfirm.Click += cmsLogOverwriteConfirm_Click;
             // 
             // cmsLogOverwriteCancel
             // 
             cmsLogOverwriteCancel.Name = "cmsLogOverwriteCancel";
-            cmsLogOverwriteCancel.Size = new Size(144, 22);
+            cmsLogOverwriteCancel.Size = new Size(180, 22);
             cmsLogOverwriteCancel.Text = "Cancel";
             cmsLogOverwriteCancel.Click += cmsLogOverwriteCancel_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(141, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // cmsLogQSOFirst
             // 
             cmsLogQSOFirst.Name = "cmsLogQSOFirst";
-            cmsLogQSOFirst.Size = new Size(144, 22);
+            cmsLogQSOFirst.Size = new Size(180, 22);
             cmsLogQSOFirst.Text = "Log QSO first";
             cmsLogQSOFirst.Click += cmsLogQSOFirst_Click;
             // 
@@ -1341,6 +1342,18 @@ namespace XMMTwrapper1
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
             // 
+            // cbAutoFtol
+            // 
+            cbAutoFtol.AutoSize = true;
+            cbAutoFtol.CheckAlign = ContentAlignment.MiddleRight;
+            cbAutoFtol.Location = new Point(65, 28);
+            cbAutoFtol.Name = "cbAutoFtol";
+            cbAutoFtol.Size = new Size(71, 19);
+            cbAutoFtol.TabIndex = 73;
+            cbAutoFtol.Text = "Auto Set";
+            cbAutoFtol.UseVisualStyleBackColor = true;
+            cbAutoFtol.CheckedChanged += cbAutoFtol_CheckedChanged;
+            // 
             // cbResetOnCQ
             // 
             cbResetOnCQ.AutoSize = true;
@@ -1595,18 +1608,6 @@ namespace XMMTwrapper1
             cmsLogSaveMenuCancel.Size = new Size(128, 22);
             cmsLogSaveMenuCancel.Text = "No Action";
             cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
-            // 
-            // cbAutoFtol
-            // 
-            cbAutoFtol.AutoSize = true;
-            cbAutoFtol.CheckAlign = ContentAlignment.MiddleRight;
-            cbAutoFtol.Location = new Point(65, 28);
-            cbAutoFtol.Name = "cbAutoFtol";
-            cbAutoFtol.Size = new Size(71, 19);
-            cbAutoFtol.TabIndex = 73;
-            cbAutoFtol.Text = "Auto Set";
-            cbAutoFtol.UseVisualStyleBackColor = true;
-            cbAutoFtol.CheckedChanged += cbAutoFtol_CheckedChanged;
             // 
             // Form1
             // 
