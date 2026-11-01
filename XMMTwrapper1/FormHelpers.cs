@@ -1,5 +1,6 @@
 ﻿
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 public static class TextBoxWordSelect
@@ -212,3 +213,39 @@ public static class TextBoxExtensions
 }
 
 
+
+static class RichTextBoxExt
+{
+    const int WM_VSCROLL = 0x115, SB_BOTTOM = 7, WM_SETREDRAW = 0x0B, SB_VERT = 1, SIF_ALL = 0x17;
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct SCROLLINFO { public int cbSize, fMask, nMin, nMax, nPage, nPos, nTrackPos; }
+
+    [DllImport("user32.dll")] static extern int GetScrollInfo(IntPtr h, int bar, ref SCROLLINFO si);
+    [DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr h, int msg, IntPtr w, IntPtr l);
+
+    static bool AtBottom(RichTextBox r)
+    {
+        var si = new SCROLLINFO { cbSize = Marshal.SizeOf<SCROLLINFO>(), fMask = SIF_ALL };
+        if (GetScrollInfo(r.Handle, SB_VERT, ref si) == 0) return true;   // no scrollbar yet
+        return si.nPos + si.nPage >= si.nMax - 1;
+    }
+
+    public static void AppendKeepBottom(this RichTextBox r, string text)
+    {
+        bool follow = AtBottom(r);
+        SendMessage(r.Handle, WM_SETREDRAW, IntPtr.Zero, IntPtr.Zero);   // freeze painting
+        try
+        {
+            r.SelectionStart = r.TextLength;      // append at end, no selection
+            r.SelectionLength = 0;
+            r.SelectedText = text;                // or r.AppendText(text)
+            if (follow) SendMessage(r.Handle, WM_VSCROLL, (IntPtr)SB_BOTTOM, IntPtr.Zero);
+        }
+        finally
+        {
+            SendMessage(r.Handle, WM_SETREDRAW, (IntPtr)1, IntPtr.Zero); // thaw
+            r.Invalidate();
+        }
+    }
+}

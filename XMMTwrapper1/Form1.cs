@@ -212,17 +212,17 @@ namespace XMMTwrapper1
             //  received singley or once when both received together.
             if ((s == "\r" || s == "\n") && lastChar != "\r\n")
             {
-                tbTextReceived.AppendText(Environment.NewLine);
+                tbTextReceived.AppendKeepBottom(Environment.NewLine);
                 lastChar = Environment.NewLine;
             }
             else
             {
-                tbTextReceived.AppendText(s);
+                tbTextReceived.AppendKeepBottom(s);
                 lastChar = s;
             }
             tbTextReceived.SelectionStart = tbTextReceived.Text.Length;
             tbTextReceived.SelectionLength = 0;
-            tbTextReceived.ScrollToCaret();
+            //tbTextReceived.ScrollToCaret();
 
             string strSuggestedCallsign = ITU_Prefix_Checker.IsCallsign(lastChar);
             if (strSuggestedCallsign != "")

@@ -295,13 +295,13 @@ namespace XMMTwrapper1
                 {
                     // start our TX on a fresh line
                     if (tbTextReceived.TextLength > 0 && lastChar != Environment.NewLine)
-                        tbTextReceived.AppendText(Environment.NewLine);
+                        tbTextReceived.AppendKeepBottom(Environment.NewLine);
                     _jttyTxLineOpen = true;
                 }
                 if (_jttyTxPendingSpace) { AppendTx(" "); _jttyTxPendingSpace = false; }
                 AppendTx(c.ToString());
             }
-            tbTextReceived.ScrollToCaret();
+            //tbTextReceived.ScrollToCaret();       causes line jumping
         }
 
         private void AppendTx(string s)
@@ -309,7 +309,7 @@ namespace XMMTwrapper1
             tbTextReceived.SelectionStart = tbTextReceived.TextLength;
             tbTextReceived.SelectionLength = 0;
             tbTextReceived.SelectionBackColor = Color.Yellow;
-            tbTextReceived.AppendText(s);
+            tbTextReceived.AppendKeepBottom(s);
             tbTextReceived.SelectionBackColor = tbTextReceived.BackColor;   // so later RX text isn't yellow
             lastChar = s;
         }
@@ -317,7 +317,7 @@ namespace XMMTwrapper1
         private void CloseTxLine()
         {
             if (!_jttyTxLineOpen) return;
-            tbTextReceived.AppendText(Environment.NewLine);
+            tbTextReceived.AppendKeepBottom(Environment.NewLine);
             lastChar = Environment.NewLine;
             _jttyTxLineOpen = false;
             _jttyTxPendingSpace = false;

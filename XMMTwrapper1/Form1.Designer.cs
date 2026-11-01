@@ -726,7 +726,6 @@ namespace XMMTwrapper1
             tbTextReceived.Size = new Size(598, 95);
             tbTextReceived.TabIndex = 24;
             tbTextReceived.Text = "";
-            tbTextReceived.WordWrap = false;
             tbTextReceived.MouseDown += tbTextReceived_MouseDown;
             // 
             // cmsLogOverwrite
@@ -1494,46 +1493,46 @@ namespace XMMTwrapper1
             // 
             cmsScroller.Items.AddRange(new ToolStripItem[] { cmsScrollerMenuDeleteLane, cmsScrollerMenuDeleteAll, toolStripSeparator2, cmsScrollerMenuCopyLane, cmsScrollerMenuCopyAll, cmsScrollerMenuCopyText });
             cmsScroller.Name = "cmsScroller";
-            cmsScroller.Size = new Size(181, 142);
+            cmsScroller.Size = new Size(136, 120);
             cmsScroller.Closed += cmsScroller_Closed;
             // 
             // cmsScrollerMenuDeleteLane
             // 
             cmsScrollerMenuDeleteLane.Name = "cmsScrollerMenuDeleteLane";
-            cmsScrollerMenuDeleteLane.Size = new Size(180, 22);
+            cmsScrollerMenuDeleteLane.Size = new Size(135, 22);
             cmsScrollerMenuDeleteLane.Text = "Delete Lane";
             cmsScrollerMenuDeleteLane.Click += cmsScrollerMenuDeleteLane_Click;
             // 
             // cmsScrollerMenuDeleteAll
             // 
             cmsScrollerMenuDeleteAll.Name = "cmsScrollerMenuDeleteAll";
-            cmsScrollerMenuDeleteAll.Size = new Size(180, 22);
+            cmsScrollerMenuDeleteAll.Size = new Size(135, 22);
             cmsScrollerMenuDeleteAll.Text = "Delete All";
             cmsScrollerMenuDeleteAll.Click += cmsScrollerMenuDeleteAll_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(177, 6);
+            toolStripSeparator2.Size = new Size(132, 6);
             // 
             // cmsScrollerMenuCopyLane
             // 
             cmsScrollerMenuCopyLane.Name = "cmsScrollerMenuCopyLane";
-            cmsScrollerMenuCopyLane.Size = new Size(180, 22);
+            cmsScrollerMenuCopyLane.Size = new Size(135, 22);
             cmsScrollerMenuCopyLane.Text = "Copy Lane";
             cmsScrollerMenuCopyLane.Click += cmsScrollerMenuCopyLane_Click;
             // 
             // cmsScrollerMenuCopyAll
             // 
             cmsScrollerMenuCopyAll.Name = "cmsScrollerMenuCopyAll";
-            cmsScrollerMenuCopyAll.Size = new Size(180, 22);
+            cmsScrollerMenuCopyAll.Size = new Size(135, 22);
             cmsScrollerMenuCopyAll.Text = "Copy All";
             cmsScrollerMenuCopyAll.Click += cmsScrollerMenuCopyAll_Click;
             // 
             // cmsScrollerMenuCopyText
             // 
             cmsScrollerMenuCopyText.Name = "cmsScrollerMenuCopyText";
-            cmsScrollerMenuCopyText.Size = new Size(180, 22);
+            cmsScrollerMenuCopyText.Size = new Size(135, 22);
             cmsScrollerMenuCopyText.Text = "Copy Text";
             cmsScrollerMenuCopyText.Click += cmsScrollerMenuCopyText_Click;
             // 

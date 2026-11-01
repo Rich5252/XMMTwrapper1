@@ -120,7 +120,7 @@ namespace XMMTwrapper1
             lane.InQsoWindow = m.InQsoWindow;
             lane.LastActivity = t;
 
-            if (!lane.CallIsManual) GuessCall(lane, m.Text);
+            if (!lane.CallIsManual) GuessCall(lane, m.Text, m.Complete);
 
             _lanes.Sort((a, b) => a.Freq != b.Freq ? a.Freq.CompareTo(b.Freq) : a.Number.CompareTo(b.Number));
             Prune(t, raise: false);
@@ -184,23 +184,65 @@ namespace XMMTwrapper1
             return l;
         }
 
-        // First callsign-like word of the message; the word after "DE" wins (the sender).
-        private void GuessCall(TickerLane lane, string text)
-        {
-            if (CallFinder == null) return;
-            string[] words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        // Strict shape check: 1-3 char prefix (must start with a letter, or digit+letter), one digit,
+        // then 1-3 letters, optional /suffix.  Rejects glued/garbled decodes such as F4JKYCQ or
+        // G5BAQTU (suffix of 5 letters), and numbers/words such as 599, 40W, TS890, RST5.
+        private static readonly System.Text.RegularExpressions.Regex CallShape = new(
+            @"^(?:[A-Z][A-Z0-9]?[A-Z0-9]?|[0-9][A-Z][A-Z0-9]?)[0-9][A-Z]{1,3}(?:/[A-Z0-9]{1,4})?$",
+            System.Text.RegularExpressions.RegexOptions.Compiled);
 
-            int de = Array.FindIndex(words, w => w == "DE");
-            if (de >= 0 && de + 1 < words.Length)
+        public static bool LooksLikeCall(string word) => CallShape.IsMatch(word);
+
+        // A word counts as a call only if it has the right shape AND (when set) CallFinder accepts it.
+        // CallFinder MUST be stateless (whole word in, bool-ish out). Do not wire in the char-stream
+        // ITU_Prefix_Checker.IsCallsign here: it keeps a static buffer and glues words together.
+        // The word itself is used, never CallFinder's return value.
+        private bool IsCall(string w) =>
+            LooksLikeCall(w) && (CallFinder == null || !string.IsNullOrEmpty(CallFinder(w)));
+
+        // Whole words only. Rules, strongest first (the latest match in the message wins):
+        //   1. DE <call>              -> sender
+        //   2. CQ [DX|TEST|..] <call> -> sender
+        //   3. <call> CQ              -> sender
+        //   4. <call> <call> ...      -> second is the sender (CALLED-STN SENDER 599 nnn)
+        //   5. message is only a call (or the same call repeated)
+        // No rule matches (garbled, partial, plain text) -> the lane keeps its previous guess.
+        // While a message is still being received its last word may be unfinished, so it is ignored
+        // unless the text ends with a space or the message is complete.
+        private void GuessCall(TickerLane lane, string text, bool complete)
+        {
+            var list = new List<string>(text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+            if (!complete && list.Count > 0 && !char.IsWhiteSpace(text[text.Length - 1]))
+                list.RemoveAt(list.Count - 1);
+            string[] w = list.Select(x => x.Trim(',', '.', ':', ';', '!', '?')).ToArray();
+            if (w.Length == 0) return;
+            bool[] c = w.Select(IsCall).ToArray();
+
+            // 1. DE <call>
+            for (int i = w.Length - 2; i >= 0; i--)
+                if (w[i] == "DE" && c[i + 1]) { lane.Call = w[i + 1]; return; }
+
+            // 2. CQ <call>  (up to two filler words between, e.g. CQ DX CALL, CQ TEST CALL)
+            for (int i = w.Length - 2; i >= 0; i--)
             {
-                string c = CallFinder(words[de + 1]) ?? "";
-                if (c.Length > 0) { lane.Call = c; return; }
+                if (w[i] != "CQ") continue;
+                for (int j = i + 1; j < w.Length && j <= i + 3; j++)
+                {
+                    if (c[j]) { lane.Call = w[j]; return; }
+                    if (w[j] == "CQ" || w[j] == "DE") break;
+                }
             }
-            foreach (string w in words)
-            {
-                string c = CallFinder(w) ?? "";
-                if (c.Length > 0) { lane.Call = c; return; }
-            }
+
+            // 3. <call> CQ
+            for (int i = w.Length - 1; i >= 1; i--)
+                if (w[i] == "CQ" && c[i - 1]) { lane.Call = w[i - 1]; return; }
+
+            // 4. <call> <call>
+            for (int i = w.Length - 1; i >= 1; i--)
+                if (c[i] && c[i - 1]) { lane.Call = w[i]; return; }
+
+            // 5. only a call (maybe repeated)
+            if (c.All(x => x) && w.Distinct().Count() == 1) lane.Call = w[0];
         }
     }
 }
