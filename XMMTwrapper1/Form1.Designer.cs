@@ -171,6 +171,7 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
+            cbAutoFtol = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1327,6 +1328,7 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
+            gbJTTYcontrols.Controls.Add(cbAutoFtol);
             gbJTTYcontrols.Controls.Add(cbResetOnCQ);
             gbJTTYcontrols.Controls.Add(btnResetRxFreq);
             gbJTTYcontrols.Controls.Add(btnTune);
@@ -1594,6 +1596,18 @@ namespace XMMTwrapper1
             cmsLogSaveMenuCancel.Text = "No Action";
             cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
             // 
+            // cbAutoFtol
+            // 
+            cbAutoFtol.AutoSize = true;
+            cbAutoFtol.CheckAlign = ContentAlignment.MiddleRight;
+            cbAutoFtol.Location = new Point(65, 28);
+            cbAutoFtol.Name = "cbAutoFtol";
+            cbAutoFtol.Size = new Size(71, 19);
+            cbAutoFtol.TabIndex = 73;
+            cbAutoFtol.Text = "Auto Set";
+            cbAutoFtol.UseVisualStyleBackColor = true;
+            cbAutoFtol.CheckedChanged += cbAutoFtol_CheckedChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1804,5 +1818,6 @@ namespace XMMTwrapper1
         private ToolStripMenuItem cmsScrollerMenuCopyLane;
         private ToolStripMenuItem cmsScrollerMenuCopyAll;
         private ToolStripMenuItem cmsScrollerMenuCopyText;
+        private CheckBox cbAutoFtol;
     }
 }

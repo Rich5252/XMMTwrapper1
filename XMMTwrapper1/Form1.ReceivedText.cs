@@ -78,12 +78,15 @@ namespace XMMTwrapper1
             tbCallsign.Text = word;
 
             if (btnJTTY.Checked && logRst != null && !(bool)tbReportOut.Tag)        // only fill if not fixed
-                tbReportOut.Text = logRst.Length >= 3 ? logRst.Substring(0, 3) : logRst;
+                tbReportOut.Text = TextBoxWordSelect.NormalizeReportWord(logRst.Length >= 3 ? logRst.Substring(0, 3) : logRst);
 
             if (btnJTTY.Checked && hz is int f && f >= 200 && f <= 5000)
             {
                 _jttyLink.SendTag("RXFREQ", f.ToString());
-                _jttyLink.SendTag("FTOL", "10");
+                if (cbAutoFtol.Checked)
+                {
+                    _jttyLink.SendTag("FTOL", "10");
+                }
             }
         }
 

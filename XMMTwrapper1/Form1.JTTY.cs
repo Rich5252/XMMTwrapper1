@@ -72,7 +72,10 @@ namespace XMMTwrapper1
             {
                 if (lane.Call != null && lane.Call != tbCallsign.Text) QuerySetNewDxCallsign(lane.Call, lane.Snr.ToString(), lane.Freq);
                 _jttyLink.SendTag("RXFREQ", lane.Freq.ToString()); //select this lane as RX freq with 10Hz Ftol
-                _jttyLink.SendTag("FTOL", "10");
+                if (cbAutoFtol.Checked)
+                {
+                    _jttyLink.SendTag("FTOL", "10");
+                }
             };
             RxTextScroller.LaneRightClicked += (lane, word, e) =>
             {
@@ -444,6 +447,11 @@ namespace XMMTwrapper1
             if (RxTextScroller.SelectedLane is { } l) RxTextScroller.CopyLaneTextOnly(l);
             _pendingActionDeleteLaneAll = null;
             _pendingActionDeleteLane = null;
+        }
+
+        private void cbAutoFtol_CheckedChanged(object sender, EventArgs e)
+        {
+            
         }
     }   
 }
