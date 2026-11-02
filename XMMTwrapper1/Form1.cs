@@ -246,6 +246,7 @@ namespace XMMTwrapper1
             {
                 tbCallSignList.AppendText(strSuggestedCallsign);
                 tbCallSignList.AppendText(Environment.NewLine);
+                dgCallsigns.Rows.Add(strSuggestedCallsign, ITU_Prefix_Checker.Entity);
             }
 
         }
@@ -418,7 +419,5 @@ namespace XMMTwrapper1
                 btnTune.BackColor = Color.Red;
             }
         }
-
-
     }
 }

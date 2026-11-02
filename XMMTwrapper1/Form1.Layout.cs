@@ -82,6 +82,11 @@ namespace XMMTwrapper1
             RxTextScroller.Top = tbTextReceived.Bottom + 2;
             btnClearText.Left = inner.Width - _clearBtnRightMargin - btnClearText.Width;
 
+            dgCallsigns.Left = axxmmxy1.Right + 3;
+            dgCallsigns.Width = panelLogging.Right - dgCallsigns.Left - 3;
+            colCallsign.Width = 60;
+            colEntity.Width = dgCallsigns.Width - colCallsign.Width - 3;
+
             ResumeLayout(true);
         }
     }

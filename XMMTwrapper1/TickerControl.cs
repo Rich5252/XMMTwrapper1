@@ -66,7 +66,7 @@ namespace XMMTwrapper1
             }
         }
 
-        /// Timeline scale in pixels per second (8..400). Ctrl+Wheel zooms. About 50 shows RTTY at
+        /// Timeline scale in pixels per second (4..400). Ctrl+Wheel zooms. About 50 shows RTTY at
         /// roughly its real speed; smaller squeezes more time on screen.
         [Category("Appearance"), DefaultValue(50)]
         public int TimelinePixelsPerSecond
@@ -316,21 +316,34 @@ namespace XMMTwrapper1
 
         /// Timeline layout of a lane: each message starts at its start time and is as wide as it
         /// lasted - but never narrower than its text, and never running into the next message.
+        /// While following live, the newest message is kept fully visible: if its text is longer
+        /// than the time since it started (at this scale) it is right-justified to the right edge,
+        /// and it is only "dragged left" by its start time once it fits.
         private List<Placed> LayoutTimeline(TickerLane lane)
         {
             var segs = lane.Segments.OrderBy(sg => sg.Start).ToList();
             var list = new List<Placed>(segs.Count);
+            if (segs.Count == 0) return list;
+
+            float rightX = TextLeft + ViewW;
+            int last = segs.Count - 1;
+            float lastX0 = TimeX(segs[last].Start);
+            if (_follow)
+                lastX0 = Math.Min(lastX0, rightX - segs[last].Text.Length * _cw - 4);
+
             for (int i = 0; i < segs.Count; i++)
             {
                 var sg = segs[i];
-                float x0 = TimeX(sg.Start);
+                float x0 = i == last ? lastX0 : TimeX(sg.Start);
                 float xTime = TimeX(sg.LastUpdate > sg.Start ? sg.LastUpdate : sg.Start);
-                float limit = i + 1 < segs.Count ? TimeX(segs[i + 1].Start) - 2 : float.MaxValue;
+                float limit = i == last ? float.MaxValue
+                            : i + 1 == last ? lastX0 - 2
+                            : TimeX(segs[i + 1].Start) - 2;
                 float x1 = Math.Max(xTime, Math.Min(x0 + sg.Text.Length * _cw + 4, limit));
                 x1 = Math.Max(x1, x0 + 3);
 
                 string shown = sg.Text;
-                int fit = (int)((x1 - x0 - 4) / _cw);
+                int fit = (int)((x1 - x0 - 4) / _cw + 0.001f);
                 if (fit < shown.Length)
                     shown = fit >= 2 ? shown.Substring(0, fit - 1) + "\u2026" : "";
                 list.Add(new Placed(sg, x0, x1, shown));

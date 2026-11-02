@@ -176,6 +176,9 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
+            dgCallsigns = new DataGridView();
+            colCallsign = new DataGridViewTextBoxColumn();
+            colEntity = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -202,6 +205,7 @@ namespace XMMTwrapper1
             cmsScroller.SuspendLayout();
             panelLogging2.SuspendLayout();
             cmsLogSave.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgCallsigns).BeginInit();
             SuspendLayout();
             // 
             // axxmmxy1
@@ -616,7 +620,7 @@ namespace XMMTwrapper1
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblMMTTYstatus, toolStripStatusLabel3, lblPipeStatus, toolStripStatusLabel1, lblWSjttyStatus, toolStripStatusLabel2, lblLogFileName });
             statusStrip1.Location = new Point(0, 571);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(902, 22);
+            statusStrip1.Size = new Size(896, 22);
             statusStrip1.TabIndex = 22;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -670,7 +674,7 @@ namespace XMMTwrapper1
             menuStrip1.Items.AddRange(new ToolStripItem[] { OptionMenu, audioSelectToolStripMenuItem, exportLogToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(902, 24);
+            menuStrip1.Size = new Size(896, 24);
             menuStrip1.TabIndex = 23;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -1170,6 +1174,7 @@ namespace XMMTwrapper1
             tbCallSignList.ScrollBars = ScrollBars.Vertical;
             tbCallSignList.Size = new Size(100, 168);
             tbCallSignList.TabIndex = 70;
+            tbCallSignList.Visible = false;
             tbCallSignList.MouseDoubleClick += tbCallSignList_MouseDoubleClick;
             // 
             // label14
@@ -1646,11 +1651,37 @@ namespace XMMTwrapper1
             cmsLogSaveMenuCancel.Size = new Size(128, 22);
             cmsLogSaveMenuCancel.Text = "No Action";
             // 
+            // dgCallsigns
+            // 
+            dgCallsigns.BackgroundColor = SystemColors.Control;
+            dgCallsigns.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgCallsigns.Columns.AddRange(new DataGridViewColumn[] { colCallsign, colEntity });
+            dgCallsigns.Location = new Point(794, 37);
+            dgCallsigns.Name = "dgCallsigns";
+            dgCallsigns.ReadOnly = true;
+            dgCallsigns.RowHeadersVisible = false;
+            dgCallsigns.Size = new Size(183, 186);
+            dgCallsigns.TabIndex = 93;
+            // 
+            // colCallsign
+            // 
+            colCallsign.HeaderText = "Callsign";
+            colCallsign.Name = "colCallsign";
+            colCallsign.ReadOnly = true;
+            colCallsign.Width = 60;
+            // 
+            // colEntity
+            // 
+            colEntity.HeaderText = "Entity";
+            colEntity.Name = "colEntity";
+            colEntity.ReadOnly = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(902, 593);
+            ClientSize = new Size(896, 593);
+            Controls.Add(dgCallsigns);
             Controls.Add(gbRttyCW);
             Controls.Add(panelLogging2);
             Controls.Add(panelTextReceived);
@@ -1711,6 +1742,7 @@ namespace XMMTwrapper1
             panelLogging2.ResumeLayout(false);
             panelLogging2.PerformLayout();
             cmsLogSave.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgCallsigns).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1862,5 +1894,8 @@ namespace XMMTwrapper1
         private Button btnSend15;
         private CheckBox cbShowTimeLine;
         private NumericUpDown nUpDownLaneLifeTime;
+        private DataGridView dgCallsigns;
+        private DataGridViewTextBoxColumn colCallsign;
+        private DataGridViewTextBoxColumn colEntity;
     }
 }

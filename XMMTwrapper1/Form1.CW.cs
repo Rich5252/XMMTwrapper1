@@ -216,6 +216,7 @@ namespace XMMTwrapper1
         {
             tbTextReceived.Clear();
             tbCallSignList.Clear();
+            dgCallsigns.Rows.Clear();
         }
 
         private void tbToneFreq_TextChanged(object sender, EventArgs e)
