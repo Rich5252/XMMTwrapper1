@@ -4,6 +4,11 @@ namespace XMMTwrapper1
 {
     public partial class Form1
     {
+        public void InitializeTextReceivedUi()
+        {
+            cmsLogInitActions();
+        }
+
         private void tbTextReceived_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
@@ -97,67 +102,65 @@ namespace XMMTwrapper1
             }
         }
 
-        private void cmsLogOverwrite_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+
+        private void cmsLogInitActions()
         {
-            if (cmsLogOverwrite.Tag == null)
+            //Log context action menu
+            cmsLogOverwrite.Opening += (s, e) =>
             {
-                // If the context menu was opened by a left click, cancel the opening to prevent it from showing.
-                e.Cancel = true;
-            }
-        }
-        //context menu actions for log overwrite confirmation
-        private void cmsLogOverwrite_Closed(object? sender, ToolStripDropDownClosedEventArgs e)
-        {
-            // Clicking away or pressing Esc closes the menu without an item click = cancel.
-            if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
-        }
+                if (cmsLogOverwrite.Tag == null)
+                {
+                    // If the context menu was opened by a left click, cancel the opening to prevent it from showing.
+                    e.Cancel = true;
+                }
+            };
+            cmsLogOverwrite.Closed += (s, e) =>
+            {
+                // Clicking away or pressing Esc closes the menu without an item click = cancel.
+                if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
+            };
 
-        private void cmsLogOverwriteConfirm_Click(object? sender, EventArgs e)
-        {
-            var a = _pendingAction;
-            _pendingAction = null;
-            a?.Invoke();
-        }
-
-        private void cmsLogOverwriteCancel_Click(object? sender, EventArgs e)
-        {
-            _pendingAction = null;
-        }
-
-
-        private void cmsLogQSOFirst_Click(object? sender, EventArgs e)
-        {
-            bool success = LogQSO();      //returns true if QSO logged, false if not
-
-            if (success)                //if logging was successful, then clear the pending action and invoke it
+            cmsLogOverwriteConfirm.Click += (s, e) =>
             {
                 var a = _pendingAction;
                 _pendingAction = null;
                 a?.Invoke();
-            }
-        }
+            };
 
-        private void cmsLogSaveMenuLogQSO_Click(object sender, EventArgs e)
-        {
-            LogQSO();
-            _pendingAction = null;
-        }
+            cmsLogOverwriteCancel.Click += (s, e) => { _pendingAction = null; };
 
-        private void cmsLogSaveMenuClearLog_Click(object sender, EventArgs e)
-        {
-            ClearDownUiAfterLog();
-            _pendingAction = null;  
-        }
+            cmsLogQSOFirst.Click += (s, e) =>
+            {
+                bool success = LogQSO();      //returns true if QSO logged, false if not
+                if (success)                //if logging was successful, then clear the pending action and invoke it
+                {
+                    var a = _pendingAction;
+                    _pendingAction = null;
+                    a?.Invoke();
+                }
+            };
 
-        private void cmsLogSaveMenuCancel_Click(object sender, EventArgs e)
-        {
-            _pendingAction = null;
-        }
+            //Log save context menu actions
+            cmsLogSaveMenuLogQSO.Click += (s, e) =>
+            {
+                LogQSO();
+                _pendingAction = null;
+            };
 
-        private void cmsLogSave_Closed(object sender, ToolStripDropDownClosedEventArgs e)
-        {
-            // Clicking away or pressing Esc closes the menu without an item click = cancel.
-            if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
+            cmsLogSaveMenuCancel.Click += (s, e) => { _pendingAction = null; };
+
+            cmsLogSave.Closed += (s, e) =>
+            {
+                // Clicking away or pressing Esc closes the menu without an item click = cancel.
+                if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
+            };
+
+            cmsLogSaveMenuClearLog.Click += (s, e) =>
+            {
+                ClearDownUiAfterLog();
+                _pendingAction = null;
+            };
+
         }
     }
 }

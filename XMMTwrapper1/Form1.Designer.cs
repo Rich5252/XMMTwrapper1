@@ -147,6 +147,8 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
+            nUpDownLaneLifeTime = new NumericUpDown();
+            cbShowTimeLine = new CheckBox();
             cbAutoFtol = new CheckBox();
             cbResetOnCQ = new CheckBox();
             btnResetRxFreq = new Button();
@@ -174,7 +176,6 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
-            cbShowTimeLine = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -194,6 +195,7 @@ namespace XMMTwrapper1
             ((System.ComponentModel.ISupportInitialize)btnTemplate).BeginInit();
             gbRttyCW.SuspendLayout();
             gbJTTYcontrols.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nUpDownLaneLifeTime).BeginInit();
             panelButtons.SuspendLayout();
             panelLogging.SuspendLayout();
             panelTextReceived.SuspendLayout();
@@ -738,22 +740,18 @@ namespace XMMTwrapper1
             cmsLogOverwrite.Name = "cmsLogOverwtite";
             cmsLogOverwrite.Size = new Size(145, 76);
             cmsLogOverwrite.Text = "Log Overwrite";
-            cmsLogOverwrite.Closed += cmsLogOverwrite_Closed;
-            cmsLogOverwrite.Opening += cmsLogOverwrite_Opening;
             // 
             // cmsLogOverwriteConfirm
             // 
             cmsLogOverwriteConfirm.Name = "cmsLogOverwriteConfirm";
             cmsLogOverwriteConfirm.Size = new Size(144, 22);
             cmsLogOverwriteConfirm.Text = "Confirm";
-            cmsLogOverwriteConfirm.Click += cmsLogOverwriteConfirm_Click;
             // 
             // cmsLogOverwriteCancel
             // 
             cmsLogOverwriteCancel.Name = "cmsLogOverwriteCancel";
             cmsLogOverwriteCancel.Size = new Size(144, 22);
             cmsLogOverwriteCancel.Text = "Cancel";
-            cmsLogOverwriteCancel.Click += cmsLogOverwriteCancel_Click;
             // 
             // toolStripSeparator1
             // 
@@ -765,7 +763,6 @@ namespace XMMTwrapper1
             cmsLogQSOFirst.Name = "cmsLogQSOFirst";
             cmsLogQSOFirst.Size = new Size(144, 22);
             cmsLogQSOFirst.Text = "Log QSO first";
-            cmsLogQSOFirst.Click += cmsLogQSOFirst_Click;
             // 
             // tbCallsign
             // 
@@ -1332,6 +1329,7 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
+            gbJTTYcontrols.Controls.Add(nUpDownLaneLifeTime);
             gbJTTYcontrols.Controls.Add(cbShowTimeLine);
             gbJTTYcontrols.Controls.Add(cbAutoFtol);
             gbJTTYcontrols.Controls.Add(cbResetOnCQ);
@@ -1345,6 +1343,27 @@ namespace XMMTwrapper1
             gbJTTYcontrols.TabIndex = 87;
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
+            // 
+            // nUpDownLaneLifeTime
+            // 
+            nUpDownLaneLifeTime.Location = new Point(165, 109);
+            nUpDownLaneLifeTime.Name = "nUpDownLaneLifeTime";
+            nUpDownLaneLifeTime.Size = new Size(40, 23);
+            nUpDownLaneLifeTime.TabIndex = 77;
+            nUpDownLaneLifeTime.Value = new decimal(new int[] { 10, 0, 0, 0 });
+            nUpDownLaneLifeTime.ValueChanged += nUpDownLaneLifeTime_ValueChanged;
+            // 
+            // cbShowTimeLine
+            // 
+            cbShowTimeLine.AutoSize = true;
+            cbShowTimeLine.CheckAlign = ContentAlignment.MiddleRight;
+            cbShowTimeLine.Location = new Point(80, 110);
+            cbShowTimeLine.Name = "cbShowTimeLine";
+            cbShowTimeLine.Size = new Size(74, 19);
+            cbShowTimeLine.TabIndex = 74;
+            cbShowTimeLine.Text = "TimeLine";
+            cbShowTimeLine.UseVisualStyleBackColor = true;
+            cbShowTimeLine.CheckedChanged += cbShowTimeLine_CheckedChanged;
             // 
             // cbAutoFtol
             // 
@@ -1606,40 +1625,24 @@ namespace XMMTwrapper1
             cmsLogSave.Items.AddRange(new ToolStripItem[] { cmsLogSaveMenuLogQSO, cmsLogSaveMenuClearLog, cmsLogSaveMenuCancel });
             cmsLogSave.Name = "cmsLogSave";
             cmsLogSave.Size = new Size(129, 70);
-            cmsLogSave.Closed += cmsLogSave_Closed;
             // 
             // cmsLogSaveMenuLogQSO
             // 
             cmsLogSaveMenuLogQSO.Name = "cmsLogSaveMenuLogQSO";
             cmsLogSaveMenuLogQSO.Size = new Size(128, 22);
             cmsLogSaveMenuLogQSO.Text = "Log QSO";
-            cmsLogSaveMenuLogQSO.Click += cmsLogSaveMenuLogQSO_Click;
             // 
             // cmsLogSaveMenuClearLog
             // 
             cmsLogSaveMenuClearLog.Name = "cmsLogSaveMenuClearLog";
             cmsLogSaveMenuClearLog.Size = new Size(128, 22);
             cmsLogSaveMenuClearLog.Text = "Clear Log";
-            cmsLogSaveMenuClearLog.Click += cmsLogSaveMenuClearLog_Click;
             // 
             // cmsLogSaveMenuCancel
             // 
             cmsLogSaveMenuCancel.Name = "cmsLogSaveMenuCancel";
             cmsLogSaveMenuCancel.Size = new Size(128, 22);
             cmsLogSaveMenuCancel.Text = "No Action";
-            cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
-            // 
-            // cbShowTimeLine
-            // 
-            cbShowTimeLine.AutoSize = true;
-            cbShowTimeLine.CheckAlign = ContentAlignment.MiddleRight;
-            cbShowTimeLine.Location = new Point(80, 110);
-            cbShowTimeLine.Name = "cbShowTimeLine";
-            cbShowTimeLine.Size = new Size(74, 19);
-            cbShowTimeLine.TabIndex = 74;
-            cbShowTimeLine.Text = "TimeLine";
-            cbShowTimeLine.UseVisualStyleBackColor = true;
-            cbShowTimeLine.CheckedChanged += cbShowTimeLine_CheckedChanged;
             // 
             // Form1
             // 
@@ -1695,6 +1698,7 @@ namespace XMMTwrapper1
             gbRttyCW.PerformLayout();
             gbJTTYcontrols.ResumeLayout(false);
             gbJTTYcontrols.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nUpDownLaneLifeTime).EndInit();
             panelButtons.ResumeLayout(false);
             panelButtons.PerformLayout();
             panelLogging.ResumeLayout(false);
@@ -1855,5 +1859,6 @@ namespace XMMTwrapper1
         private Button btnSend16;
         private Button btnSend15;
         private CheckBox cbShowTimeLine;
+        private NumericUpDown nUpDownLaneLifeTime;
     }
 }

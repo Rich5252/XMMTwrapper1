@@ -397,14 +397,6 @@ namespace XMMTwrapper1
 
         private void RxScroller_LaneRightClicked(TickerLane lane, string? word, MouseEventArgs e)
         {
-            _pendingActionDeleteLane = () =>
-            {
-                RxTextScroller.Model.RemoveLane(lane);
-            };
-            _pendingActionDeleteLaneAll = () =>
-            {
-                RxTextScroller.Model.Clear();
-            };
             cmsScroller.Show(Cursor.Position);
         }
 
@@ -426,6 +418,11 @@ namespace XMMTwrapper1
         private void cbShowTimeLine_CheckedChanged(object sender, EventArgs e)
         {
             RxTextScroller.TimelineMode = cbShowTimeLine.Checked ? true : false;
+        }
+
+        private void nUpDownLaneLifeTime_ValueChanged(object sender, EventArgs e)
+        {
+            RxTextScroller.Model.LaneTimeout = TimeSpan.FromMinutes((double) nUpDownLaneLifeTime.Value);
         }
     }   
 }

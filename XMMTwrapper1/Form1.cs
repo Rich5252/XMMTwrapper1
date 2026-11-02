@@ -34,6 +34,7 @@ namespace XMMTwrapper1
             Log.Mark("Form1 before init");
             InitializeComponent();
 
+            InitializeTextReceivedUi();
             InitializeJttyUi();
 
             InitializeCWDecoder();
