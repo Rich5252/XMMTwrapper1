@@ -135,6 +135,10 @@ namespace XMMTwrapper1
             tbSerialNumIn.Tag = _ini.GetValue("General", "SerialNumInFix", "false") == "True";  //restore fix/auto state
             string autoInc = _ini.GetValue("General", "AutoIncr", "false");
             cbSerialNumAutoInc.Checked = (autoInc == "True");
+            cbResetOnCQ.Checked = (_ini.GetValue("General", "ResetOnCQ", "False") == "True");
+            nUpDownLaneLifeTime.Value = TextToInt(_ini.GetValue("General", "LaneLifeTime", "10"));  //default 10 minutes
+            cbAutoFtol.Checked = (_ini.GetValue("General", "AutoFtol", "False") == "True");
+            cbShowTimeLine.Checked = (_ini.GetValue("General", "ShowTimeline", "True") == "True");
 
             InitQsoLogger();
         }
@@ -171,6 +175,11 @@ namespace XMMTwrapper1
             SelectMode();           //init mode UI
             UpdateButtonMacros();   //init Send button macros & labels
 
+            //setup RxTextScroller once the form is fully loaded and shown
+            RxTextScroller.Model.LaneTimeout = TimeSpan.FromMinutes((double)nUpDownLaneLifeTime.Value);
+            RxTextScroller.TimelineMode = cbShowTimeLine.Checked;
+            RxTextScroller.TimelinePixelsPerSecond = TextToInt(_ini.GetValue("General", "TimelinePixelsPerSecond", "4"));
+
             //diagnostic to explore ocx interface
             //DumpSpecDrawSignature();
         }
@@ -197,6 +206,11 @@ namespace XMMTwrapper1
             _ini.SetValue("General", "SerialNumIn", tbSerialNumIn.Text);
             _ini.SetValue("General", "SerialNumInFix", $"{tbSerialNumIn.Tag}");
             _ini.SetValue("General", "AutoIncr", $"{cbSerialNumAutoInc.Checked}");
+            _ini.SetValue("General", "ResetOnCQ", $"{cbResetOnCQ.Checked}");
+            _ini.SetValue("General", "LaneLifeTime", $"{nUpDownLaneLifeTime.Value}");
+            _ini.SetValue("General", "AutoFtol", $"{cbAutoFtol.Checked}");
+            _ini.SetValue("General", "TimelinePixelsPerSecond", $"{RxTextScroller.TimelinePixelsPerSecond}");
+            _ini.SetValue("General", "ShowTimeline", $"{RxTextScroller.TimelineMode}");
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)

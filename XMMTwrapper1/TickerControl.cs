@@ -72,7 +72,7 @@ namespace XMMTwrapper1
         public int TimelinePixelsPerSecond
         {
             get => _pps;
-            set { _pps = Math.Max(8, Math.Min(400, value)); _now = DateTime.UtcNow; RelayoutAndRepaint(); }
+            set { _pps = Math.Max(4, Math.Min(400, value)); _now = DateTime.UtcNow; RelayoutAndRepaint(); }
         }
 
         /// Faint vertical lines on the lanes at the ruler's tick marks (timeline mode).

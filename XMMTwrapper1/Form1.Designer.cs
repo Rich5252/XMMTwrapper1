@@ -147,8 +147,8 @@ namespace XMMTwrapper1
             tbFreeText = new TextBox();
             label16 = new Label();
             gbJTTYcontrols = new GroupBox();
-            nUpDownLaneLifeTime = new NumericUpDown();
             cbShowTimeLine = new CheckBox();
+            nUpDownLaneLifeTime = new NumericUpDown();
             cbAutoFtol = new CheckBox();
             cbResetOnCQ = new CheckBox();
             btnResetRxFreq = new Button();
@@ -837,16 +837,16 @@ namespace XMMTwrapper1
             gbRttyCW.Controls.Add(btnJTTY);
             gbRttyCW.Controls.Add(btnRTTY);
             gbRttyCW.Controls.Add(btnCW);
-            gbRttyCW.Location = new Point(12, 148);
+            gbRttyCW.Location = new Point(12, 160);
             gbRttyCW.Name = "gbRttyCW";
-            gbRttyCW.Size = new Size(58, 66);
+            gbRttyCW.Size = new Size(58, 54);
             gbRttyCW.TabIndex = 29;
             gbRttyCW.TabStop = false;
             // 
             // btnJTTY
             // 
             btnJTTY.AutoSize = true;
-            btnJTTY.Location = new Point(5, 47);
+            btnJTTY.Location = new Point(5, 36);
             btnJTTY.Name = "btnJTTY";
             btnJTTY.Size = new Size(48, 19);
             btnJTTY.TabIndex = 2;
@@ -860,7 +860,7 @@ namespace XMMTwrapper1
             btnRTTY.AutoSize = true;
             btnRTTY.Checked = true;
             btnRTTY.Font = new Font("Verdana", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnRTTY.Location = new Point(5, 30);
+            btnRTTY.Location = new Point(5, 18);
             btnRTTY.Name = "btnRTTY";
             btnRTTY.Size = new Size(54, 18);
             btnRTTY.TabIndex = 1;
@@ -873,7 +873,7 @@ namespace XMMTwrapper1
             // 
             btnCW.AutoSize = true;
             btnCW.Font = new Font("Verdana", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnCW.Location = new Point(5, 11);
+            btnCW.Location = new Point(5, 0);
             btnCW.Name = "btnCW";
             btnCW.Size = new Size(47, 18);
             btnCW.TabIndex = 0;
@@ -1329,8 +1329,8 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
-            gbJTTYcontrols.Controls.Add(nUpDownLaneLifeTime);
             gbJTTYcontrols.Controls.Add(cbShowTimeLine);
+            gbJTTYcontrols.Controls.Add(nUpDownLaneLifeTime);
             gbJTTYcontrols.Controls.Add(cbAutoFtol);
             gbJTTYcontrols.Controls.Add(cbResetOnCQ);
             gbJTTYcontrols.Controls.Add(btnResetRxFreq);
@@ -1344,20 +1344,13 @@ namespace XMMTwrapper1
             gbJTTYcontrols.TabStop = false;
             gbJTTYcontrols.Text = "JTTY";
             // 
-            // nUpDownLaneLifeTime
-            // 
-            nUpDownLaneLifeTime.Location = new Point(165, 109);
-            nUpDownLaneLifeTime.Name = "nUpDownLaneLifeTime";
-            nUpDownLaneLifeTime.Size = new Size(40, 23);
-            nUpDownLaneLifeTime.TabIndex = 77;
-            nUpDownLaneLifeTime.Value = new decimal(new int[] { 10, 0, 0, 0 });
-            nUpDownLaneLifeTime.ValueChanged += nUpDownLaneLifeTime_ValueChanged;
-            // 
             // cbShowTimeLine
             // 
             cbShowTimeLine.AutoSize = true;
             cbShowTimeLine.CheckAlign = ContentAlignment.MiddleRight;
-            cbShowTimeLine.Location = new Point(80, 110);
+            cbShowTimeLine.Checked = true;
+            cbShowTimeLine.CheckState = CheckState.Checked;
+            cbShowTimeLine.Location = new Point(131, 110);
             cbShowTimeLine.Name = "cbShowTimeLine";
             cbShowTimeLine.Size = new Size(74, 19);
             cbShowTimeLine.TabIndex = 74;
@@ -1365,11 +1358,20 @@ namespace XMMTwrapper1
             cbShowTimeLine.UseVisualStyleBackColor = true;
             cbShowTimeLine.CheckedChanged += cbShowTimeLine_CheckedChanged;
             // 
+            // nUpDownLaneLifeTime
+            // 
+            nUpDownLaneLifeTime.Location = new Point(88, 109);
+            nUpDownLaneLifeTime.Name = "nUpDownLaneLifeTime";
+            nUpDownLaneLifeTime.Size = new Size(40, 23);
+            nUpDownLaneLifeTime.TabIndex = 77;
+            nUpDownLaneLifeTime.Value = new decimal(new int[] { 10, 0, 0, 0 });
+            nUpDownLaneLifeTime.ValueChanged += nUpDownLaneLifeTime_ValueChanged;
+            // 
             // cbAutoFtol
             // 
             cbAutoFtol.AutoSize = true;
             cbAutoFtol.CheckAlign = ContentAlignment.MiddleRight;
-            cbAutoFtol.Location = new Point(65, 28);
+            cbAutoFtol.Location = new Point(134, 26);
             cbAutoFtol.Name = "cbAutoFtol";
             cbAutoFtol.Size = new Size(71, 19);
             cbAutoFtol.TabIndex = 73;
@@ -1382,7 +1384,7 @@ namespace XMMTwrapper1
             cbResetOnCQ.CheckAlign = ContentAlignment.MiddleRight;
             cbResetOnCQ.Checked = true;
             cbResetOnCQ.CheckState = CheckState.Checked;
-            cbResetOnCQ.Location = new Point(63, 85);
+            cbResetOnCQ.Location = new Point(114, 84);
             cbResetOnCQ.Name = "cbResetOnCQ";
             cbResetOnCQ.Size = new Size(91, 19);
             cbResetOnCQ.TabIndex = 72;
@@ -1649,12 +1651,12 @@ namespace XMMTwrapper1
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(902, 593);
+            Controls.Add(gbRttyCW);
             Controls.Add(panelLogging2);
             Controls.Add(panelTextReceived);
             Controls.Add(panelLogging);
             Controls.Add(panelButtons);
             Controls.Add(label14);
-            Controls.Add(gbRttyCW);
             Controls.Add(statusStrip1);
             Controls.Add(tbCallSignList);
             Controls.Add(menuStrip1);
