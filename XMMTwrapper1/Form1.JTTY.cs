@@ -45,6 +45,8 @@ namespace XMMTwrapper1
         private void InitializeJttyUi()
         {
             lblWSjttyStatus.Text = "WS not connected";
+
+            cmsScrollerInitActions();
         }
 
         // Called from Form1_Shown, so events are raised on the UI thread
@@ -412,46 +414,13 @@ namespace XMMTwrapper1
             if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
         }
 
-        private void cmsScrollerMenuDeleteLane_Click(object? sender, EventArgs e)
+        private void cmsScrollerInitActions()
         {
-            var a = _pendingActionDeleteLane;
-            _pendingActionDeleteLane = null;
-            _pendingActionDeleteLaneAll = null;
-            a?.Invoke();
-        }
-
-        private void cmsScrollerMenuDeleteAll_Click(object? sender, EventArgs e)
-        {
-            var a = _pendingActionDeleteLaneAll;
-            _pendingActionDeleteLaneAll = null;
-            _pendingActionDeleteLane = null;
-            a?.Invoke();
-        }
-
-        private void cmsScrollerMenuCopyLane_Click(object sender, EventArgs e)
-        {
-            RxTextScroller.CopySelectedLane();
-            _pendingActionDeleteLaneAll = null;
-            _pendingActionDeleteLane = null;
-        }
-
-        private void cmsScrollerMenuCopyAll_Click(object sender, EventArgs e)
-        {
-            RxTextScroller.CopyAllLanes(header: true);
-            _pendingActionDeleteLaneAll = null;
-            _pendingActionDeleteLane = null;
-        }
-
-        private void cmsScrollerMenuCopyText_Click(object sender, EventArgs e)
-        {
-            if (RxTextScroller.SelectedLane is { } l) RxTextScroller.CopyLaneTextOnly(l);
-            _pendingActionDeleteLaneAll = null;
-            _pendingActionDeleteLane = null;
-        }
-
-        private void cbAutoFtol_CheckedChanged(object sender, EventArgs e)
-        {
-            
+            cmsScrollerMenuDeleteLane.Click += (s, e) => { if (RxTextScroller.SelectedLane is { } l) RxTextScroller.Model.RemoveLane(l); };
+            cmsScrollerMenuDeleteAll.Click += (s, e) => { RxTextScroller.Model.Clear(); };
+            cmsScrollerMenuCopyLane.Click += (s, e) => { RxTextScroller.CopySelectedLane(); };
+            cmsScrollerMenuCopyAll.Click += (s, e) => { RxTextScroller.CopyAllLanes(header: true); };
+            cmsScrollerMenuCopyText.Click += (s, e) => { if (RxTextScroller.SelectedLane is { } l) RxTextScroller.CopyLaneTextOnly(l); };
         }
     }   
 }

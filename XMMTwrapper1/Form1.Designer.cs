@@ -1354,7 +1354,6 @@ namespace XMMTwrapper1
             cbAutoFtol.TabIndex = 73;
             cbAutoFtol.Text = "Auto Set";
             cbAutoFtol.UseVisualStyleBackColor = true;
-            cbAutoFtol.CheckedChanged += cbAutoFtol_CheckedChanged;
             // 
             // cbResetOnCQ
             // 
@@ -1540,14 +1539,12 @@ namespace XMMTwrapper1
             cmsScrollerMenuDeleteLane.Name = "cmsScrollerMenuDeleteLane";
             cmsScrollerMenuDeleteLane.Size = new Size(135, 22);
             cmsScrollerMenuDeleteLane.Text = "Delete Lane";
-            cmsScrollerMenuDeleteLane.Click += cmsScrollerMenuDeleteLane_Click;
             // 
             // cmsScrollerMenuDeleteAll
             // 
             cmsScrollerMenuDeleteAll.Name = "cmsScrollerMenuDeleteAll";
             cmsScrollerMenuDeleteAll.Size = new Size(135, 22);
             cmsScrollerMenuDeleteAll.Text = "Delete All";
-            cmsScrollerMenuDeleteAll.Click += cmsScrollerMenuDeleteAll_Click;
             // 
             // toolStripSeparator2
             // 
@@ -1559,21 +1556,18 @@ namespace XMMTwrapper1
             cmsScrollerMenuCopyLane.Name = "cmsScrollerMenuCopyLane";
             cmsScrollerMenuCopyLane.Size = new Size(135, 22);
             cmsScrollerMenuCopyLane.Text = "Copy Lane";
-            cmsScrollerMenuCopyLane.Click += cmsScrollerMenuCopyLane_Click;
             // 
             // cmsScrollerMenuCopyAll
             // 
             cmsScrollerMenuCopyAll.Name = "cmsScrollerMenuCopyAll";
             cmsScrollerMenuCopyAll.Size = new Size(135, 22);
             cmsScrollerMenuCopyAll.Text = "Copy All";
-            cmsScrollerMenuCopyAll.Click += cmsScrollerMenuCopyAll_Click;
             // 
             // cmsScrollerMenuCopyText
             // 
             cmsScrollerMenuCopyText.Name = "cmsScrollerMenuCopyText";
             cmsScrollerMenuCopyText.Size = new Size(135, 22);
             cmsScrollerMenuCopyText.Text = "Copy Text";
-            cmsScrollerMenuCopyText.Click += cmsScrollerMenuCopyText_Click;
             // 
             // lblDupeTimeDate
             // 
