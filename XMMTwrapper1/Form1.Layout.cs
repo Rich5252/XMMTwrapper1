@@ -84,7 +84,7 @@ namespace XMMTwrapper1
 
             dgCallsigns.Left = axxmmxy1.Right + 3;
             dgCallsigns.Width = panelLogging.Right - dgCallsigns.Left - 3;
-            colCallsign.Width = 60;
+            colCallsign.Width = 65;
             colEntity.Width = dgCallsigns.Width - colCallsign.Width - 3;
 
             ResumeLayout(true);

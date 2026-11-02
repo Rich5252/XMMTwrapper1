@@ -248,6 +248,7 @@ namespace XMMTwrapper1
                 tbCallSignList.AppendText(strSuggestedCallsign);
                 tbCallSignList.AppendText(Environment.NewLine);
                 dgCallsigns.Rows.Add(strSuggestedCallsign, ITU_Prefix_Checker.Entity);
+                dgCallsigns.FirstDisplayedScrollingRowIndex = dgCallsigns.RowCount - 1;  //scroll to last row
             }
 
         }
