@@ -46,7 +46,7 @@ namespace XMMTwrapper1
         {
             lblWSjttyStatus.Text = "WS not connected";
 
-            cmsScrollerInitActions();
+            ScrollerInitActions();
         }
 
         // Called from Form1_Shown, so events are raised on the UI thread
@@ -406,13 +406,18 @@ namespace XMMTwrapper1
             if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked) _pendingAction = null;
         }
 
-        private void cmsScrollerInitActions()
+        private void ScrollerInitActions()
         {
             cmsScrollerMenuDeleteLane.Click += (s, e) => { if (RxTextScroller.SelectedLane is { } l) RxTextScroller.Model.RemoveLane(l); };
             cmsScrollerMenuDeleteAll.Click += (s, e) => { RxTextScroller.Model.Clear(); };
             cmsScrollerMenuCopyLane.Click += (s, e) => { RxTextScroller.CopySelectedLane(); };
             cmsScrollerMenuCopyAll.Click += (s, e) => { RxTextScroller.CopyAllLanes(header: true); };
             cmsScrollerMenuCopyText.Click += (s, e) => { if (RxTextScroller.SelectedLane is { } l) RxTextScroller.CopyLaneTextOnly(l); };
+
+            RxTextScroller.HeaderClicked += e =>
+            {
+                if (e.Button == MouseButtons.Left) RxTextScroller.Unpause();
+            };
         }
 
         private void cbShowTimeLine_CheckedChanged(object sender, EventArgs e)

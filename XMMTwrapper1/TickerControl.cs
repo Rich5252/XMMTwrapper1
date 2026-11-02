@@ -35,6 +35,11 @@ namespace XMMTwrapper1
         /// SelectedLane == null.
         public event Action<TickerLane, string?, MouseEventArgs>? LaneRightClicked;
 
+        /// A title row (the column titles, or in timeline mode the time ruler) was clicked, with
+        /// either mouse button - check e.Button. A handy place to un-pause:
+        ///     ticker.HeaderClicked += e => { if (e.Button == MouseButtons.Left) ticker.Unpause(); };
+        public event Action<MouseEventArgs>? HeaderClicked;
+
         // ---- appearance ---------------------------------------------------------------------
 
         [Category("Appearance"), DefaultValue(true)]
@@ -148,6 +153,10 @@ namespace XMMTwrapper1
             Invalidate();
         }
 
+        /// True while the view is scrolled back and no longer following live.
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool IsPaused => !_follow;
+
         /// Scrolls every lane back to the live (newest) end.
         public void ScrollToLive()
         {
@@ -155,6 +164,9 @@ namespace XMMTwrapper1
             UpdateScrollBars();
             Invalidate();
         }
+
+        /// Resumes following live. Same as ScrollToLive.
+        public void Unpause() => ScrollToLive();
 
         // ---- implementation -----------------------------------------------------------------
 
@@ -481,6 +493,13 @@ namespace XMMTwrapper1
             Focus();
 
             ClickedWord = null;
+            if (e.Y >= 0 && e.Y < HeaderH)
+            {
+                SelectedLane = null;
+                Invalidate();
+                HeaderClicked?.Invoke(e);
+                return;
+            }
             int rowIndex = (e.Y - HeaderH) / _rowH;
             int idx = (_vbar.Visible ? _vbar.Value : 0) + rowIndex;
             if (e.Y < HeaderH || rowIndex < 0 || rowIndex >= VisibleRows || idx >= Model.Lanes.Count)
