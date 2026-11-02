@@ -253,6 +253,23 @@ namespace XMMTwrapper1
 
         public static bool LooksLikeCall(string word) => CallShape.IsMatch(word);
 
+        /// Your own call(s). A message that is YOUR transmission (the decoder hears it too) must not
+        /// set the lane's call, so these are never taken as the sender. Case-insensitive; a
+        /// portable form (G4AHN/P) matches too.  e.g. Model.IgnoreCalls.Add("G4AHN");
+        public ISet<string> IgnoreCalls { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // A call straight after one of these is who is being addressed, not the sender
+        // ("TU NOW G4AHN 599 011" = next caller). Compared with the preceding word.
+        private static readonly HashSet<string> NotSenderCues = new() { "NOW", "TO" };
+
+        private bool IsIgnored(string w)
+        {
+            if (IgnoreCalls.Count == 0) return false;
+            if (IgnoreCalls.Contains(w)) return true;
+            int slash = w.IndexOf('/');
+            return slash > 0 && IgnoreCalls.Contains(w.Substring(0, slash));
+        }
+
         // A word counts as a call only if it has the right shape AND (when set) CallFinder accepts it.
         // CallFinder MUST be stateless (whole word in, bool-ish out). Do not wire in the char-stream
         // ITU_Prefix_Checker.IsCallsign here: it keeps a static buffer and glues words together.
@@ -260,49 +277,77 @@ namespace XMMTwrapper1
         private bool IsCall(string w) =>
             LooksLikeCall(w) && (CallFinder == null || !string.IsNullOrEmpty(CallFinder(w)));
 
-        // Whole words only. Rules, strongest first (the latest match in the message wins):
+        // Whole words only. Rules, strongest first (the latest match wins):
         //   1. DE <call>              -> sender
         //   2. CQ [DX|TEST|..] <call> -> sender
         //   3. <call> CQ              -> sender
         //   4. <call> <call> ...      -> second is the sender (CALLED-STN SENDER 599 nnn)
-        //   5. message is only a call (or the same call repeated)
-        // No rule matches (garbled, partial, plain text) -> the lane keeps its previous guess.
-        // While a message is still being received its last word may be unfinished, so it is ignored
-        // unless the text ends with a space or the message is complete.
+        //   5. line is only a call (or the same call repeated)
+        // Never the sender: your own calls (IgnoreCalls), a call right after NOW/TO, and any word
+        // next to a "..." (the decoder lost characters there, so the word may be cut short:
+        // "CQ DE F4MH ... K" is not F4MH).
+        // Each line of the text (CR/LF separated) is judged on its own, in order. No match ->
+        // the lane keeps its previous guess.  While a message is still being received its last
+        // word may be unfinished, so it is ignored unless the message is complete.
         private void GuessCall(TickerLane lane, string text, bool complete)
         {
-            var list = new List<string>(text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
-            if (!complete && list.Count > 0 && !char.IsWhiteSpace(text[text.Length - 1]))
-                list.RemoveAt(list.Count - 1);
-            string[] w = list.Select(x => x.Trim(',', '.', ':', ';', '!', '?')).ToArray();
-            if (w.Length == 0) return;
-            bool[] c = w.Select(IsCall).ToArray();
+            string[] lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            bool unfinished = !complete && text.Length > 0 && !char.IsWhiteSpace(text[text.Length - 1]);
+            for (int li = 0; li < lines.Length; li++)
+            {
+                string? call = GuessCallInLine(lines[li], unfinished && li == lines.Length - 1);
+                if (call != null) lane.Call = call;
+            }
+        }
+
+        private string? GuessCallInLine(string line, bool dropLast)
+        {
+            string[] tok = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+            int n = tok.Length - (dropLast && tok.Length > 0 ? 1 : 0);      // words we may use
+            if (n == 0) return null;
+
+            string[] w = tok.Select(x => x.Trim(',', '.', ':', ';', '!', '?')).ToArray();
+            bool[] gap = tok.Select(x => x.Contains("...")).ToArray();
+            var valid = new bool[n];       // looks like a call
+            var callish = new bool[n];     // ...and is whole (not next to a decoder gap)
+            var cand = new bool[n];        // ...and can be the sender
+            var mine = new bool[n];        // ...but is one of our own calls
+            for (int i = 0; i < n; i++)
+            {
+                valid[i] = !gap[i] && IsCall(w[i]);
+                callish[i] = valid[i] && !(i > 0 && gap[i - 1]) && !(i + 1 < tok.Length && gap[i + 1]);
+                mine[i] = callish[i] && IsIgnored(w[i]);
+                cand[i] = callish[i] && !mine[i] && !(i > 0 && NotSenderCues.Contains(w[i - 1]));
+            }
 
             // 1. DE <call>
-            for (int i = w.Length - 2; i >= 0; i--)
-                if (w[i] == "DE" && c[i + 1]) { lane.Call = w[i + 1]; return; }
+            for (int i = n - 2; i >= 0; i--)
+                if (w[i] == "DE" && cand[i + 1]) return w[i + 1];
 
             // 2. CQ <call>  (up to two filler words between, e.g. CQ DX CALL, CQ TEST CALL)
-            for (int i = w.Length - 2; i >= 0; i--)
+            for (int i = n - 2; i >= 0; i--)
             {
                 if (w[i] != "CQ") continue;
-                for (int j = i + 1; j < w.Length && j <= i + 3; j++)
+                for (int j = i + 1; j < n && j <= i + 3; j++)
                 {
-                    if (c[j]) { lane.Call = w[j]; return; }
                     if (w[j] == "CQ" || w[j] == "DE") break;
+                    if (valid[j]) { if (cand[j]) return w[j]; break; }
                 }
             }
 
             // 3. <call> CQ
-            for (int i = w.Length - 1; i >= 1; i--)
-                if (w[i] == "CQ" && c[i - 1]) { lane.Call = w[i - 1]; return; }
+            for (int i = n - 1; i >= 1; i--)
+                if (w[i] == "CQ" && cand[i - 1]) return w[i - 1];
 
             // 4. <call> <call>
-            for (int i = w.Length - 1; i >= 1; i--)
-                if (c[i] && c[i - 1]) { lane.Call = w[i]; return; }
+            for (int i = n - 1; i >= 1; i--)
+                if (valid[i - 1] && cand[i]) return w[i];     // first may be cut by a gap, the sender must be whole
 
             // 5. only a call (maybe repeated)
-            if (c.All(x => x) && w.Distinct().Count() == 1) lane.Call = w[0];
+            if (cand[0] && Enumerable.Range(0, n).All(i => callish[i]) && w.Take(n).Distinct().Count() == 1)
+                return w[0];
+
+            return null;
         }
     }
 

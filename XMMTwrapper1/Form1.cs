@@ -179,6 +179,7 @@ namespace XMMTwrapper1
             RxTextScroller.Model.LaneTimeout = TimeSpan.FromMinutes((double)nUpDownLaneLifeTime.Value);
             RxTextScroller.TimelineMode = cbShowTimeLine.Checked;
             RxTextScroller.TimelinePixelsPerSecond = TextToInt(_ini.GetValue("General", "TimelinePixelsPerSecond", "4"));
+            RxTextScroller.Model.IgnoreCalls.Add(_ini.GetValue("FixedSubs", "myCall", "G4AHN"));
 
             //diagnostic to explore ocx interface
             //DumpSpecDrawSignature();

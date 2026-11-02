@@ -339,8 +339,9 @@ namespace XMMTwrapper1
                 float limit = i == last ? float.MaxValue
                             : i + 1 == last ? lastX0 - 2
                             : TimeX(segs[i + 1].Start) - 2;
+                if (limit - x0 < 3) continue;       // completely covered by a newer message at this scale
                 float x1 = Math.Max(xTime, Math.Min(x0 + sg.Text.Length * _cw + 4, limit));
-                x1 = Math.Max(x1, x0 + 3);
+                x1 = Math.Min(Math.Max(x1, x0 + 3), limit);    // never run into the next message
 
                 string shown = sg.Text;
                 int fit = (int)((x1 - x0 - 4) / _cw + 0.001f);
