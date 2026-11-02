@@ -15,6 +15,8 @@ namespace XMMTwrapper1
         public long MessageId { get; internal set; }
         public string Text { get; internal set; } = "";
         public bool Complete { get; internal set; }
+        public DateTime Start { get; internal set; }             // UTC, message start (from WS hhmmss)
+        public DateTime LastUpdate { get; internal set; }        // UTC, when the latest text arrived
     }
 
     public sealed class TickerLane
@@ -99,7 +101,7 @@ namespace XMMTwrapper1
             if (lane == null)
             {
                 lane = FindLane(m.Freq) ?? NewLane(m.Freq, t);
-                seg = new TickerSegment { MessageId = m.Id };
+                seg = new TickerSegment { MessageId = m.Id, Start = ParseMessageTime(m.Time, t) };
                 lane.SegmentList.Add(seg);
                 if (lane.SegmentList.Count > MaxSegmentsPerLane)
                 {
@@ -112,6 +114,7 @@ namespace XMMTwrapper1
 
             seg!.Text = m.Text;
             seg.Complete = m.Complete;
+            seg.LastUpdate = t;
 
             lane.Freq = m.Freq;
             lane.Snr = m.Snr;
@@ -154,6 +157,35 @@ namespace XMMTwrapper1
             }
             if (changed) Changed?.Invoke();
             return changed;
+        }
+
+        /// The start time of the oldest message still held (UTC), or null if there is none.
+        public DateTime? EarliestStart()
+        {
+            DateTime? min = null;
+            foreach (var l in _lanes)
+                foreach (var sg in l.SegmentList)
+                    if (min == null || sg.Start < min) min = sg.Start;
+            return min;
+        }
+
+        /// WS sends the message start as hhmmss UTC. Converts it to a DateTime next to `nowUtc`:
+        /// handles midnight rollover, never returns the future, and falls back to `nowUtc` if the
+        /// text is bad or more than 30 minutes old (a live message cannot be that old - this
+        /// happens when WS replays a recording).
+        public static DateTime ParseMessageTime(string? hhmmss, DateTime nowUtc)
+        {
+            nowUtc = DateTime.SpecifyKind(nowUtc, DateTimeKind.Utc);
+            if (hhmmss == null || hhmmss.Length != 6 ||
+                !int.TryParse(hhmmss.AsSpan(0, 2), out int h) ||
+                !int.TryParse(hhmmss.AsSpan(2, 2), out int mi) ||
+                !int.TryParse(hhmmss.AsSpan(4, 2), out int sec) ||
+                h > 23 || mi > 59 || sec > 59) return nowUtc;
+            DateTime d = nowUtc.Date.AddHours(h).AddMinutes(mi).AddSeconds(sec);
+            if (d > nowUtc.AddMinutes(1)) d = d.AddDays(-1);        // just after midnight
+            if (d > nowUtc) d = nowUtc;
+            if (nowUtc - d > TimeSpan.FromMinutes(30)) d = nowUtc;
+            return d;
         }
 
         /// Deletes a lane and its text. If a message that was still being received on it sends
@@ -272,5 +304,39 @@ namespace XMMTwrapper1
             // 5. only a call (maybe repeated)
             if (c.All(x => x) && w.Distinct().Count() == 1) lane.Call = w[0];
         }
+    }
+
+    /// Pure helpers for the timeline view (kept out of the control so they can be tested).
+    public static class TickerTimeline
+    {
+        private static readonly int[] Steps = { 1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600 };
+        private static readonly DateTime Epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        /// Smallest tick spacing in seconds that is at least `minPixels` wide at `pxPerSec`.
+        public static int ChooseStep(double pxPerSec, int minPixels)
+        {
+            foreach (int st in Steps) if (st * pxPerSec >= minPixels) return st;
+            return Steps[Steps.Length - 1];
+        }
+
+        /// Tick times in [from, to], aligned to multiples of `stepSec` of UTC time.
+        public static IEnumerable<DateTime> Ticks(DateTime from, DateTime to, int stepSec)
+        {
+            if (stepSec <= 0 || to < from) yield break;
+            long first = (long)Math.Ceiling((from - Epoch).TotalSeconds / stepSec) * stepSec;
+            for (long sec = first; ; sec += stepSec)
+            {
+                DateTime t = Epoch.AddSeconds(sec);
+                if (t > to) yield break;
+                yield return t;
+            }
+        }
+
+        public static string Label(DateTime t, int stepSec) =>
+            t.ToString(stepSec < 60 ? "HH:mm:ss" : "HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+
+        /// x position of time `t` when the right edge of the view (x = rightX) shows `rightEdge`.
+        public static float TimeToX(DateTime t, DateTime rightEdge, float rightX, double pxPerSec) =>
+            rightX - (float)((rightEdge - t).TotalSeconds * pxPerSec);
     }
 }

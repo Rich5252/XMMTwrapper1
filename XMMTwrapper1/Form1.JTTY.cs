@@ -422,5 +422,10 @@ namespace XMMTwrapper1
             cmsScrollerMenuCopyAll.Click += (s, e) => { RxTextScroller.CopyAllLanes(header: true); };
             cmsScrollerMenuCopyText.Click += (s, e) => { if (RxTextScroller.SelectedLane is { } l) RxTextScroller.CopyLaneTextOnly(l); };
         }
+
+        private void cbShowTimeLine_CheckedChanged(object sender, EventArgs e)
+        {
+            RxTextScroller.TimelineMode = cbShowTimeLine.Checked ? true : false;
+        }
     }   
 }

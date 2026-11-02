@@ -174,6 +174,7 @@ namespace XMMTwrapper1
             cmsLogSaveMenuLogQSO = new ToolStripMenuItem();
             cmsLogSaveMenuClearLog = new ToolStripMenuItem();
             cmsLogSaveMenuCancel = new ToolStripMenuItem();
+            cbShowTimeLine = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)axxmmxy1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axxmmWater1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)axXMMR1).BeginInit();
@@ -1331,6 +1332,7 @@ namespace XMMTwrapper1
             // 
             // gbJTTYcontrols
             // 
+            gbJTTYcontrols.Controls.Add(cbShowTimeLine);
             gbJTTYcontrols.Controls.Add(cbAutoFtol);
             gbJTTYcontrols.Controls.Add(cbResetOnCQ);
             gbJTTYcontrols.Controls.Add(btnResetRxFreq);
@@ -1627,6 +1629,18 @@ namespace XMMTwrapper1
             cmsLogSaveMenuCancel.Text = "No Action";
             cmsLogSaveMenuCancel.Click += cmsLogSaveMenuCancel_Click;
             // 
+            // cbShowTimeLine
+            // 
+            cbShowTimeLine.AutoSize = true;
+            cbShowTimeLine.CheckAlign = ContentAlignment.MiddleRight;
+            cbShowTimeLine.Location = new Point(80, 110);
+            cbShowTimeLine.Name = "cbShowTimeLine";
+            cbShowTimeLine.Size = new Size(74, 19);
+            cbShowTimeLine.TabIndex = 74;
+            cbShowTimeLine.Text = "TimeLine";
+            cbShowTimeLine.UseVisualStyleBackColor = true;
+            cbShowTimeLine.CheckedChanged += cbShowTimeLine_CheckedChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1840,5 +1854,6 @@ namespace XMMTwrapper1
         private CheckBox cbAutoFtol;
         private Button btnSend16;
         private Button btnSend15;
+        private CheckBox cbShowTimeLine;
     }
 }
